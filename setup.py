@@ -8,7 +8,7 @@ setup(
     version='0.0.1',
     license='BSD-3-Clause',
     license_files=['LICENSE'],
-    description='The application to generate template format.',
+    description='The application to provide a mock device to test Geeks Trident product.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Tuyen Mathew Duong',
