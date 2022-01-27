@@ -10,6 +10,7 @@ __edition__ = 'Community'
 edition = __edition__
 
 __all__ = [
+    'Data',
     'version',
     'edition'
 ]
