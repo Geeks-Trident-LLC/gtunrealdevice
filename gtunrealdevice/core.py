@@ -2,6 +2,7 @@
 
 import yaml
 import functools
+from os import path
 
 from gtunrealdevice.config import Data
 from gtunrealdevice.exceptions import WrapperError
@@ -48,24 +49,55 @@ def check_active_device(func):
 class DevicesData(dict):
     """Devices Data class
 
-    Raises
-    ------
-    DevicesInfoError: raise exception if devices_info_file contains invalid format
+    Methods
+    load_default() -> None
+    load(filename) -> None
     """
     def __init__(self):
         super().__init__()
+
+    def load_default(self):
+        """Load devices info from ~/.geekstrident/gtunrealdevice/devices_info.yaml
+
+        Raises
+        ------
+        DevicesInfoError: raise exception if devices_info_file contains invalid format
+        """
         if not Data.is_devices_info_file_exist():
             Data.create_devices_info_file()
         with open(Data.devices_info_filename) as fh:
             data = yaml.load(fh, Loader=yaml.SafeLoader)
             if isinstance(data, dict):
+                self.clear()
                 self.update(data)
             else:
                 fmt = '{} file has an invalid format.  Check with developer.'
                 raise DevicesInfoError(fmt.format(Data.devices_info_filename))
 
+    def load(self, filename):
+        """Load devices info from user provided filename
+
+        Parameters
+        ----------
+        filename (str): a file name
+
+        Raises
+        ------
+        DevicesInfoError: raise exception if devices_info_file contains invalid format
+        """
+
+        with open(path.expanduser(filename)) as fh:
+            data = yaml.load(fh, Loader=yaml.SafeLoader)
+            if isinstance(data, dict):
+                self.clear()
+                self.update(data)
+            else:
+                fmt = '{} file has an invalid format.  Check with developer.'
+                raise DevicesInfoError(fmt.format(filename))
+
 
 DEVICES_DATA = DevicesData()
+DEVICES_DATA.load_default()
 
 
 class URDevice:
