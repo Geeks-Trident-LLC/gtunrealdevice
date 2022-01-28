@@ -1,3 +1,5 @@
+"""Module containing the logic for URDevice."""
+
 import yaml
 import functools
 
@@ -20,7 +22,8 @@ def check_active_device(func):
 
     Raises
     ------
-    WrapperError: if decorator is used incorrectly
+    WrapperError: raise exception when decorator is incorrectly used
+    URDeviceOfflineError: raise exception when unreal device is offline
     """
     @functools.wraps(func)
     def wrapper_func(*args, **kwargs):
@@ -95,6 +98,7 @@ class URDevice:
         self.__dict__.update(**kwargs)
         self._is_connected = False
         self.data = None
+        self.table = dict()
 
     @property
     def is_connected(self):
@@ -102,7 +106,7 @@ class URDevice:
         return self._is_connected
 
     def connect(self, **kwargs):
-        """Connect GT Unreal Device
+        """Connect an unreal device
 
         Parameters
         ----------
@@ -127,7 +131,7 @@ class URDevice:
             raise URDeviceConnectionError(fmt.format(self.name))
 
     def disconnect(self, **kwargs):
-        """Disconnect GT Unreal Device
+        """Disconnect an unreal device
 
         Parameters
         ----------
@@ -145,7 +149,7 @@ class URDevice:
 
     @check_active_device
     def execute(self, cmdline, **kwargs):
-        """Execute command line for GT Unreal Device
+        """Execute command line for an unreal device
 
         Parameters
         ----------
@@ -162,14 +166,22 @@ class URDevice:
             data = self.data.get('testcases').get(self.testcase, data)
 
         no_output = '*** "{}" does not have output ***'.format(cmdline)
-        output = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        result = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        if not isinstance(result, (list, tuple)):
+            output = str(result)
+        else:
+            index = 0 if cmdline not in self.table else self.table.get(cmdline) + 1
+            index = index % len(result)
+            self.table.update({cmdline: index})
+            output = result[index]
+
         if kwargs.get('showed', True):
-            print(output)
-        return output
+            print(str(output))
+        return str(output)
 
     @check_active_device
     def configure(self, config, **kwargs):
-        """Configure GT Unreal Device
+        """Configure an unreal device
 
         Parameters
         ----------
@@ -187,7 +199,7 @@ class URDevice:
 
 
 def create(address, name='', **kwargs):
-    """Create GT Unreal Device instance
+    """Create an unreal device instance
 
     Parameters
     ----------
@@ -197,17 +209,18 @@ def create(address, name='', **kwargs):
 
     Returns
     -------
-    URDevice: GT Unreal Device instance.
+    URDevice: an unreal device instance.
     """
     device = URDevice(address, name=name, **kwargs)
     return device
 
 
 def connect(device, **kwargs):
-    """Connect GT Unreal Device
+    """Connect an unreal device
 
     Parameters
     ----------
+    device (URDevice): an Unreal device instance
     kwargs (dict): keyword arguments
 
     Returns
@@ -219,10 +232,11 @@ def connect(device, **kwargs):
 
 
 def disconnect(device, **kwargs):
-    """Disconnect GT Unreal Device
+    """Disconnect an unreal device
 
     Parameters
     ----------
+    device (URDevice): an Unreal device instance
     kwargs (dict): keyword arguments
 
     Returns
@@ -234,10 +248,11 @@ def disconnect(device, **kwargs):
 
 
 def execute(device, cmdline, **kwargs):
-    """Execute command line for GT Unreal Device
+    """Execute command line foran unreal device
 
     Parameters
     ----------
+    device (URDevice): an Unreal device instance
     cmdline (str): command line
     kwargs (dict): keyword arguments
 
@@ -250,10 +265,11 @@ def execute(device, cmdline, **kwargs):
 
 
 def configure(device, config, **kwargs):
-    """Configure GT Unreal Device
+    """Configure an unreal device
 
     Parameters
     ----------
+    device (URDevice): an Unreal device instance
     config (str): configuration data for device
     kwargs (dict): keyword arguments
 
