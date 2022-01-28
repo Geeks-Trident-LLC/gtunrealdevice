@@ -20,7 +20,7 @@ class Application:
             +--------------------------------------------------------------------------------------+
             | Geeks Trident team will announce when GUI application will be available.             |
             +--------------------------------------------------------------------------------------+
-        """.format('GTUnrealDevice version {} {}'.format(version, edition))
+        """.format('GTUnrealDevice Version {} {} Edition'.format(version, edition))
         from textwrap import dedent
         import sys
         print(dedent(data))
