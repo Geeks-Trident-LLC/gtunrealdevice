@@ -1,3 +1,5 @@
+"""Module containing the logic for URDevice."""
+
 import yaml
 import functools
 
@@ -96,6 +98,7 @@ class URDevice:
         self.__dict__.update(**kwargs)
         self._is_connected = False
         self.data = None
+        self.table = dict()
 
     @property
     def is_connected(self):
@@ -163,10 +166,18 @@ class URDevice:
             data = self.data.get('testcases').get(self.testcase, data)
 
         no_output = '*** "{}" does not have output ***'.format(cmdline)
-        output = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        result = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        if not isinstance(result, (list, tuple)):
+            output = str(result)
+        else:
+            index = 0 if cmdline not in self.table else self.table.get(cmdline) + 1
+            index = index % len(result)
+            self.table.update({cmdline: index})
+            output = result[index]
+
         if kwargs.get('showed', True):
-            print(output)
-        return output
+            print(str(output))
+        return str(output)
 
     @check_active_device
     def configure(self, config, **kwargs):
