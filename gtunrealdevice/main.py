@@ -58,8 +58,8 @@ class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
     prog_fn = 'geeks-trident-unreal-device-app'
-    commands = ['app', 'check', 'config', 'create', 'dependency',
-                'execute', 'gui', 'info', 'load', 'reset', 'version']
+    commands = ['app', 'check', 'configure', 'create', 'dependency',
+                'execute', 'gui', 'info', 'load', 'reset', 'update', 'version']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -75,8 +75,8 @@ class Cli:
 
         parser.add_argument(
             'command', type=str,
-            help='command must be either app, check, config, dependency, '
-                 'execute, gui, info, load, reset, or version'
+            help='command must be either app, check, configure, create,'
+                 'dependency, execute, gui, info, load, reset, update, or version'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -93,8 +93,8 @@ class Cli:
         Returns
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
-        command is not  app, check, config, dependency, execute, gui, info,
-        load, reset, or version, otherwise, return True
+        command is not  app, check, configure, create, dependency, execute, gui,
+        info, load, reset, update, or version, otherwise, return True
         """
         self.options.command = self.options.command.lower()
 
