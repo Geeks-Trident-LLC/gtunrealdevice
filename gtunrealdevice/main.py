@@ -25,6 +25,29 @@ def run_gui_application(options):
         sys.exit(0)
 
 
+def show_dependency(options):
+    if options.command == 'dependency':
+        from platform import uname, python_version
+        from gtunrealdevice.config import Data
+        lst = [
+            Data.main_app_text,
+            'Platform: {0.system} {0.release} - Python {1}'.format(
+                uname(), python_version()
+            ),
+            '--------------------',
+            'Dependencies:'
+        ]
+
+        for pkg in Data.get_dependency().values():
+            lst.append('  + Package: {0[package]}'.format(pkg))
+            lst.append('             {0[url]}'.format(pkg))
+
+        width = max(len(item) for item in lst)
+        txt = '\n'.join('| {1:{0}} |'.format(width, item) for item in lst)
+        print('+-{0}-+\n{1}\n+-{0}-+'.format(width * '-', txt))
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
@@ -79,6 +102,7 @@ class Cli:
         """Take CLI arguments, parse it, and process."""
         self.validate_command()
         run_gui_application(self.options)
+        show_dependency(self.options)
 
 
 def execute():
