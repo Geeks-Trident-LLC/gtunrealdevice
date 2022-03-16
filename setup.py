@@ -29,12 +29,12 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'unrealdevice = gtunrealdevice.application:execute',
-            'unreal-device = gtunrealdevice.application:execute',
-            'gtunrealdevice = gtunrealdevice.application:execute',
-            'gt-unreal-device = gtunrealdevice.application:execute',
-            'gtdevice = gtunrealdevice.application:execute',
-            'gt-device = gtunrealdevice.application:execute',
+            'unrealdevice = gtunrealdevice.main:execute',
+            'unreal-device = gtunrealdevice.main:execute',
+            'gtunrealdevice = gtunrealdevice.main:execute',
+            'gt-unreal-device = gtunrealdevice.main:execute',
+            'gtdevice = gtunrealdevice.main:execute',
+            'gt-device = gtunrealdevice.main:execute',
         ]
     },
     classifiers=[
