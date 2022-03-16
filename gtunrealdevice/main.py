@@ -48,6 +48,12 @@ def show_dependency(options):
         sys.exit(0)
 
 
+def show_version(options):
+    if options.command == 'version':
+        print('{} v{}'.format(Cli.prog, version))
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
@@ -103,6 +109,7 @@ class Cli:
         self.validate_command()
         run_gui_application(self.options)
         show_dependency(self.options)
+        show_version(self.options)
 
 
 def execute():
