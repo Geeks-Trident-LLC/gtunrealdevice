@@ -65,14 +65,16 @@ class DevicesData(dict):
         """
         if not Data.is_devices_info_file_exist():
             Data.create_devices_info_file()
-        with open(Data.devices_info_filename) as fh:
-            data = yaml.load(fh, Loader=yaml.SafeLoader)
-            if isinstance(data, dict):
-                self.clear()
-                self.update(data)
-            else:
-                fmt = '{} file has an invalid format.  Check with developer.'
-                raise DevicesInfoError(fmt.format(Data.devices_info_filename))
+        with open(Data.devices_info_filename) as stream:
+            content = stream.read()
+            if content.strip():
+                data = yaml.load(content, Loader=yaml.SafeLoader)
+                if isinstance(data, dict):
+                    self.clear()
+                    self.update(data)
+                else:
+                    fmt = '{} file has an invalid format.  Check with developer.'
+                    raise DevicesInfoError(fmt.format(Data.devices_info_filename))
 
     def load(self, filename):
         """Load devices info from user provided filename
@@ -86,14 +88,16 @@ class DevicesData(dict):
         DevicesInfoError: raise exception if devices_info_file contains invalid format
         """
 
-        with open(path.expanduser(filename)) as fh:
-            data = yaml.load(fh, Loader=yaml.SafeLoader)
-            if isinstance(data, dict):
-                self.clear()
-                self.update(data)
-            else:
-                fmt = '{} file has an invalid format.  Check with developer.'
-                raise DevicesInfoError(fmt.format(filename))
+        with open(path.expanduser(filename)) as stream:
+            content = stream.read()
+            if content.strip():
+                data = yaml.load(content, Loader=yaml.SafeLoader)
+                if isinstance(data, dict):
+                    self.clear()
+                    self.update(data)
+                else:
+                    fmt = '{} file has an invalid format.  Check with developer.'
+                    raise DevicesInfoError(fmt.format(filename))
 
 
 DEVICES_DATA = DevicesData()
