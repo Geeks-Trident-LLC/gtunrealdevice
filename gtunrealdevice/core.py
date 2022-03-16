@@ -1,4 +1,5 @@
 """Module containing the logic for URDevice."""
+import re
 
 import yaml
 import functools
@@ -98,6 +99,61 @@ class DevicesData(dict):
                 else:
                     fmt = '{} file has an invalid format.  Check with developer.'
                     raise DevicesInfoError(fmt.format(filename))
+
+    def get_data(self, data):       # noqa
+        pattern = r'(?i) *file(name)?:: *(?P<fn>[^\r\n]*[a-z][^\r\n]*) *$'
+        match = re.match(pattern, data)
+        if match and len(data.strip()) == 1:
+            try:
+                with open(match.group('fn')) as stream:
+                    result = stream.read()
+            except Exception as ex:     # noqa
+                result = data
+        else:
+            result = data
+        return result
+
+    def update_command_line(self, cmdline, output, device,
+                            testcase='', appended=False):
+
+        output = self.get_data(output)
+
+        if testcase:
+            if device in self:
+                testcases = self[device].get('testcases', dict())
+                if testcase in testcases:
+                    if appended:
+                        if cmdline in testcases[testcase]:
+                            value = testcases[testcase][cmdline]
+                            if isinstance(value, list):
+                                value.append(output)
+                            else:
+                                testcases[testcase][cmdline] = [value, output]
+                        else:
+                            testcases[testcase][cmdline] = output
+                    else:
+                        testcases[testcase][cmdline] = output
+                else:
+                    testcases[testcase] = {cmdline: output}
+                testcases and self[device].update(testcases=testcases)
+            else:
+                self[device] = dict(testcases={testcase: {cmdline: output}})
+        else:
+            if device in self:
+                cmdlines = self[device].get('cmdlines', dict())
+                if cmdline in cmdlines:
+                    if appended:
+                        if isinstance(cmdlines[cmdline], list):
+                            cmdlines[cmdline].append(output)
+                        else:
+                            cmdlines[cmdline] = [cmdlines[cmdline], output]
+                    else:
+                        cmdlines[cmdline] = output
+                else:
+                    cmdlines[cmdline] = output
+                cmdlines and self[device].update(cmdlines=cmdlines)
+            else:
+                self[device] = dict(cmdlines={cmdline: output})
 
 
 DEVICES_DATA = DevicesData()
