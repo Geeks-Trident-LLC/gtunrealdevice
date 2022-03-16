@@ -3,6 +3,7 @@
 from pathlib import Path
 from pathlib import PurePath
 from datetime import datetime
+import yaml
 
 __version__ = '0.0.2'
 version = __version__
@@ -46,3 +47,14 @@ class Data:
         fmt = '{:%Y-%m-%d %H:%M:%S.%f} - {} file is created.'
         print(fmt.format(datetime.now(), fn))
         return True
+
+    @classmethod
+    def get_dependency(cls):
+        dependencies = dict(
+            pyyaml=dict(
+                package='pyyaml v{}'.format(yaml.__version__),
+                url='https://pypi.org/project/PyYAML/'
+            ),
+        )
+
+        return dependencies
