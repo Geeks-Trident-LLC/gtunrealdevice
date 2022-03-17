@@ -6,6 +6,7 @@ import argparse
 from gtunrealdevice.application import Application
 from gtunrealdevice.config import version
 from gtunrealdevice.core import DEVICES_DATA
+from gtunrealdevice.utils import Printer
 
 
 def run_gui_application(options):
@@ -43,9 +44,7 @@ def show_dependency(options):
             lst.append('  + Package: {0[package]}'.format(pkg))
             lst.append('             {0[url]}'.format(pkg))
 
-        width = max(len(item) for item in lst)
-        txt = '\n'.join('| {1:{0}} |'.format(width, item) for item in lst)
-        print('+-{0}-+\n{1}\n+-{0}-+'.format(width * '-', txt))
+        Printer.print(lst)
         sys.exit(0)
 
 
