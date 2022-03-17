@@ -1,10 +1,11 @@
 """Module containing the logic for the gtunrealdevice entry-points."""
-
+import re
 import sys
 import argparse
 
 from gtunrealdevice.application import Application
 from gtunrealdevice.config import version
+from gtunrealdevice.core import DEVICES_DATA
 
 
 def run_gui_application(options):
@@ -54,12 +55,29 @@ def show_version(options):
         sys.exit(0)
 
 
+def show_device_info(options):
+    if options.command == 'view':
+        kwargs = dict()
+        pattern = r'(?i) *(?P<key>testcases?|cmdlines|device)::(?P<value>.*)?'
+        for item in options.operands:
+            match = re.match(pattern, item)
+            if match:
+                key = match.group('key')
+                if key == 'testcases' or key == 'cmdlines':
+                    kwargs[key] = True
+                else:
+                    kwargs[key] = match.group('value').strip()
+
+        DEVICES_DATA.view(**kwargs)
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
     prog_fn = 'geeks-trident-unreal-device-app'
-    commands = ['app', 'check', 'configure', 'create', 'dependency',
-                'execute', 'gui', 'info', 'load', 'reset', 'update', 'version']
+    commands = ['app', 'check', 'configure', 'create', 'dependency', 'execute',
+                'gui', 'info', 'load', 'reset', 'save', 'update', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -76,7 +94,8 @@ class Cli:
         parser.add_argument(
             'command', type=str,
             help='command must be either app, check, configure, create,'
-                 'dependency, execute, gui, info, load, reset, update, or version'
+                 'dependency, execute, gui, info, load, reset, save, update, '
+                 'version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -94,7 +113,7 @@ class Cli:
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, check, configure, create, dependency, execute, gui,
-        info, load, reset, update, or version, otherwise, return True
+        info, load, reset, save, update, version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
 
@@ -102,7 +121,6 @@ class Cli:
             return True
         self.parser.print_help()
         sys.exit(1)
-        return True
 
     def run(self):
         """Take CLI arguments, parse it, and process."""
@@ -110,6 +128,7 @@ class Cli:
         run_gui_application(self.options)
         show_dependency(self.options)
         show_version(self.options)
+        show_device_info(self.options)
 
 
 def execute():
