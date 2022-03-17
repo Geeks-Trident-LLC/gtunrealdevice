@@ -71,6 +71,33 @@ def show_device_info(options):
         sys.exit(0)
 
 
+def show_info(options):
+    if options.command == 'info':
+        from platform import uname, python_version
+        from gtunrealdevice.config import Data
+        lst = [
+            Data.main_app_text,
+            'Platform: {0.system} {0.release} - Python {1}'.format(
+                uname(), python_version()
+            ),
+            '--------------------',
+            'Dependencies:'
+        ]
+
+        for pkg in Data.get_dependency().values():
+            lst.append('  + Package: {0[package]}'.format(pkg))
+            lst.append('             {0[url]}'.format(pkg))
+
+        lst.append('--------------------')
+
+        lst.append('Device Info Location(s):')
+        lst.extend(['  - {}'.format(fn) for fn in DEVICES_DATA.filenames])
+        lst.extend(['==========', 'total devices is {}'.format(len(DEVICES_DATA))])
+
+        Printer.print(lst)
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
@@ -127,6 +154,7 @@ class Cli:
         run_gui_application(self.options)
         show_dependency(self.options)
         show_version(self.options)
+        show_info(self.options)
         show_device_info(self.options)
 
 
