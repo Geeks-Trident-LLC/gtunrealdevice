@@ -162,7 +162,8 @@ class DevicesData(dict):
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
         lst = ['Device Info Location(s):']
         lst.extend(['  - {}'.format(fn) for fn in self.filenames])
-        lst.extend(['==========', 'total devices is {}'.format(len(self))])
+        lst.extend(['==========',
+                    'Total number of devices is {}'.format(len(self))])
         Printer.print(lst)
 
         if not self:
@@ -194,7 +195,7 @@ class DevicesData(dict):
                                 if node:
                                     print(yaml.dump(node))
                                 else:
-                                    fmt = 'there is no cmdlines section in {!r} device.'
+                                    fmt = 'There is no cmdlines section in {!r} device.'
                                     print(fmt.format(device))
                         else:
                             print(yaml.dump(self[device]))

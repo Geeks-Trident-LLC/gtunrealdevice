@@ -66,6 +66,12 @@ def show_device_info(options):
                     kwargs[key] = True
                 else:
                     kwargs[key] = match.group('value').strip()
+            else:
+                if item in DEVICES_DATA:
+                    kwargs['device'] = item
+                else:
+                    if not kwargs.get('device', ''):
+                        kwargs['device'] = item
 
         DEVICES_DATA.view(**kwargs)
         sys.exit(0)
@@ -92,7 +98,8 @@ def show_info(options):
 
         lst.append('Device Info Location(s):')
         lst.extend(['  - {}'.format(fn) for fn in DEVICES_DATA.filenames])
-        lst.extend(['==========', 'total devices is {}'.format(len(DEVICES_DATA))])
+        lst.extend(['==========',
+                    'Total number of devices is {}'.format(len(DEVICES_DATA))])
 
         Printer.print(lst)
         sys.exit(0)
