@@ -1,4 +1,5 @@
 """Module containing the logic for URDevice."""
+import re
 
 import yaml
 import functools
@@ -9,6 +10,8 @@ from gtunrealdevice.exceptions import WrapperError
 from gtunrealdevice.exceptions import DevicesInfoError
 from gtunrealdevice.exceptions import URDeviceConnectionError
 from gtunrealdevice.exceptions import URDeviceOfflineError
+
+from gtunrealdevice.utils import Printer
 
 
 def check_active_device(func):
@@ -55,6 +58,7 @@ class DevicesData(dict):
     """
     def __init__(self):
         super().__init__()
+        self.filenames = [Data.devices_info_filename]
 
     def load_default(self):
         """Load devices info from ~/.geekstrident/gtunrealdevice/devices_info.yaml
@@ -65,14 +69,16 @@ class DevicesData(dict):
         """
         if not Data.is_devices_info_file_exist():
             Data.create_devices_info_file()
-        with open(Data.devices_info_filename) as fh:
-            data = yaml.load(fh, Loader=yaml.SafeLoader)
-            if isinstance(data, dict):
-                self.clear()
-                self.update(data)
-            else:
-                fmt = '{} file has an invalid format.  Check with developer.'
-                raise DevicesInfoError(fmt.format(Data.devices_info_filename))
+        with open(Data.devices_info_filename) as stream:
+            content = stream.read()
+            if content.strip():
+                data = yaml.load(content, Loader=yaml.SafeLoader)
+                if isinstance(data, dict):
+                    self.clear()
+                    self.update(data)
+                else:
+                    fmt = '{} file has an invalid format.  Check with developer.'
+                    raise DevicesInfoError(fmt.format(Data.devices_info_filename))
 
     def load(self, filename):
         """Load devices info from user provided filename
@@ -86,14 +92,115 @@ class DevicesData(dict):
         DevicesInfoError: raise exception if devices_info_file contains invalid format
         """
 
-        with open(path.expanduser(filename)) as fh:
-            data = yaml.load(fh, Loader=yaml.SafeLoader)
-            if isinstance(data, dict):
-                self.clear()
-                self.update(data)
+        with open(path.expanduser(filename)) as stream:
+            filename not in self.filenames and self.filenames.append(filename)
+            content = stream.read()
+            if content.strip():
+                data = yaml.load(content, Loader=yaml.SafeLoader)
+                if isinstance(data, dict):
+                    self.clear()
+                    self.update(data)
+                else:
+                    fmt = '{} file has an invalid format.  Check with developer.'
+                    raise DevicesInfoError(fmt.format(filename))
+
+    def get_data(self, data):       # noqa
+        pattern = r'(?i) *file(name)?:: *(?P<fn>[^\r\n]*[a-z][^\r\n]*) *$'
+        match = re.match(pattern, data)
+        if match and len(data.strip()) == 1:
+            try:
+                with open(match.group('fn')) as stream:
+                    result = stream.read()
+            except Exception as ex:     # noqa
+                result = data
+        else:
+            result = data
+        return result
+
+    def update_command_line(self, cmdline, output, device,
+                            testcase='', appended=False):
+
+        output = self.get_data(output)
+
+        if testcase:
+            if device in self:
+                testcases = self[device].get('testcases', dict())
+                if testcase in testcases:
+                    if appended:
+                        if cmdline in testcases[testcase]:
+                            value = testcases[testcase][cmdline]
+                            if isinstance(value, list):
+                                value.append(output)
+                            else:
+                                testcases[testcase][cmdline] = [value, output]
+                        else:
+                            testcases[testcase][cmdline] = output
+                    else:
+                        testcases[testcase][cmdline] = output
+                else:
+                    testcases[testcase] = {cmdline: output}
+                testcases and self[device].update(testcases=testcases)
             else:
-                fmt = '{} file has an invalid format.  Check with developer.'
-                raise DevicesInfoError(fmt.format(filename))
+                self[device] = dict(testcases={testcase: {cmdline: output}})
+        else:
+            if device in self:
+                cmdlines = self[device].get('cmdlines', dict())
+                if cmdline in cmdlines:
+                    if appended:
+                        if isinstance(cmdlines[cmdline], list):
+                            cmdlines[cmdline].append(output)
+                        else:
+                            cmdlines[cmdline] = [cmdlines[cmdline], output]
+                    else:
+                        cmdlines[cmdline] = output
+                else:
+                    cmdlines[cmdline] = output
+                cmdlines and self[device].update(cmdlines=cmdlines)
+            else:
+                self[device] = dict(cmdlines={cmdline: output})
+
+    def view(self, device='', cmdlines=False, testcase='', testcases=False):
+        lst = ['File Locations:']
+        lst.extend(['  - {}'.format(fn) for fn in self.filenames])
+        lst.extend(['==========', 'total devices is {}'.format(len(self))])
+        Printer.print(lst)
+
+        if any([device, cmdlines, testcase, testcases]):
+            if device:
+                if device in self:
+                    tcs = self[device].get('testcases', None)
+                    if testcase:
+                        if tcs and testcase in tcs:
+                            print(yaml.dump(tcs[testcase]))
+                        elif tcs and testcase not in tcs:
+                            fmt = 'There is no {} test case in {!r} device'
+                            print(fmt.format(testcase, device))
+                        else:
+                            fmt = 'There is no testcases section in {!r} device'
+                            print(fmt.format(device))
+                    else:
+                        if testcases or cmdlines:
+                            if testcases:
+                                if tcs:
+                                    print(yaml.dump(tcs))
+                                else:
+                                    fmt = 'There is no testcases section in {!r} device'
+                                    print(fmt.format(device))
+                            else:
+                                node = self[device].get('cmdlines', None)
+                                if node:
+                                    print(yaml.dump(node))
+                                else:
+                                    fmt = 'there is no cmdlines section in {!r} device'
+                                    print(fmt.format(device))
+                        else:
+                            print(yaml.dump(self[device]))
+                else:
+                    print('There is no {!r} device'.format(device))
+            else:
+                self and print(yaml.dump(self))
+        else:
+            self and print(yaml.dump(self))
 
 
 DEVICES_DATA = DevicesData()
