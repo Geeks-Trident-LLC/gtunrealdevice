@@ -11,6 +11,8 @@ from gtunrealdevice.exceptions import DevicesInfoError
 from gtunrealdevice.exceptions import URDeviceConnectionError
 from gtunrealdevice.exceptions import URDeviceOfflineError
 
+from gtunrealdevice.utils import Printer
+
 
 def check_active_device(func):
     """Wrapper for URDevice methods.
@@ -56,6 +58,7 @@ class DevicesData(dict):
     """
     def __init__(self):
         super().__init__()
+        self.filenames = [Data.devices_info_filename]
 
     def load_default(self):
         """Load devices info from ~/.geekstrident/gtunrealdevice/devices_info.yaml
@@ -90,6 +93,7 @@ class DevicesData(dict):
         """
 
         with open(path.expanduser(filename)) as stream:
+            filename not in self.filenames and self.filenames.append(filename)
             content = stream.read()
             if content.strip():
                 data = yaml.load(content, Loader=yaml.SafeLoader)
@@ -154,6 +158,49 @@ class DevicesData(dict):
                 cmdlines and self[device].update(cmdlines=cmdlines)
             else:
                 self[device] = dict(cmdlines={cmdline: output})
+
+    def view(self, device='', cmdlines=False, testcase='', testcases=False):
+        lst = ['File Locations:']
+        lst.extend(['  - {}'.format(fn) for fn in self.filenames])
+        lst.extend(['==========', 'total devices is {}'.format(len(self))])
+        Printer.print(lst)
+
+        if any([device, cmdlines, testcase, testcases]):
+            if device:
+                if device in self:
+                    tcs = self[device].get('testcases', None)
+                    if testcase:
+                        if tcs and testcase in tcs:
+                            print(yaml.dump(tcs[testcase]))
+                        elif tcs and testcase not in tcs:
+                            fmt = 'There is no {} test case in {!r} device'
+                            print(fmt.format(testcase, device))
+                        else:
+                            fmt = 'There is no testcases section in {!r} device'
+                            print(fmt.format(device))
+                    else:
+                        if testcases or cmdlines:
+                            if testcases:
+                                if tcs:
+                                    print(yaml.dump(tcs))
+                                else:
+                                    fmt = 'There is no testcases section in {!r} device'
+                                    print(fmt.format(device))
+                            else:
+                                node = self[device].get('cmdlines', None)
+                                if node:
+                                    print(yaml.dump(node))
+                                else:
+                                    fmt = 'there is no cmdlines section in {!r} device'
+                                    print(fmt.format(device))
+                        else:
+                            print(yaml.dump(self[device]))
+                else:
+                    print('There is no {!r} device'.format(device))
+            else:
+                self and print(yaml.dump(self))
+        else:
+            self and print(yaml.dump(self))
 
 
 DEVICES_DATA = DevicesData()
