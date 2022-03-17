@@ -116,3 +116,16 @@ class SerializedFile:
                     fmt = "CANT remove because there is no {} in serialized file."
                     cls.message = fmt.format(name)
                     return False
+
+    @classmethod
+    def check_instance(cls, name, testcase=''):
+        tbl = cls.get_info()
+        dict_obj = tbl.get('dict_obj', dict())
+        if name in dict_obj:
+            if testcase:
+                instance = pickle.loads(dict_obj.get(name))
+                return getattr(instance, 'testcase', '') == testcase
+            else:
+                return True
+        else:
+            return False
