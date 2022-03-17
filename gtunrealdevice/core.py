@@ -160,10 +160,13 @@ class DevicesData(dict):
                 self[device] = dict(cmdlines={cmdline: output})
 
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
-        lst = ['File Locations:']
+        lst = ['Device Info Location(s):']
         lst.extend(['  - {}'.format(fn) for fn in self.filenames])
         lst.extend(['==========', 'total devices is {}'.format(len(self))])
         Printer.print(lst)
+
+        if not self:
+            print('There is zero device.')
 
         if any([device, cmdlines, testcase, testcases]):
             if device:
@@ -173,10 +176,10 @@ class DevicesData(dict):
                         if tcs and testcase in tcs:
                             print(yaml.dump(tcs[testcase]))
                         elif tcs and testcase not in tcs:
-                            fmt = 'There is no {} test case in {!r} device'
+                            fmt = 'There is no {} test case in {!r} device.'
                             print(fmt.format(testcase, device))
                         else:
-                            fmt = 'There is no testcases section in {!r} device'
+                            fmt = 'There is no testcases section in {!r} device.'
                             print(fmt.format(device))
                     else:
                         if testcases or cmdlines:
@@ -184,23 +187,23 @@ class DevicesData(dict):
                                 if tcs:
                                     print(yaml.dump(tcs))
                                 else:
-                                    fmt = 'There is no testcases section in {!r} device'
+                                    fmt = 'There is no testcases section in {!r} device.'
                                     print(fmt.format(device))
                             else:
                                 node = self[device].get('cmdlines', None)
                                 if node:
                                     print(yaml.dump(node))
                                 else:
-                                    fmt = 'there is no cmdlines section in {!r} device'
+                                    fmt = 'there is no cmdlines section in {!r} device.'
                                     print(fmt.format(device))
                         else:
                             print(yaml.dump(self[device]))
                 else:
-                    print('There is no {!r} device'.format(device))
+                    print('There is no {!r} device.'.format(device))
             else:
-                self and print(yaml.dump(self))
+                self and print(yaml.dump(dict(self)))
         else:
-            self and print(yaml.dump(self))
+            self and print(yaml.dump(dict(self)))
 
 
 DEVICES_DATA = DevicesData()
