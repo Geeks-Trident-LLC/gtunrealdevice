@@ -160,10 +160,9 @@ class DevicesData(dict):
                 self[device] = dict(cmdlines={cmdline: output})
 
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
-        lst = ['Device Info Location(s):']
-        lst.extend(['  - {}'.format(fn) for fn in self.filenames])
-        lst.extend(['==========',
-                    'Total number of devices is {}'.format(len(self))])
+        lst = ['Devices Info:']
+        lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+        lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
         Printer.print(lst)
 
         if not self:

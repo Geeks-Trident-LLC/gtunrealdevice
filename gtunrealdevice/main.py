@@ -8,6 +8,8 @@ from gtunrealdevice.config import version
 from gtunrealdevice.core import DEVICES_DATA
 from gtunrealdevice.utils import Printer
 
+from gtunrealdevice.serialization import SerializedFile
+
 
 def run_gui_application(options):
     """Run gtunrealdevice application.
@@ -96,10 +98,13 @@ def show_info(options):
 
         lst.append('--------------------')
 
-        lst.append('Device Info Location(s):')
-        lst.extend(['  - {}'.format(fn) for fn in DEVICES_DATA.filenames])
-        lst.extend(['==========',
-                    'Total number of devices is {}'.format(len(DEVICES_DATA))])
+        lst.append('Devices Info:')
+        lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+        lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
+
+        lst.append('--------------------')
+
+        lst.append(SerializedFile.get_info_text())
 
         Printer.print(lst)
         sys.exit(0)
