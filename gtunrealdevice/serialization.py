@@ -1,4 +1,4 @@
-"""Module containing the logic for URDevice(s) serialization."""
+"""Module containing the logic for UnrealDevice(s) serialization."""
 
 from pathlib import Path
 from datetime import datetime
@@ -8,7 +8,7 @@ import pickle
 from gtunrealdevice.exceptions import SerializedError
 from gtunrealdevice.exceptions import InvalidSerializedFile
 from gtunrealdevice.exceptions import InvalidSerializedInstance
-from gtunrealdevice import URDevice
+from gtunrealdevice import UnrealDevice
 
 from gtunrealdevice.config import Data
 
@@ -49,10 +49,10 @@ class SerializedFile:
                         for byte_data in dict_obj.values():
                             try:
                                 obj = pickle.loads(byte_data)
-                                if isinstance(obj, URDevice):
+                                if isinstance(obj, UnrealDevice):
                                     continue
                                 type_name = type(obj).__name__
-                                fmt = 'Expecting URDevice instance but received {} type'
+                                fmt = 'Expecting UnrealDevice instance but received {} type'
                                 raise InvalidSerializedInstance(fmt.format(type_name))
                             except Exception as ex:
                                 raise SerializedError(str(ex))
@@ -87,7 +87,7 @@ class SerializedFile:
         dict_obj.update({name: pickle.dumps(node)})
         with (open(cls.filename, 'w')) as stream:
             yaml.dump(dict_obj, stream)
-            fmt = 'Successfully added URDevice instance of {}.'
+            fmt = 'Successfully added UnrealDevice instance of {}.'
             cls.message = fmt.format(name)
             return True
 
@@ -109,7 +109,7 @@ class SerializedFile:
                     dict_obj.pop(name)
                     with (open(cls.filename, 'w')) as write_stream:
                         yaml.dump(dict_obj, write_stream)
-                    fmt = 'Successfully removed URDevice instance of {}'
+                    fmt = 'Successfully removed UnrealDevice instance of {}'
                     cls.message = fmt.format(cls.filename)
                     return True
                 else:

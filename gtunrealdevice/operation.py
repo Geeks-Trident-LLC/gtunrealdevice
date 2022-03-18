@@ -3,7 +3,7 @@
 import sys
 import re
 
-from gtunrealdevice import URDevice
+from gtunrealdevice import UnrealDevice
 from gtunrealdevice.utils import Printer
 from gtunrealdevice.core import DEVICES_DATA
 from gtunrealdevice.serialization import SerializedFile
@@ -49,7 +49,7 @@ def do_device_connect(options):
                     sys.exit(0)
 
             try:
-                instance = URDevice(host_addr)
+                instance = UnrealDevice(host_addr)
                 instance.connect(testcase=testcase)
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(0)

@@ -1,4 +1,4 @@
-"""Module containing the logic for URDevice."""
+"""Module containing the logic for UnrealDevice."""
 import re
 
 import yaml
@@ -9,14 +9,14 @@ from datetime import datetime
 from gtunrealdevice.config import Data
 from gtunrealdevice.exceptions import WrapperError
 from gtunrealdevice.exceptions import DevicesInfoError
-from gtunrealdevice.exceptions import URDeviceConnectionError
-from gtunrealdevice.exceptions import URDeviceOfflineError
+from gtunrealdevice.exceptions import UnrealDeviceConnectionError
+from gtunrealdevice.exceptions import UnrealDeviceOfflineError
 
 from gtunrealdevice.utils import Printer
 
 
 def check_active_device(func):
-    """Wrapper for URDevice methods.
+    """Wrapper for UnrealDevice methods.
     Parameters
     ----------
     func (function): a callable function
@@ -28,20 +28,20 @@ def check_active_device(func):
     Raises
     ------
     WrapperError: raise exception when decorator is incorrectly used
-    URDeviceOfflineError: raise exception when unreal device is offline
+    UnrealDeviceOfflineError: raise exception when unreal device is offline
     """
     @functools.wraps(func)
     def wrapper_func(*args, **kwargs):
         """A Wrapper Function"""
         if args:
             device = args[0]
-            if isinstance(device, URDevice):
+            if isinstance(device, UnrealDevice):
                 if device.is_connected:
                     result = func(*args, **kwargs)
                     return result
                 else:
                     fmt = '{} device is offline.'
-                    raise URDeviceOfflineError(fmt.format(device.name))
+                    raise UnrealDeviceOfflineError(fmt.format(device.name))
             else:
                 fmt = 'Using invalid decorator for this instance "{}"'
                 raise WrapperError(fmt.format(type(device)))
@@ -211,7 +211,7 @@ DEVICES_DATA = DevicesData()
 DEVICES_DATA.load_default()
 
 
-class URDevice:
+class UnrealDevice:
     """Unreal Device class
 
     Attributes
@@ -233,7 +233,7 @@ class URDevice:
 
     Raises
     ------
-    URDeviceConnectionError: raise exception if device can not connect
+    UnrealDeviceConnectionError: raise exception if device can not connect
     """
     def __init__(self, address, name='', **kwargs):
         self.address = str(address).strip()
@@ -286,7 +286,7 @@ class URDevice:
             return self.is_connected
         else:
             fmt = '{} is unavailable for connection.'
-            raise URDeviceConnectionError(fmt.format(self.name))
+            raise UnrealDeviceConnectionError(fmt.format(self.name))
 
     def disconnect(self, **kwargs):
         """Disconnect an unreal device
@@ -401,9 +401,9 @@ def create(address, name='', **kwargs):
 
     Returns
     -------
-    URDevice: an unreal device instance.
+    UnrealDevice: an unreal device instance.
     """
-    device = URDevice(address, name=name, **kwargs)
+    device = UnrealDevice(address, name=name, **kwargs)
     return device
 
 
@@ -412,7 +412,7 @@ def connect(device, **kwargs):
 
     Parameters
     ----------
-    device (URDevice): an Unreal device instance
+    device (UnrealDevice): an unreal device instance
     kwargs (dict): keyword arguments
 
     Returns
@@ -428,7 +428,7 @@ def disconnect(device, **kwargs):
 
     Parameters
     ----------
-    device (URDevice): an Unreal device instance
+    device (UnrealDevice): an unreal device instance
     kwargs (dict): keyword arguments
 
     Returns
@@ -444,7 +444,7 @@ def execute(device, cmdline, **kwargs):
 
     Parameters
     ----------
-    device (URDevice): an Unreal device instance
+    device (UnrealDevice): an unreal device instance
     cmdline (str): command line
     kwargs (dict): keyword arguments
 
@@ -461,7 +461,7 @@ def configure(device, config, **kwargs):
 
     Parameters
     ----------
-    device (URDevice): an Unreal device instance
+    device (UnrealDevice): an unreal device instance
     config (str): configuration data for device
     kwargs (dict): keyword arguments
 
