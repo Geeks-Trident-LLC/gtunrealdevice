@@ -1,7 +1,7 @@
 """Top-level module for gtunrealdevice.
 
 """
-from gtunrealdevice.core import URDevice
+from gtunrealdevice.core import UnrealDevice
 from gtunrealdevice.core import create
 from gtunrealdevice.core import connect
 from gtunrealdevice.core import disconnect
@@ -15,7 +15,7 @@ __version__ = version
 __edition__ = edition
 
 __all__ = [
-    'URDevice',
+    'UnrealDevice',
     'create',
     'connect',
     'disconnect',

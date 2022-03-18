@@ -9,15 +9,15 @@ class DevicesInfoError(Exception):
     """Use to capture devices info"""
 
 
-class URDeviceError(Exception):
+class UnrealDeviceError(Exception):
     """Use to capture error for creating GTUnrealDevice."""
 
 
-class URDeviceConnectionError(URDeviceError):
+class UnrealDeviceConnectionError(UnrealDeviceError):
     """Use to capture error when GTUnrealDevice establishes connection."""
 
 
-class URDeviceOfflineError(URDeviceError):
+class UnrealDeviceOfflineError(UnrealDeviceError):
     """Use to capture error when GTUnrealDevice is offline."""
 
 
