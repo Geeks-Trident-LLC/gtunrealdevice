@@ -193,10 +193,11 @@ def do_device_disconnect(options):
 def do_device_execute(options):
     if options.command == 'execute':
         lst = ['unreal-device execute syntax:', '-' * 10,
-               'unreal-device execute <cmdline>'
+               'unreal-device execute <cmdline>',
                'unreal-device execute <host_address>::<cmdline>',
                'unreal-device execute <host_name>::<cmdline>']
         execute_syntax = '\n'.join(lst)
+        other_execute_syntax = '\n'.join(lst[:1] + lst[2:])
 
         data = ' '.join(options.operands).strip()
         pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
@@ -216,14 +217,18 @@ def do_device_execute(options):
                 if len(DEVICES_DATA) == 1:
                     host_addr = list(DEVICES_DATA)[0]
                 else:
-                    Printer.print(lst[:1] + lst[2:])
+                    Printer.print(other_execute_syntax)
                     sys.exit(1)
 
             instance = SerializedFile.get_instance(host_addr)
             if instance:
-                output = instance.execute(cmdline)
-                print(output)
-                sys.exit(0)
+                if instance.is_connected:
+                    instance.execute(cmdline)
+                    sys.exit(0)
+                else:
+                    fmt = 'CANT execute cmdline because {} is disconnected.'
+                    print(fmt.format(host_addr))
+                    sys.exit(0)
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
                 print(fmt.format(host_addr))
