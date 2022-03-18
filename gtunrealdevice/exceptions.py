@@ -19,3 +19,15 @@ class URDeviceConnectionError(URDeviceError):
 
 class URDeviceOfflineError(URDeviceError):
     """Use to capture error when GTUnrealDevice is offline."""
+
+
+class SerializedError(Exception):
+    """Use to capture error for serialized file."""
+
+
+class InvalidSerializedFile(SerializedError):
+    """Use to capture error for serialized file."""
+
+
+class InvalidSerializedInstance(SerializedError):
+    """Use to capture error for serialized file."""

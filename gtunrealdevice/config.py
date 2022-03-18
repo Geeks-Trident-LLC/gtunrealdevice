@@ -22,12 +22,25 @@ __all__ = [
 
 class Data:
     # app yaml files
-    devices_info_filename = str(
+    app_directory = str(
         PurePath(
             Path.home(),
             '.geekstrident',
             'gtunrealdevice',
+        )
+    )
+
+    devices_info_filename = str(
+        PurePath(
+            app_directory,
             'devices_info.yaml'
+        )
+    )
+
+    serialized_filename = str(
+        PurePath(
+            app_directory,
+            'serialized_data.yaml'
         )
     )
 
