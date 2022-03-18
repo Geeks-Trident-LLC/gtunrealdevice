@@ -40,15 +40,13 @@ def do_device_connect(options):
                     ))
                     sys.exit(0)
                 else:
-                    instance.connect()
+                    instance.connect(testcase=testcase)
                     SerializedFile.add_instance(host_addr, instance)
                     sys.exit(0)
 
             try:
-                instance = URDevice(host_addr, showed=True)
-                if testcase:
-                    instance.testcase = testcase
-                instance.connect()
+                instance = URDevice(host_addr)
+                instance.connect(testcase=testcase)
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(0)
             except Exception as ex:
@@ -65,7 +63,7 @@ def do_device_disconnect(options):
         lst = [
             'unreal-device disconnect syntax:', '-' * 10,
             'unreal-device disconnect <host_address>',
-            'unreal-device connect <host_name>',
+            'unreal-device disconnect <host_name>',
         ]
         disconnect_syntax = '\n'.join(lst)
         if len(options.operands) == 1:

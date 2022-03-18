@@ -241,6 +241,7 @@ class URDevice:
         self._is_connected = False
         self.data = None
         self.table = dict()
+        self.testcase = ''
 
     @property
     def is_connected(self):
@@ -264,6 +265,15 @@ class URDevice:
         if self.address in DEVICES_DATA:
             self.data = DEVICES_DATA.get(self.address)
             self._is_connected = True
+
+            testcase = kwargs.get('testcase', '')
+            if testcase:
+                if testcase in self.data.get('testcases', dict()):
+                    self.testcase = testcase
+                else:
+                    fmt = '*** "{}" test case is unavailable for this connection.'
+                    print(fmt.format(testcase))
+
             if kwargs.get('showed', True):
                 login_result = self.data.get('login')
                 print(login_result)
@@ -304,7 +314,7 @@ class URDevice:
         """
 
         data = self.data.get('cmdlines')
-        if hasattr(self, 'testcase'):
+        if self.testcase:
             data = self.data.get('testcases').get(self.testcase, data)
 
         no_output = '*** "{}" does not have output ***'.format(cmdline)
