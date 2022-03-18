@@ -25,7 +25,7 @@ class TestURDevice:
     )
     def test_connect(self, ip_address, device_name, status):
         device = URDevice(ip_address, name=device_name)
-        connection_status = device.connect()
+        connection_status = device.connect(is_timestamp=False)
         assert connection_status == status
 
     @pytest.mark.parametrize(
@@ -36,8 +36,8 @@ class TestURDevice:
     )
     def test_disconnect(self, ip_address, device_name, status):
         device = URDevice(ip_address, name=device_name)
-        device.connect()
-        connection_status = device.disconnect()
+        device.connect(is_timestamp=False)
+        connection_status = device.disconnect(is_timestamp=False)
         assert connection_status == status
 
     @pytest.mark.parametrize(
@@ -52,9 +52,9 @@ class TestURDevice:
     )
     def test_common_execute(self, ip_address, device_name, cmdline, iteration, expected_output):
         device = URDevice(ip_address, name=device_name)
-        device.connect()
+        device.connect(is_timestamp=False)
         for _ in range(iteration):
-            output = device.execute(cmdline)
+            output = device.execute(cmdline, is_timestamp=False)
 
         assert output == expected_output
 
@@ -70,9 +70,9 @@ class TestURDevice:
     )
     def test_testcase_execute(self, ip_address, device_name, testcase,
                               cmdline, iteration, expected_output):
-        device = URDevice(ip_address, name=device_name, testcase=testcase)
-        device.connect()
+        device = URDevice(ip_address, name=device_name)
+        device.connect(is_timestamp=False, testcase=testcase)
         for _ in range(iteration):
-            output = device.execute(cmdline)
+            output = device.execute(cmdline, is_timestamp=False)
 
         assert output == expected_output
