@@ -8,17 +8,21 @@ from gtunrealdevice.utils import Printer
 from gtunrealdevice.core import DEVICES_DATA
 from gtunrealdevice.serialization import SerializedFile
 
+from gtunrealdevice.usage import validate_usage
+from gtunrealdevice.usage import show_usage
+
 
 def do_device_connect(options):
     if options.command == 'connect':
-        lst = [
-            'unreal-device connect syntax:', '-' * 10,
-            'unreal-device connect <host_address>',
-            'unreal-device connect <host_address> <testcase>',
-            'unreal-device connect <host_name>',
-            'unreal-device connect <host_name> <testcase>'
-        ]
-        connect_syntax = '\n'.join(lst)
+        # lst = [
+        #     'unreal-device connect syntax:', '-' * 10,
+        #     'unreal-device connect <host_address>',
+        #     'unreal-device connect <host_address> <testcase>',
+        #     'unreal-device connect <host_name>',
+        #     'unreal-device connect <host_name> <testcase>'
+        # ]
+        # connect_syntax = '\n'.join(lst)
+        validate_usage(options.command, options.operands)
         total = len(options.operands)
         if total == 1 or total == 2:
             host_addr = options.operands[0]
@@ -54,18 +58,20 @@ def do_device_connect(options):
                 print(failure)
                 sys.exit(1)
         else:
-            Printer.print(connect_syntax)
-            sys.exit(1)
+            # Printer.print(connect_syntax)
+            # sys.exit(1)
+            show_usage(options.command)
 
 
 def do_device_disconnect(options):
     if options.command == 'disconnect':
-        lst = [
-            'unreal-device disconnect syntax:', '-' * 10,
-            'unreal-device disconnect <host_address>',
-            'unreal-device disconnect <host_name>',
-        ]
-        disconnect_syntax = '\n'.join(lst)
+        # lst = [
+        #     'unreal-device disconnect syntax:', '-' * 10,
+        #     'unreal-device disconnect <host_address>',
+        #     'unreal-device disconnect <host_name>',
+        # ]
+        # disconnect_syntax = '\n'.join(lst)
+        validate_usage(options.command, options.operands)
         if len(options.operands) == 1:
             host_addr = options.operands[0]
             original_addr = host_addr
@@ -91,18 +97,20 @@ def do_device_disconnect(options):
                     print(fmt.format(original_addr))
                     sys.exit(1)
         else:
-            Printer.print(disconnect_syntax)
-            sys.exit(1)
+            show_usage(options.command)
+            # Printer.print(disconnect_syntax)
+            # sys.exit(1)
 
 
 def do_device_execute(options):
     if options.command == 'execute':
-        lst = ['unreal-device execute syntax:', '-' * 10,
-               'unreal-device execute <cmdline>',
-               'unreal-device execute <host_address>::<cmdline>',
-               'unreal-device execute <host_name>::<cmdline>']
-        execute_syntax = '\n'.join(lst)
-        other_execute_syntax = '\n'.join(lst[:1] + lst[2:])
+        # lst = ['unreal-device execute syntax:', '-' * 10,
+        #        'unreal-device execute <cmdline>',
+        #        'unreal-device execute <host_address>::<cmdline>',
+        #        'unreal-device execute <host_name>::<cmdline>']
+        # execute_syntax = '\n'.join(lst)
+        # other_execute_syntax = '\n'.join(lst[:1] + lst[2:])
+        validate_usage(options.command, options.operands)
 
         data = ' '.join(options.operands).strip()
         pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
@@ -122,8 +130,9 @@ def do_device_execute(options):
                 if len(DEVICES_DATA) == 1:
                     host_addr = list(DEVICES_DATA)[0]
                 else:
-                    Printer.print(other_execute_syntax)
-                    sys.exit(1)
+                    show_usage(options.command, 'other')
+                    # Printer.print(other_execute_syntax)
+                    # sys.exit(1)
 
             instance = SerializedFile.get_instance(host_addr)
             if instance:
@@ -139,5 +148,6 @@ def do_device_execute(options):
                 print(fmt.format(host_addr))
                 sys.exit(0)
         else:
-            Printer.print(execute_syntax)
-            sys.exit(1)
+            show_usage(options.command)
+            # Printer.print(execute_syntax)
+            # sys.exit(1)
