@@ -122,6 +122,7 @@ def do_device_connect(options):
                 for addr, node in DEVICES_DATA.items():
                     if node.get('name') == host_addr:
                         host_addr = addr
+                        break
 
             if SerializedFile.check_instance(host_addr, testcase=testcase):
                 lst = ['{} is already connected.'.format(host_addr),
@@ -147,6 +148,35 @@ def do_device_connect(options):
                 'unreal-device connect <host_address> <testcase>',
                 'unreal-device connect <host_name>',
                 'unreal-device connect <host_name> <testcase>'
+            ]
+            Printer.print(lst)
+            sys.exit(1)
+
+
+def do_device_disconnect(options):
+    if options.command == 'disconnect':
+        if len(options.operands) == 1:
+            host_addr = options.operands[0]
+
+            if host_addr not in DEVICES_DATA:
+                for addr, node in DEVICES_DATA.items():
+                    if node.get('name') == host_addr:
+                        host_addr = addr
+                        break
+
+            result = SerializedFile.remove_instance(host_addr)
+            name = DEVICES_DATA.get(host_addr).get('name', host_addr)
+            if result:
+                print('{} is disconnected.'.format(name))
+                sys.exit(0)
+            else:
+                print('CANT disconnect because {} has not connected.'.format(name))
+                sys.exit(1)
+        else:
+            lst = [
+                'unreal-device disconnect syntax:', '-' * 10,
+                'unreal-device disconnect <host_address>',
+                'unreal-device connect <host_name>',
             ]
             Printer.print(lst)
             sys.exit(1)
@@ -215,6 +245,7 @@ class Cli:
         show_info(self.options)
         show_device_info(self.options)
         do_device_connect(self.options)
+        do_device_disconnect(self.options)
 
 
 def execute():
