@@ -113,10 +113,18 @@ def show_info(options):
 
 def do_device_connect(options):
     if options.command == 'connect':
-        if len(options.operands) > 0:
-            lst = options.operands
-            host_addr = lst[0]
-            testcase = lst[1] if len(lst) > 1 else ''
+        lst = [
+            'unreal-device connect syntax:', '-' * 10,
+            'unreal-device connect <host_address>',
+            'unreal-device connect <host_address> <testcase>',
+            'unreal-device connect <host_name>',
+            'unreal-device connect <host_name> <testcase>'
+        ]
+        connect_syntax = '\n'.join(lst)
+        total = len(options.operands)
+        if total == 1 or total == 2:
+            host_addr = options.operands[0]
+            testcase = options.operands[1] if total == 2 else ''
 
             if host_addr not in DEVICES_DATA:
                 for addr, node in DEVICES_DATA.items():
@@ -125,10 +133,18 @@ def do_device_connect(options):
                         break
 
             if SerializedFile.check_instance(host_addr, testcase=testcase):
-                lst = ['{} is already connected.'.format(host_addr),
-                       'Use reconnect, reload, or reset for a new connection.']
-                Printer.print(lst)
-                sys.exit(0)
+                instance = SerializedFile.get_instance(host_addr)
+
+                if instance.is_connected:
+                    Printer.print('\n'.join(
+                        ['{} is already connected.'.format(host_addr),
+                         'Use reconnect, reload, or reset for a new connection.']
+                    ))
+                    sys.exit(0)
+                else:
+                    instance.connect()
+                    SerializedFile.add_instance(host_addr, instance)
+                    sys.exit(0)
 
             try:
                 instance = URDevice(host_addr, showed=True)
@@ -142,14 +158,7 @@ def do_device_connect(options):
                 print(failure)
                 sys.exit(1)
         else:
-            lst = [
-                'unreal-device connect syntax:', '-' * 10,
-                'unreal-device connect <host_address>',
-                'unreal-device connect <host_address> <testcase>',
-                'unreal-device connect <host_name>',
-                'unreal-device connect <host_name> <testcase>'
-            ]
-            Printer.print(lst)
+            Printer.print(connect_syntax)
             sys.exit(1)
 
 
