@@ -182,6 +182,49 @@ def do_device_disconnect(options):
             sys.exit(1)
 
 
+def do_device_execute(options):
+    if options.command == 'execute':
+        lst = ['unreal-device execute syntax:', '-' * 10,
+               'unreal-device execute <cmdline>'
+               'unreal-device execute <host_address>::<cmdline>',
+               'unreal-device execute <host_name>::<cmdline>']
+        execute_syntax = '\n'.join(lst)
+
+        data = ' '.join(options.operands).strip()
+        pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
+        match = re.match(pattern, data)
+        if match:
+            host_addr = match.group('host_addr') or ''
+            cmdline = match.group('cmdline').strip()
+
+            if host_addr:
+                host_addr = host_addr.strip(':')
+                if host_addr not in DEVICES_DATA:
+                    for addr, node in DEVICES_DATA.items():
+                        if node.get('name') == host_addr:
+                            host_addr = addr
+                            break
+            else:
+                if len(DEVICES_DATA) == 1:
+                    host_addr = list(DEVICES_DATA)[0]
+                else:
+                    Printer.print(lst[:1] + lst[2:])
+                    sys.exit(1)
+
+            instance = SerializedFile.get_instance(host_addr)
+            if instance:
+                output = instance.execute(cmdline)
+                print(output)
+                sys.exit(0)
+            else:
+                fmt = 'CANT execute cmdline because {} has not connected.'
+                print(fmt.format(host_addr))
+                sys.exit(0)
+        else:
+            Printer.print(execute_syntax)
+            sys.exit(1)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
@@ -246,6 +289,7 @@ class Cli:
         show_device_info(self.options)
         do_device_connect(self.options)
         do_device_disconnect(self.options)
+        do_device_execute(self.options)
 
 
 def execute():
