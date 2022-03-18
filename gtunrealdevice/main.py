@@ -118,10 +118,9 @@ class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
     prog_fn = 'geeks-trident-unreal-device-app'
-    commands = ['app', 'check', 'configure', 'connect', 'dependency',
-                'disconnect', 'execute', 'gui', 'info', 'load',
-                'reconnect', 'reset', 'reload', 'save',
-                'update', 'version', 'view']
+    commands = ['app', 'check', 'configure', 'connect', 'destroy',
+                'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
+                'reconnect', 'save', 'update', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -138,9 +137,8 @@ class Cli:
         parser.add_argument(
             'command', type=str,
             help='command must be either app, check, configure, connect,'
-                 'dependency, disconnect, execute, gui, info, load, '
-                 'reconnect, reset, reload, save, update, '
-                 'version, or view'
+                 'destroy, dependency, disconnect, execute, gui, info, load, '
+                 'reconnect, save, update, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -157,8 +155,8 @@ class Cli:
         Returns
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
-        command is not  app, check, configure, connect, dependency, disconnect,
-        execute, gui, info, load, reconnect, reset, reload,
+        command is not  app, check, configure, connect, dependency, destroy,
+        disconnect, execute, gui, info, load, reconnect,
         save, update, version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
