@@ -123,7 +123,7 @@ class Cli:
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reload', 'save', 'update', 'version', 'view']
+                'reload', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -141,7 +141,7 @@ class Cli:
             'command', type=str,
             help='command must be either app, configure, connect,'
                  'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reload, save, update, version, or view'
+                 'reload, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -160,7 +160,7 @@ class Cli:
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, configure, connect, dependency, destroy,
         disconnect, execute, gui, info, load, reload,
-        save, update, version, or view, otherwise, return True
+        version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
 
