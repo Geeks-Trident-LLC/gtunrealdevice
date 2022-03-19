@@ -5,6 +5,22 @@ import sys
 from gtunrealdevice.utils import Printer
 
 
+class ConfigureUsage:
+    usage = '\n'.join([
+        'configure syntax:',
+        '-----------------',
+        'unreal-device configure <cfg_reference>',
+        'unreal-device configure <host_address>::<cfg_reference>',
+        'unreal-device configure <host_name>::<cfg_reference>'
+    ])
+    other_usage = '\n'.join([
+        'configure syntax:',
+        '-----------------',
+        'unreal-device configure <host_address>::<cfg_reference>',
+        'unreal-device configure <host_name>::<cfg_reference>'
+    ])
+
+
 class ConnectUsage:
     usage = '\n'.join([
         'connect syntax:',
@@ -43,6 +59,7 @@ class ExecuteUsage:
 
 
 class Usage:
+    configure = ConfigureUsage
     connect = ConnectUsage
     disconnect = DisconnectUsage
     execute = ExecuteUsage

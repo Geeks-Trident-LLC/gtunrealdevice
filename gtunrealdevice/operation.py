@@ -107,8 +107,6 @@ def do_device_execute(options):
                     host_addr = list(DEVICES_DATA)[0]
                 else:
                     show_usage(options.command, 'other')
-                    # Printer.print(other_execute_syntax)
-                    # sys.exit(1)
 
             instance = SerializedFile.get_instance(host_addr)
             if instance:
@@ -121,6 +119,47 @@ def do_device_execute(options):
                     sys.exit(0)
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
+                print(fmt.format(host_addr))
+                sys.exit(0)
+        else:
+            show_usage(options.command)
+
+
+def do_device_configure(options):
+    if options.command == 'configure':
+        validate_usage(options.command, options.operands)
+
+        data = ' '.join(options.operands).strip()
+        pattern = r'(?P<host_addr>\S+::)? *(?P<cfg_ref>.+)'
+        match = re.match(pattern, data)
+        if match:
+            host_addr = match.group('host_addr') or ''
+            cfg_ref = match.group('cfg_ref').strip()
+
+            if host_addr:
+                host_addr = host_addr.strip(':')
+                if host_addr not in DEVICES_DATA:
+                    for addr, node in DEVICES_DATA.items():
+                        if node.get('name') == host_addr:
+                            host_addr = addr
+                            break
+            else:
+                if len(DEVICES_DATA) == 1:
+                    host_addr = list(DEVICES_DATA)[0]
+                else:
+                    show_usage(options.command, 'other')
+
+            instance = SerializedFile.get_instance(host_addr)
+            if instance:
+                if instance.is_connected:
+                    instance.configure(cfg_ref)
+                    sys.exit(0)
+                else:
+                    fmt = 'CANT configure because {} is disconnected.'
+                    print(fmt.format(host_addr))
+                    sys.exit(0)
+            else:
+                fmt = 'CANT configure because {} has not connected.'
                 print(fmt.format(host_addr))
                 sys.exit(0)
         else:

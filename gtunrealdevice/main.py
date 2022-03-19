@@ -13,6 +13,7 @@ from gtunrealdevice.serialization import SerializedFile
 from gtunrealdevice.operation import do_device_connect
 from gtunrealdevice.operation import do_device_disconnect
 from gtunrealdevice.operation import do_device_execute
+from gtunrealdevice.operation import do_device_configure
 
 
 def run_gui_application(options):
@@ -179,6 +180,7 @@ class Cli:
         do_device_connect(self.options)
         do_device_disconnect(self.options)
         do_device_execute(self.options)
+        do_device_configure(self.options)
 
 
 def execute():
