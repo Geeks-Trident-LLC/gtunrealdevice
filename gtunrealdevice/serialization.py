@@ -87,33 +87,31 @@ class SerializedFile:
         dict_obj.update({name: pickle.dumps(node)})
         with (open(cls.filename, 'w')) as stream:
             yaml.dump(dict_obj, stream)
-            fmt = 'Successfully added UnrealDevice instance of {}.'
+            fmt = '+++ Successfully added unreal "{}" device.'
             cls.message = fmt.format(name)
             return True
 
     @classmethod
     def remove_instance(cls, name):
         tbl = cls.get_info()
-        if tbl.get('existed') == 'No':
-            fmt = "CANT remove serialized instance because {} file hasn't existed."
-            cls.message = fmt.format(cls.filename)
-            return False
-        elif tbl.get('total') == 0:
-            fmt = "CANT remove because {} doesn't contain any serialized instance."
-            cls.message = fmt.format(cls.filename)
+        if tbl.get('total') == 0:
+            fmt = '''*** CANT remove because unreal "{}" device isn't initialized.'''
+            cls.message = fmt.format(name)
             return False
         else:
             with open(cls.filename) as read_stream:
                 dict_obj = yaml.load(read_stream, Loader=yaml.SafeLoader)
                 if name in dict_obj:
-                    dict_obj.pop(name)
+                    byte_data = dict_obj.pop(name)
+                    instance = pickle.loads(byte_data)
+                    instance.is_connected and instance.disconnect()
                     with (open(cls.filename, 'w')) as write_stream:
                         yaml.dump(dict_obj, write_stream)
-                    fmt = 'Successfully removed UnrealDevice instance of {}'
-                    cls.message = fmt.format(cls.filename)
+                    fmt = '+++ Successfully removed unreal {} device.'
+                    cls.message = fmt.format(name)
                     return True
                 else:
-                    fmt = "CANT remove because there is no {} in serialized file."
+                    fmt = '*** CANT remove because there is no unreal "{}" device.'
                     cls.message = fmt.format(name)
                     return False
 

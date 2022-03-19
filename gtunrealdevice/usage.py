@@ -41,6 +41,15 @@ class DisconnectUsage:
     ])
 
 
+class DestroyUsage:
+    usage = '\n'.join([
+        'destroy syntax:',
+        '---------------',
+        'unreal-device destroy <host_address>',
+        'unreal-device destroy <host_name>',
+    ])
+
+
 class ExecuteUsage:
     usage = '\n'.join([
         'execute syntax:',
@@ -73,6 +82,7 @@ class Usage:
     configure = ConfigureUsage
     connect = ConnectUsage
     disconnect = DisconnectUsage
+    destroy = DestroyUsage
     execute = ExecuteUsage
     reload = ReloadUsage
 

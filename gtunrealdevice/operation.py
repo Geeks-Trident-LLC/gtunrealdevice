@@ -84,6 +84,25 @@ def do_device_disconnect(options):
             show_usage(options.command)
 
 
+def do_device_destroy(options):
+    if options.command == 'destroy':
+        validate_usage(options.command, options.operands)
+        if len(options.operands) == 1:
+            host_addr = options.operands[0]
+
+            if host_addr not in DEVICES_DATA:
+                for addr, node in DEVICES_DATA.items():
+                    if node.get('name') == host_addr:
+                        host_addr = addr
+                        break
+
+            result = SerializedFile.remove_instance(host_addr)
+            print(SerializedFile.message)
+            sys.exit(int(result))
+        else:
+            show_usage(options.command)
+
+
 def do_device_execute(options):
     if options.command == 'execute':
         validate_usage(options.command, options.operands)
