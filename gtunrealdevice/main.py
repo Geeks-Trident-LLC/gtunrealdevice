@@ -62,7 +62,7 @@ def show_version(options):
         sys.exit(0)
 
 
-def show_device_info(options):
+def view_device_info(options):
     if options.command == 'view':
         kwargs = dict()
         pattern = r'(?i) *(?P<key>testcases?|cmdlines|device)::(?P<value>.*)?'
@@ -175,7 +175,7 @@ class Cli:
         show_dependency(self.options)
         show_version(self.options)
         show_info(self.options)
-        show_device_info(self.options)
+        view_device_info(self.options)
 
         # device action
         do_device_connect(self.options)
