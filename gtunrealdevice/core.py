@@ -227,9 +227,11 @@ class UnrealDevice:
     Methods
     -------
     connect(**kwargs) -> bool
+    reconnect(**kwargs) -> bool
     disconnect(**kwargs) -> bool
     execute(cmdline, **kwargs) -> str
     configure(config, **kwargs) -> str
+    render_data(data, is_cfg=False, is_timestamp=True) -> str
 
     Raises
     ------
@@ -286,6 +288,46 @@ class UnrealDevice:
             return self.is_connected
         else:
             fmt = '{} is unavailable for connection.'
+            raise UnrealDeviceConnectionError(fmt.format(self.name))
+
+    def reconnect(self, **kwargs):
+        """Reconnect an unreal device
+
+        Parameters
+        ----------
+        kwargs (dict): keyword arguments
+
+        Returns
+        -------
+        bool: connection status
+        """
+        if self.address in DEVICES_DATA:
+            self.data = DEVICES_DATA.get(self.address)
+            self._is_connected = True
+
+            testcase = kwargs.get('testcase', '')
+            if testcase:
+                if testcase in self.data.get('testcases', dict()):
+                    self.testcase = testcase
+                else:
+                    fmt = '*** "{}" test case is unavailable for this reconnection ***'
+                    print(fmt.format(testcase))
+
+            if kwargs.get('showed', True):
+                reload_txt = self.data.get('reload', '')
+                if not reload_txt:
+                    reload_txt = kwargs.get('reload_data', '')
+                login_txt = self.data.get('login', '')
+                reconnect_txt = '{}\n{}'.format(reload_txt, login_txt).strip()
+                if reconnect_txt:
+                    is_timestamp = kwargs.get('is_timestamp', True)
+                    reconnect_txt = self.render_data(
+                        reconnect_txt, is_timestamp=is_timestamp
+                    )
+                    print(reconnect_txt)
+            return self.is_connected
+        else:
+            fmt = '{} is unavailable for reconnection.'
             raise UnrealDeviceConnectionError(fmt.format(self.name))
 
     def disconnect(self, **kwargs):

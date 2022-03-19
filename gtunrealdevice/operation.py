@@ -32,7 +32,7 @@ def do_device_connect(options):
                 if instance.is_connected:
                     Printer.print('\n'.join(
                         ['{} is already connected.'.format(host_addr),
-                         'Use reconnect for a new connection.']
+                         'Use reload for a new connection.']
                     ))
                     sys.exit(0)
                 else:
@@ -162,5 +162,43 @@ def do_device_configure(options):
                 fmt = 'CANT configure because {} has not connected.'
                 print(fmt.format(host_addr))
                 sys.exit(0)
+        else:
+            show_usage(options.command)
+
+
+def do_device_reload(options):
+    if options.command == 'reload':
+        validate_usage(options.command, options.operands)
+        total = len(options.operands)
+        if total == 1 or total == 2:
+            host_addr = options.operands[0]
+            testcase = options.operands[1] if total == 2 else ''
+
+            if host_addr not in DEVICES_DATA:
+                for addr, node in DEVICES_DATA.items():
+                    if node.get('name') == host_addr:
+                        host_addr = addr
+                        break
+
+            try:
+                reload_data = '\n'.join([
+                    'Reloading "{}" device ...'.format(host_addr),
+                    '...',
+                    'Closing all applications ...',
+                    'Unload device drivers ...',
+                    '... ',
+                    'Checking memory ...',
+                    'Loading device drivers ...',
+                    'Complete loading ...',
+                    'System is ready for login.'
+                ])
+                instance = UnrealDevice(host_addr)
+                instance.reload(testcase=testcase, reload_data=reload_data)
+                SerializedFile.add_instance(host_addr, instance)
+                sys.exit(0)
+            except Exception as ex:
+                failure = '{}: {}'.format(type(ex).__name__, ex)
+                print(failure)
+                sys.exit(1)
         else:
             show_usage(options.command)

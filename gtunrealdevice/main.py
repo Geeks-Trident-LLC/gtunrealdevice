@@ -14,6 +14,7 @@ from gtunrealdevice.operation import do_device_connect
 from gtunrealdevice.operation import do_device_disconnect
 from gtunrealdevice.operation import do_device_execute
 from gtunrealdevice.operation import do_device_configure
+from gtunrealdevice.operation import do_device_reload
 
 
 def run_gui_application(options):
@@ -121,7 +122,7 @@ class Cli:
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'check', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reconnect', 'save', 'update', 'version', 'view']
+                'reload', 'save', 'update', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -139,7 +140,7 @@ class Cli:
             'command', type=str,
             help='command must be either app, check, configure, connect,'
                  'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reconnect, save, update, version, or view'
+                 'reload, save, update, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -157,7 +158,7 @@ class Cli:
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, check, configure, connect, dependency, destroy,
-        disconnect, execute, gui, info, load, reconnect,
+        disconnect, execute, gui, info, load, reload,
         save, update, version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
@@ -181,6 +182,7 @@ class Cli:
         do_device_disconnect(self.options)
         do_device_execute(self.options)
         do_device_configure(self.options)
+        do_device_reload(self.options)
 
 
 def execute():

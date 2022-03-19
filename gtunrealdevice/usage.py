@@ -58,11 +58,23 @@ class ExecuteUsage:
     ])
 
 
+class ReloadUsage:
+    usage = '\n'.join([
+        'reload syntax:',
+        '--------------',
+        'unreal-device reload <host_address>',
+        'unreal-device reload <host_address> <testcase>',
+        'unreal-device reload <host_name>',
+        'unreal-device reload <host_name> <testcase>'
+    ])
+
+
 class Usage:
     configure = ConfigureUsage
     connect = ConnectUsage
     disconnect = DisconnectUsage
     execute = ExecuteUsage
+    reload = ReloadUsage
 
 
 def validate_usage(name, operands):
