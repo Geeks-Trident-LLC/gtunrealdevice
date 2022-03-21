@@ -118,7 +118,7 @@ class DevicesData(dict):
         filename = filename or Data.devices_info_filename
 
         with open(path.expanduser(filename), 'w') as stream:
-            self and yaml.safe_dump(self, stream)
+            self and yaml.safe_dump(dict(self), stream)
 
     def is_valid_file(self, filename):
         """Check filename

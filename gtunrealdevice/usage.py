@@ -67,6 +67,15 @@ class ExecuteUsage:
     ])
 
 
+class LoadUsage:
+    usage = '\n'.join([
+        'load syntax:',
+        '---------------',
+        'unreal-device load <filename>',
+        'unreal-device load keep <filename>',
+    ])
+
+
 class ReloadUsage:
     usage = '\n'.join([
         'reload syntax:',
@@ -84,6 +93,7 @@ class Usage:
     disconnect = DisconnectUsage
     destroy = DestroyUsage
     execute = ExecuteUsage
+    load = LoadUsage
     reload = ReloadUsage
 
 

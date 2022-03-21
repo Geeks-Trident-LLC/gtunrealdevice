@@ -18,6 +18,11 @@ from gtunrealdevice.operation import do_device_configure
 from gtunrealdevice.operation import do_device_reload
 from gtunrealdevice.operation import do_device_destroy
 
+from gtunrealdevice.usage import validate_usage
+from gtunrealdevice.usage import show_usage
+
+from gtunrealdevice.utils import File
+
 
 def run_gui_application(options):
     """Run gtunrealdevice application.
@@ -104,6 +109,41 @@ def show_info(options):
         sys.exit(0)
 
 
+def load_device_info(options):
+    command, operands = options.command, options.operands
+    if command == 'load':
+        validate_usage(command, operands)
+        total = len(operands)
+        if total < 1 or total > 2:
+            show_usage(command)
+
+        keep, fn = str(operands[0]).lower(), str(operands[-1])
+        is_file = File.is_exist(fn)
+        is_kept = keep == 'keep'
+        if not is_file or (total == 2 and not is_kept):
+            if not is_file:
+                print('*** operand MUST BE a file name.')
+            show_usage(command)
+
+        is_valid = DEVICES_DATA.is_valid_file(fn)
+        if not is_valid:
+            sample_format = DEVICES_DATA.get_sample_device_info_format()
+            print(sample_format)
+            sys.exit(1)
+
+        if is_kept:
+            DEVICES_DATA.load(fn)
+            DEVICES_DATA.save()
+            lst = ['+++ Successfully loaded "{}" device info and'.format(fn),
+                   'saved to "{}" file'.format(Data.devices_info_filename)]
+            Printer.print(lst)
+        else:
+            DEVICES_DATA.load(fn)
+            msg = '+++ successfully loaded "{}" device info'.format(fn)
+            Printer.print(msg)
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'unreal-device'
@@ -164,6 +204,7 @@ class Cli:
         show_version(self.options)
         show_info(self.options)
         view_device_info(self.options)
+        load_device_info(self.options)
 
         # device action
         do_device_connect(self.options)
