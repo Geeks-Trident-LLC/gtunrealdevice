@@ -20,6 +20,7 @@ from gtunrealdevice.operation import do_device_destroy
 
 from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import show_usage
+from gtunrealdevice.usage import get_global_usage
 
 from gtunrealdevice.utils import File
 
@@ -144,13 +145,19 @@ def load_device_info(options):
         sys.exit(0)
 
 
+def show_usage(options):
+    if options.command == 'usage':
+        print(get_global_usage())
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reload', 'version', 'view']
+                'reload', 'usage', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -168,7 +175,7 @@ class Cli:
             'command', type=str,
             help='command must be either app, configure, connect, '
                  'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reload, version, or view'
+                 'reload, usage, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -186,7 +193,7 @@ class Cli:
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, configure, connect, dependency, destroy,
-        disconnect, execute, gui, info, load, reload,
+        disconnect, execute, gui, info, load, reload, usage,
         version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
@@ -205,6 +212,7 @@ class Cli:
         show_info(self.options)
         view_device_info(self.options)
         load_device_info(self.options)
+        show_usage(self.options)
 
         # device action
         do_device_connect(self.options)
