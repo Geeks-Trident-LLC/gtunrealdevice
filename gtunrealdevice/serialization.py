@@ -1,7 +1,5 @@
 """Module containing the logic for UnrealDevice(s) serialization."""
 
-from pathlib import Path
-from datetime import datetime
 import yaml
 import pickle
 
@@ -11,6 +9,7 @@ from gtunrealdevice.exceptions import InvalidSerializedInstance
 from gtunrealdevice import UnrealDevice
 
 from gtunrealdevice.config import Data
+from gtunrealdevice.utils import File
 
 
 class SerializedFile:
@@ -19,21 +18,13 @@ class SerializedFile:
 
     @classmethod
     def is_file_exist(cls):
-        file_obj = Path(cls.filename)
-        return file_obj.exists()
+        return File.is_exist(cls.filename)
 
     @classmethod
     def create_file(cls):
-        if cls.is_file_exist():
-            return True
-
-        file_obj = Path(cls.filename)
-        if not file_obj.parent.exists():
-            file_obj.parent.mkdir(parents=True, exist_ok=True)
-        file_obj.touch()
-        fmt = '{:%Y-%m-%d %H:%M:%S.%f} - {} file is created.'
-        print(fmt.format(datetime.now(), cls.filename))
-        return True
+        is_created = File.create(cls.filename)
+        cls.message = File.message
+        return is_created
 
     @classmethod
     def get_info(cls):
