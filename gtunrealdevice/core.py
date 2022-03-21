@@ -5,6 +5,7 @@ import yaml
 import functools
 from os import path
 from datetime import datetime
+from textwrap import dedent
 
 from gtunrealdevice.config import Data
 from gtunrealdevice.exceptions import WrapperError
@@ -60,6 +61,7 @@ class DevicesData(dict):
     def __init__(self):
         super().__init__()
         self.filenames = [Data.devices_info_filename]
+        self.message = ''
 
     def load_default(self):
         """Load devices info from ~/.geekstrident/gtunrealdevice/devices_info.yaml
@@ -73,7 +75,7 @@ class DevicesData(dict):
         with open(Data.devices_info_filename) as stream:
             content = stream.read()
             if content.strip():
-                data = yaml.load(content, Loader=yaml.SafeLoader)
+                data = yaml.safe_load(content)
                 if isinstance(data, dict):
                     self.clear()
                     self.update(data)
@@ -93,17 +95,140 @@ class DevicesData(dict):
         DevicesInfoError: raise exception if devices_info_file contains invalid format
         """
 
+        is_valid = self.is_valid_file(filename)
+        if not is_valid:
+            raise DevicesInfoError(self.message)
+
         with open(path.expanduser(filename)) as stream:
             filename not in self.filenames and self.filenames.append(filename)
-            content = stream.read()
-            if content.strip():
-                data = yaml.load(content, Loader=yaml.SafeLoader)
-                if isinstance(data, dict):
-                    self.clear()
-                    self.update(data)
-                else:
-                    fmt = '{} file has an invalid format.  Check with developer.'
-                    raise DevicesInfoError(fmt.format(filename))
+            node = yaml.safe_load(stream)
+            self.update(node)
+
+    def save(self, filename=''):
+        """Save device info to filename
+
+        Parameters
+        ----------
+        filename (str): a file name
+
+        Returns
+        -------
+        bool: True if filename is successfully saved, otherwise, False.
+        """
+        filename = filename or Data.devices_info_filename
+
+        with open(path.expanduser(filename), 'w') as stream:
+            self and yaml.safe_dump(self, stream)
+
+    def is_valid_file(self, filename):
+        """Check filename
+
+        Parameters
+        ----------
+        filename (str): a file name
+
+        Returns
+        -------
+        bool: True if filename has proper format, otherwise, False.
+        """
+        try:
+            with open(path.expanduser(filename)) as stream:
+                content = stream.read().strip()
+                if not content:
+                    self.message = '"{}" file is empty.'.format(filename)
+                    return False
+
+                is_valid = self.is_valid_structure(content)
+                return is_valid
+        except Exception as ex:
+            self.message = '{} - {}'.format(type(ex).__name__, ex)
+            return False
+
+    def is_valid_structure(self, data):
+        """Check structure of data
+
+        Parameters
+        ----------
+        data (str): data for device info
+
+        Returns
+        -------
+        bool: True if data has proper format, otherwise, False.
+        """
+        node = yaml.safe_load(data)
+        if not isinstance(node, dict):
+            self.message = 'Invalid device info format.'
+            return False
+
+        cmdlines = node.get('cmdlines', None)
+        if cmdlines:
+            if not isinstance(cmdlines, dict):
+                self.message = 'Invalid cmdlines format.'
+                return False
+
+            for cmdline in cmdlines:
+                if isinstance(cmdline, (list, str)):
+                    continue
+                self.message = 'Invalid cmdline format.'
+                return False
+
+        testcases = node.get('testcases', None)
+        if testcases:
+            if not isinstance(testcases, dict):
+                self.message = 'Invalid testcases format.'
+                return False
+
+            for testcase in testcases:
+                if isinstance(testcase, dict):
+                    continue
+                self.message = 'Invalid testcase format.'
+                return False
+
+        configs = node.get('configs', None)
+        if configs:
+            if not isinstance(configs, dict):
+                self.message = 'Invalid configs format.'
+                return False
+
+        return True
+
+    def get_sample_device_info_format(self):    # noqa
+        text = dedent('''
+            ####################################################################
+            # sample device info                                               #
+            # name, login, and testcases nodes are optional                    #
+            ####################################################################
+            host_address_1:
+              name: host_name (optional)
+              login: |-
+                output_of_login (optional)
+              cmdlines:
+                cmdline_1: |-
+                  line 1 output_of_cmdline_1
+                  ...
+                  line n output_of_cmdline_1
+                cmdline_k_for_multiple_output:
+                  - |-
+                    line 1 - output_of_cmdline_k
+                    ...
+                    line n - output_of_cmdline_k
+                  - |-
+                    line 1 - other_output_of_cmdline_k
+                    ...
+                    line n - other_output_of_cmdline_k
+              testcases:
+                name_of_testcase_1:
+                  cmdline_1: |-
+                    line 1 output_of_cmdline_1_of_testcase_1
+                    ...
+                    line n output_of_cmdline_1_of_testcase_1
+              configs:
+                cfg_1: |-
+                  line 1 of cfg_1 
+                  ...
+                  line n of cfg_1
+        ''').strip()
+        return text
 
     def get_data(self, data):       # noqa
         pattern = r'(?i) *file(name)?:: *(?P<fn>[^\r\n]*[a-z][^\r\n]*) *$'
