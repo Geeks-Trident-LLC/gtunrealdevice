@@ -1,7 +1,5 @@
 """Module containing the attributes for gtunrealdevice."""
 
-from pathlib import Path
-from pathlib import PurePath
 import yaml
 
 from os import path
@@ -26,27 +24,9 @@ class Data:
     message = ''
 
     # app yaml files
-    app_directory = str(
-        PurePath(
-            Path.home(),
-            '.geekstrident',
-            'gtunrealdevice',
-        )
-    )
-
-    devices_info_filename = str(
-        PurePath(
-            app_directory,
-            'devices_info.yaml'
-        )
-    )
-
-    serialized_filename = str(
-        PurePath(
-            app_directory,
-            'serialized_data.yaml'
-        )
-    )
+    app_directory = File.get_path('.geekstrident', 'gtunrealdevice', is_home=True)
+    devices_info_filename = File.get_path(app_directory, 'devices_info.yaml')
+    serialized_filename = File.get_path(app_directory, 'serialized_data.yaml')
 
     # main app
     main_app_text = 'gtunrealdevice v{}'.format(version)

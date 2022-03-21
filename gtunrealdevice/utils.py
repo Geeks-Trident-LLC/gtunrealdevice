@@ -2,6 +2,7 @@
 
 import re
 from pathlib import Path
+from pathlib import PurePath
 from datetime import datetime
 
 
@@ -141,3 +142,20 @@ class File:
         except Exception as ex:
             cls.message = '{}: {}'.format(type(ex).__name__, ex)
             return False
+
+    @classmethod
+    def get_path(cls, *args, is_home=False):
+        """Create a file path
+
+        Parameters
+        ----------
+        args (tuple): a list of file items
+        is_home (bool): True will include Home directory.  Default is False.
+
+        Returns
+        -------
+        str: a file path.
+        """
+        lst = [Path.home()] if is_home else []
+        lst.extend(list(args))
+        return str(PurePath(*lst))
