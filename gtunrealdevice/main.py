@@ -106,7 +106,7 @@ def show_info(options):
 
 class Cli:
     """gtunrealdevice console CLI application."""
-    prog = 'gtunrealdevice'
+    prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
@@ -116,7 +116,7 @@ class Cli:
         parser = argparse.ArgumentParser(
             prog=self.prog,
             usage='%(prog)s [options] command operands',
-            description='%(prog)s application',
+            description='Geeks Trident Unreal Device Application',
         )
 
         parser.add_argument(
@@ -126,7 +126,7 @@ class Cli:
 
         parser.add_argument(
             'command', type=str,
-            help='command must be either app, configure, connect,'
+            help='command must be either app, configure, connect, '
                  'destroy, dependency, disconnect, execute, gui, info, load, '
                  'reload, version, or view'
         )
