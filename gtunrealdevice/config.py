@@ -1,12 +1,11 @@
 """Module containing the attributes for gtunrealdevice."""
 
-from pathlib import Path
-from pathlib import PurePath
-from datetime import datetime
 import yaml
 
 from os import path
 from textwrap import dedent
+
+from gtunrealdevice.utils import File
 
 __version__ = '0.0.2'
 version = __version__
@@ -21,28 +20,13 @@ __all__ = [
 
 
 class Data:
+
+    message = ''
+
     # app yaml files
-    app_directory = str(
-        PurePath(
-            Path.home(),
-            '.geekstrident',
-            'gtunrealdevice',
-        )
-    )
-
-    devices_info_filename = str(
-        PurePath(
-            app_directory,
-            'devices_info.yaml'
-        )
-    )
-
-    serialized_filename = str(
-        PurePath(
-            app_directory,
-            'serialized_data.yaml'
-        )
-    )
+    app_directory = File.get_path('.geekstrident', 'gtunrealdevice', is_home=True)
+    devices_info_filename = File.get_path(app_directory, 'devices_info.yaml')
+    serialized_filename = File.get_path(app_directory, 'serialized_data.yaml')
 
     # main app
     main_app_text = 'gtunrealdevice v{}'.format(version)
@@ -96,24 +80,25 @@ class Data:
     ).strip()
 
     @classmethod
+    def get_app_info(cls):
+        from platform import uname as u, python_version as v
+        lst = [cls.main_app_text,
+               'Project : {}'.format(cls.repo_url),
+               'License : {}'.format(cls.license_name),
+               'Platform: {0.system} {0.release} - Python {1}'.format(u(), v()),
+               ]
+        app_info = '\n'.join(lst)
+        return app_info
+
+    @classmethod
     def is_devices_info_file_exist(cls):
-        fn = cls.devices_info_filename
-        file_obj = Path(fn)
-        return file_obj.exists()
+        return File.is_exist(cls.devices_info_filename)
 
     @classmethod
     def create_devices_info_file(cls):
-        if cls.is_devices_info_file_exist():
-            return True
-
-        fn = cls.devices_info_filename
-        file_obj = Path(fn)
-        if not file_obj.parent.exists():
-            file_obj.parent.mkdir(parents=True, exist_ok=True)
-        file_obj.touch()
-        fmt = '{:%Y-%m-%d %H:%M:%S.%f} - {} file is created.'
-        print(fmt.format(datetime.now(), fn))
-        return True
+        is_created = File.create(cls.devices_info_filename)
+        cls.message = File.message
+        return is_created
 
     @classmethod
     def get_dependency(cls):

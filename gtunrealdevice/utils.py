@@ -1,6 +1,9 @@
 """Module containing the logic for utilities."""
 
 import re
+from pathlib import Path
+from pathlib import PurePath
+from datetime import datetime
 
 
 class Printer:
@@ -91,3 +94,68 @@ class Printer:
 
         print_func = print_func if callable(print_func) else print
         print_func(txt)
+
+
+class File:
+    message = ''
+
+    @classmethod
+    def is_exist(cls, filename):
+        """Check file existence
+
+        Parameters
+        ----------
+        filename (str): a file name
+
+        Returns
+        -------
+        bool: True if existed, otherwise False
+        """
+        file_obj = Path(filename)
+        return file_obj.exists()
+
+    @classmethod
+    def create(cls, filename):
+        """Check file existence
+
+        Parameters
+        ----------
+        filename (str): a file name
+
+        Returns
+        -------
+        bool: True if created, otherwise False
+        """
+        if cls.is_exist(filename):
+            cls.message = 'File is already existed.'
+            return True
+
+        try:
+            file_obj = Path(filename)
+            if not file_obj.parent.exists():
+                file_obj.parent.mkdir(parents=True, exist_ok=True)
+            file_obj.touch()
+            fmt = '{:%Y-%m-%d %H:%M:%S.%f} - {} file is created.'
+            print(fmt.format(datetime.now(), filename))
+            cls.message = '{} file is created.'.format(filename)
+            return True
+        except Exception as ex:
+            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            return False
+
+    @classmethod
+    def get_path(cls, *args, is_home=False):
+        """Create a file path
+
+        Parameters
+        ----------
+        args (tuple): a list of file items
+        is_home (bool): True will include Home directory.  Default is False.
+
+        Returns
+        -------
+        str: a file path.
+        """
+        lst = [Path.home()] if is_home else []
+        lst.extend(list(args))
+        return str(PurePath(*lst))

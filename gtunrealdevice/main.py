@@ -3,6 +3,7 @@ import re
 import sys
 import argparse
 
+from gtunrealdevice.config import Data
 from gtunrealdevice.application import Application
 from gtunrealdevice.config import version
 from gtunrealdevice.core import DEVICES_DATA
@@ -16,6 +17,12 @@ from gtunrealdevice.operation import do_device_execute
 from gtunrealdevice.operation import do_device_configure
 from gtunrealdevice.operation import do_device_reload
 from gtunrealdevice.operation import do_device_destroy
+
+from gtunrealdevice.usage import validate_usage
+from gtunrealdevice.usage import show_usage
+from gtunrealdevice.usage import get_global_usage
+
+from gtunrealdevice.utils import File
 
 
 def run_gui_application(options):
@@ -38,16 +45,7 @@ def run_gui_application(options):
 
 def show_dependency(options):
     if options.command == 'dependency':
-        from platform import uname, python_version
-        from gtunrealdevice.config import Data
-        lst = [
-            Data.main_app_text,
-            'Platform: {0.system} {0.release} - Python {1}'.format(
-                uname(), python_version()
-            ),
-            '--------------------',
-            'Dependencies:'
-        ]
+        lst = [Data.get_app_info()]
 
         for pkg in Data.get_dependency().values():
             lst.append('  + Package: {0[package]}'.format(pkg))
@@ -88,13 +86,8 @@ def view_device_info(options):
 
 def show_info(options):
     if options.command == 'info':
-        from platform import uname, python_version
-        from gtunrealdevice.config import Data
         lst = [
-            Data.main_app_text,
-            'Platform: {0.system} {0.release} - Python {1}'.format(
-                uname(), python_version()
-            ),
+            Data.get_app_info(),
             '--------------------',
             'Dependencies:'
         ]
@@ -117,19 +110,60 @@ def show_info(options):
         sys.exit(0)
 
 
+def load_device_info(options):
+    command, operands = options.command, options.operands
+    if command == 'load':
+        validate_usage(command, operands)
+        total = len(operands)
+        if total < 1 or total > 2:
+            show_usage(command)
+
+        keep, fn = str(operands[0]).lower(), str(operands[-1])
+        is_file = File.is_exist(fn)
+        is_kept = keep == 'keep'
+        if not is_file or (total == 2 and not is_kept):
+            if not is_file:
+                print('*** operand MUST BE a file name.')
+            show_usage(command)
+
+        is_valid = DEVICES_DATA.is_valid_file(fn)
+        if not is_valid:
+            sample_format = DEVICES_DATA.get_sample_device_info_format()
+            print(sample_format)
+            sys.exit(1)
+
+        if is_kept:
+            DEVICES_DATA.load(fn)
+            DEVICES_DATA.save()
+            lst = ['+++ Successfully loaded "{}" device info and'.format(fn),
+                   'saved to "{}" file'.format(Data.devices_info_filename)]
+            Printer.print(lst)
+        else:
+            DEVICES_DATA.load(fn)
+            msg = '+++ successfully loaded "{}" device info'.format(fn)
+            Printer.print(msg)
+        sys.exit(0)
+
+
+def show_usage(options):
+    if options.command == 'usage':
+        print(get_global_usage())
+        sys.exit(0)
+
+
 class Cli:
     """gtunrealdevice console CLI application."""
-    prog = 'gtunrealdevice'
+    prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reload', 'version', 'view']
+                'reload', 'usage', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
             prog=self.prog,
             usage='%(prog)s [options] command operands',
-            description='%(prog)s application',
+            description='Geeks Trident Unreal Device Application',
         )
 
         parser.add_argument(
@@ -139,9 +173,9 @@ class Cli:
 
         parser.add_argument(
             'command', type=str,
-            help='command must be either app, configure, connect,'
+            help='command must be either app, configure, connect, '
                  'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reload, version, or view'
+                 'reload, usage, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -159,7 +193,7 @@ class Cli:
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, configure, connect, dependency, destroy,
-        disconnect, execute, gui, info, load, reload,
+        disconnect, execute, gui, info, load, reload, usage,
         version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
@@ -177,6 +211,8 @@ class Cli:
         show_version(self.options)
         show_info(self.options)
         view_device_info(self.options)
+        load_device_info(self.options)
+        show_usage(self.options)
 
         # device action
         do_device_connect(self.options)
