@@ -5,6 +5,22 @@ import sys
 from gtunrealdevice.utils import Printer
 
 
+class ConfigureUsage:
+    usage = '\n'.join([
+        'configure syntax:',
+        '-----------------',
+        'unreal-device configure <cfg_reference>',
+        'unreal-device configure <host_address>::<cfg_reference>',
+        'unreal-device configure <host_name>::<cfg_reference>'
+    ])
+    other_usage = '\n'.join([
+        'configure syntax:',
+        '-----------------',
+        'unreal-device configure <host_address>::<cfg_reference>',
+        'unreal-device configure <host_name>::<cfg_reference>'
+    ])
+
+
 class ConnectUsage:
     usage = '\n'.join([
         'connect syntax:',
@@ -25,6 +41,15 @@ class DisconnectUsage:
     ])
 
 
+class DestroyUsage:
+    usage = '\n'.join([
+        'destroy syntax:',
+        '---------------',
+        'unreal-device destroy <host_address>',
+        'unreal-device destroy <host_name>',
+    ])
+
+
 class ExecuteUsage:
     usage = '\n'.join([
         'execute syntax:',
@@ -42,10 +67,24 @@ class ExecuteUsage:
     ])
 
 
+class ReloadUsage:
+    usage = '\n'.join([
+        'reload syntax:',
+        '--------------',
+        'unreal-device reload <host_address>',
+        'unreal-device reload <host_address> <testcase>',
+        'unreal-device reload <host_name>',
+        'unreal-device reload <host_name> <testcase>'
+    ])
+
+
 class Usage:
+    configure = ConfigureUsage
     connect = ConnectUsage
     disconnect = DisconnectUsage
+    destroy = DestroyUsage
     execute = ExecuteUsage
+    reload = ReloadUsage
 
 
 def validate_usage(name, operands):

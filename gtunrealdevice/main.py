@@ -13,6 +13,9 @@ from gtunrealdevice.serialization import SerializedFile
 from gtunrealdevice.operation import do_device_connect
 from gtunrealdevice.operation import do_device_disconnect
 from gtunrealdevice.operation import do_device_execute
+from gtunrealdevice.operation import do_device_configure
+from gtunrealdevice.operation import do_device_reload
+from gtunrealdevice.operation import do_device_destroy
 
 
 def run_gui_application(options):
@@ -60,7 +63,7 @@ def show_version(options):
         sys.exit(0)
 
 
-def show_device_info(options):
+def view_device_info(options):
     if options.command == 'view':
         kwargs = dict()
         pattern = r'(?i) *(?P<key>testcases?|cmdlines|device)::(?P<value>.*)?'
@@ -118,10 +121,9 @@ class Cli:
     """gtunrealdevice console CLI application."""
     prog = 'gtunrealdevice'
     prog_fn = 'geeks-trident-unreal-device-app'
-    commands = ['app', 'check', 'configure', 'connect', 'dependency',
-                'disconnect', 'execute', 'gui', 'info', 'load',
-                'reconnect', 'reset', 'reload', 'save',
-                'update', 'version', 'view']
+    commands = ['app', 'configure', 'connect', 'destroy',
+                'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
+                'reload', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -137,10 +139,9 @@ class Cli:
 
         parser.add_argument(
             'command', type=str,
-            help='command must be either app, check, configure, connect,'
-                 'dependency, disconnect, execute, gui, info, load, '
-                 'reconnect, reset, reload, save, update, '
-                 'version, or view'
+            help='command must be either app, configure, connect,'
+                 'destroy, dependency, disconnect, execute, gui, info, load, '
+                 'reload, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -157,9 +158,9 @@ class Cli:
         Returns
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
-        command is not  app, check, configure, connect, dependency, disconnect,
-        execute, gui, info, load, reconnect, reset, reload,
-        save, update, version, or view, otherwise, return True
+        command is not  app, configure, connect, dependency, destroy,
+        disconnect, execute, gui, info, load, reload,
+        version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
 
@@ -175,12 +176,15 @@ class Cli:
         show_dependency(self.options)
         show_version(self.options)
         show_info(self.options)
-        show_device_info(self.options)
+        view_device_info(self.options)
 
         # device action
         do_device_connect(self.options)
         do_device_disconnect(self.options)
         do_device_execute(self.options)
+        do_device_configure(self.options)
+        do_device_reload(self.options)
+        do_device_destroy(self.options)
 
 
 def execute():
