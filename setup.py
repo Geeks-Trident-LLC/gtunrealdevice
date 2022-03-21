@@ -31,24 +31,30 @@ setup(
         'console_scripts': [
             'unrealdevice = gtunrealdevice.main:execute',
             'unreal-device = gtunrealdevice.main:execute',
-            'gtunrealdevice = gtunrealdevice.main:execute',
-            'gt-unreal-device = gtunrealdevice.main:execute',
-            'gtdevice = gtunrealdevice.main:execute',
-            'gt-device = gtunrealdevice.main:execute',
         ]
     },
     classifiers=[
+        # development status
+        'Development Status :: 2 - Pre-Alpha',
+        # intended audience
         'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Other Audience',
+        # operating system
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',
+        # license
         'License :: OSI Approved :: BSD License',
+        # programming language
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        # topic
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: Testing',
     ],
 )
