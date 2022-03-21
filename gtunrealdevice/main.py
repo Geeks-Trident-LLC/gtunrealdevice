@@ -3,6 +3,7 @@ import re
 import sys
 import argparse
 
+from gtunrealdevice.config import Data
 from gtunrealdevice.application import Application
 from gtunrealdevice.config import version
 from gtunrealdevice.core import DEVICES_DATA
@@ -38,16 +39,7 @@ def run_gui_application(options):
 
 def show_dependency(options):
     if options.command == 'dependency':
-        from platform import uname, python_version
-        from gtunrealdevice.config import Data
-        lst = [
-            Data.main_app_text,
-            'Platform: {0.system} {0.release} - Python {1}'.format(
-                uname(), python_version()
-            ),
-            '--------------------',
-            'Dependencies:'
-        ]
+        lst = [Data.get_app_info()]
 
         for pkg in Data.get_dependency().values():
             lst.append('  + Package: {0[package]}'.format(pkg))
@@ -88,13 +80,8 @@ def view_device_info(options):
 
 def show_info(options):
     if options.command == 'info':
-        from platform import uname, python_version
-        from gtunrealdevice.config import Data
         lst = [
-            Data.main_app_text,
-            'Platform: {0.system} {0.release} - Python {1}'.format(
-                uname(), python_version()
-            ),
+            Data.get_app_info(),
             '--------------------',
             'Dependencies:'
         ]

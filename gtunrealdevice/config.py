@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from pathlib import PurePath
-from datetime import datetime
 import yaml
 
 from os import path
@@ -99,6 +98,17 @@ class Data:
         OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         """.format(years, company)
     ).strip()
+
+    @classmethod
+    def get_app_info(cls):
+        from platform import uname as u, python_version as v
+        lst = [cls.main_app_text,
+               'Project : {}'.format(cls.repo_url),
+               'License : {}'.format(cls.license_name),
+               'Platform: {0.system} {0.release} - Python {1}'.format(u(), v()),
+               ]
+        app_info = '\n'.join(lst)
+        return app_info
 
     @classmethod
     def is_devices_info_file_exist(cls):
