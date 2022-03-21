@@ -43,7 +43,7 @@ class SerializedFile:
             with open(cls.filename) as stream:
                 content = stream.read().strip()
                 if content:
-                    dict_obj = yaml.load(content, Loader=yaml.SafeLoader)
+                    dict_obj = yaml.safe_load(content)
                     if isinstance(dict_obj, dict):
                         tbl.update(dict_obj=dict_obj)
                         for byte_data in dict_obj.values():
@@ -100,7 +100,7 @@ class SerializedFile:
             return False
         else:
             with open(cls.filename) as read_stream:
-                dict_obj = yaml.load(read_stream, Loader=yaml.SafeLoader)
+                dict_obj = yaml.safe_load(read_stream)
                 if name in dict_obj:
                     byte_data = dict_obj.pop(name)
                     instance = pickle.loads(byte_data)
