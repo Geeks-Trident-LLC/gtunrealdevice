@@ -203,16 +203,18 @@ def do_device_reload(options):
                 reload_data = '\n'.join([
                     'Reloading "{}" device ...'.format(host_addr),
                     '...',
-                    'Closing all applications ...',
-                    'Unload device drivers ...',
+                    'Closing all applications ... Application are closed.',
+                    'Unload device drivers ... Unload completed',
                     '... ',
-                    'Checking memory ...',
-                    'Loading device drivers ...',
-                    'Complete loading ...',
+                    'Booting "{}" device ...'.format(host_addr),
+                    '...'
+                    'Checking memory ... memory tests are PASSED.',
+                    'Loading device drivers ... Device drivers are loaded.',
+                    '...',
                     'System is ready for login.'
                 ])
                 instance = UnrealDevice(host_addr)
-                instance.reload(testcase=testcase, reload_data=reload_data)
+                instance.reconnect(testcase=testcase, reload_data=reload_data)
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(0)
             except Exception as ex:
