@@ -44,18 +44,6 @@ def run_gui_application(options):
         sys.exit(0)
 
 
-def show_dependency(options):
-    if options.command == 'dependency':
-        lst = [Data.get_app_info()]
-
-        for pkg in Data.get_dependency().values():
-            lst.append('  + Package: {0[package]}'.format(pkg))
-            lst.append('             {0[url]}'.format(pkg))
-
-        Printer.print(lst)
-        sys.exit(0)
-
-
 def show_version(options):
     if options.command == 'version':
         print('{} v{}'.format(Cli.prog, version))
@@ -179,7 +167,7 @@ class Cli:
     prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
-                'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
+                'disconnect', 'execute', 'gui', 'info', 'load',
                 'release', 'reload', 'usage', 'version', 'view']
 
     def __init__(self):
@@ -197,7 +185,7 @@ class Cli:
         parser.add_argument(
             'command', type=str,
             help='command must be either app, configure, connect, '
-                 'destroy, dependency, disconnect, execute, gui, info, load, '
+                 'destroy, disconnect, execute, gui, info, load, '
                  'release, reload, usage, version, or view'
         )
         parser.add_argument(
@@ -215,7 +203,7 @@ class Cli:
         Returns
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
-        command is not  app, configure, connect, dependency, destroy,
+        command is not  app, configure, connect, destroy,
         disconnect, execute, gui, info, load, release, reload, usage,
         version, or view, otherwise, return True
         """
@@ -230,7 +218,6 @@ class Cli:
         """Take CLI arguments, parse it, and process."""
         self.validate_command()
         run_gui_application(self.options)
-        show_dependency(self.options)
         show_version(self.options)
         show_info(self.options)
         view_device_info(self.options)
