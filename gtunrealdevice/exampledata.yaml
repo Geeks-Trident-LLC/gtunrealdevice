@@ -1,0 +1,26 @@
+load:
+  example1:
+    header: |-
+      Example: Assuming end-user doesnt know anything about unreal-device tool.
+      How to use use "unreal-device load ..." command line.
+    body: |-
+      Step 1: understanding sample_devices_info format
+          
+          unreal-device info sample_devices_info
+          
+          Note: the structure of sample_devices_info is YAML syntax.
+      
+      Step 2: create a file as user_devices_info.yaml
+      
+      Step 3: load user_devices_info.yaml to unreal-device load user_devices_info.yaml
+          
+          unreal-device load user_devices_info.yaml
+      
+      Step 4: if user wants to save it for later uses, just add keep after load, e.g.
+          
+          unreal-device load keep user_devices_info.yaml
+          
+          Note: "load keep" will overwrite any existing device info.
+              Use text editor to check the file 
+              Linxus OS: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml
+              Window OS: %HOMEDRIVE%/%HOMEPATH%/.geekstrident/gtunrealdevice/devices_info.yaml

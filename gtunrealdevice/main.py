@@ -25,6 +25,8 @@ from gtunrealdevice.usage import get_global_usage
 
 from gtunrealdevice.utils import File
 
+from gtunrealdevice.example import LoadExample
+
 
 def run_gui_application(options):
     """Run gtunrealdevice application.
@@ -125,6 +127,19 @@ def load_device_info(options):
     command, operands = options.command, options.operands
     if command == 'load':
         validate_usage(command, operands)
+
+        op_txt = ' '.join(operands).rstrip()
+        op_count = len(operands)
+
+        if op_txt.lower().startswith('example'):
+            index = str(operands[-1]).strip()
+            if op_count == 2 and re.match('1$', index):
+                result = LoadExample.get(index)
+                print('\n\n{}\n'.format(result))
+                sys.exit(0)
+            else:
+                show_usage(command, 'example', exit_code=1)
+
         total = len(operands)
         if total < 1 or total > 2:
             show_usage(command, exit_code=1)

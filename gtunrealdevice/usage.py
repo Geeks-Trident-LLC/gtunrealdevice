@@ -90,6 +90,12 @@ class LoadUsage:
         Printer.get('Unreal Device Load Usage'),
         'unreal-device load <filename>',
         'unreal-device load keep <filename>',
+        'unreal-device load example 1',
+    ])
+
+    example_usage = '\n'.join([
+        Printer.get('Unreal Device Load Example'),
+        'unreal-device load example 1',
     ])
 
 
