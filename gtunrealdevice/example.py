@@ -24,3 +24,6 @@ class Example:
 class LoadExample(Example):
     name = 'load'
 
+
+class ConnectExample(Example):
+    name = 'connect'

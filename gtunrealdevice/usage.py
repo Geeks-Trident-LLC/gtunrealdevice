@@ -26,7 +26,17 @@ class ConnectUsage:
         'unreal-device connect <host_address>',
         'unreal-device connect <host_address> <testcase>',
         'unreal-device connect <host_name>',
-        'unreal-device connect <host_name> <testcase>'
+        'unreal-device connect <host_name> <testcase>',
+        'unreal-device connect {1, 2, 3, 4, or 5}',
+    ])
+
+    example_usage = '\n'.join([
+        Printer.get('Unreal Device Connect Example'),
+        'unreal-device connect example 1',
+        'unreal-device connect example 2',
+        'unreal-device connect example 3',
+        'unreal-device connect example 4',
+        'unreal-device connect example 5',
     ])
 
 

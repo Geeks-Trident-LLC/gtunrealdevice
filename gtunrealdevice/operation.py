@@ -11,10 +11,26 @@ from gtunrealdevice.serialization import SerializedFile
 from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import show_usage
 
+from gtunrealdevice.example import ConnectExample
+
 
 def do_device_connect(options):
+    command, operands = options.command, options.operands
     if options.command == 'connect':
         validate_usage(options.command, options.operands)
+
+        op_txt = ' '.join(operands).rstrip()
+        op_count = len(operands)
+
+        if op_txt.lower().startswith('example'):
+            index = str(operands[-1]).strip()
+            if op_count == 2 and re.match('[1-5]$', index):
+                result = ConnectExample.get(index)
+                print('\n\n{}\n'.format(result))
+                sys.exit(0)
+            else:
+                show_usage(command, 'example', exit_code=1)
+
         total = len(options.operands)
         if total == 1 or total == 2:
             host_addr = options.operands[0]

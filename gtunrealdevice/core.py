@@ -365,20 +365,27 @@ class UnrealDevice:
                 if testcase in self.data.get('testcases', dict()):
                     self.testcase = testcase
                 else:
-                    fmt = '*** "{}" test case is unavailable for this connection ***'
+                    fmt = 'Warning: "{}" test case is unavailable for this connection ***'
                     print(fmt.format(testcase))
 
             if kwargs.get('showed', True):
                 login_result = self.data.get('login', '')
-                if login_result:
-                    fmt = 'login unreal-device {}@dummy_username:dummy_password'
-                    is_timestamp = kwargs.get('is_timestamp', True)
-                    login_result = self.render_data(
-                        login_result, is_timestamp=is_timestamp,
-                        service='authentication',
-                        extra=fmt.format(self.address)
-                    )
-                    print(login_result)
+                fmt = 'login unreal-device {}@dummy_username:dummy_password'
+                extra = fmt.format(self.address)
+                if testcase:
+                    if testcase in self.data.get('testcases', dict()):
+                        extra = '{} for "{}"'.format(extra, testcase)
+                    else:
+                        extra = '{} fallback to default.'.format(extra)
+
+                fmt = 'login unreal-device {}@dummy_username:dummy_password'
+                is_timestamp = kwargs.get('is_timestamp', True)
+                login_result = self.render_data(
+                    login_result, is_timestamp=is_timestamp,
+                    service='authentication',
+                    extra=extra
+                )
+                print(login_result)
             return self.is_connected
         else:
             fmt = '{} is unavailable for connection.'
