@@ -1,6 +1,7 @@
 """Module containing the logic for console command line usage"""
 
 import sys
+import re
 
 from gtunrealdevice.utils import Printer
 from gtunrealdevice.utils import Misc
@@ -147,6 +148,26 @@ def show_usage(name, *args, exit_code=None):
         fmt = '*** ErrorUsage: "{}" has not defined or unavailable.'
         print(fmt.format(name))
         sys.exit(1)
+
+
+def validate_example_usage(name, operands, max_count=1):
+    pattern = r'example *(?P<index>[0-9]+)$'
+    txt = ' '.join(operands).strip().lower()
+    m = re.match(pattern, txt)
+    if m:
+        index = m.group('index')
+        if 1 <= int(index) <= max_count:
+            module = __import__('gtunrealdevice')
+            cls_name = '{}Example'.format(name.title())
+            cls = getattr(module.example, cls_name)
+            result = cls.get(str(index))
+            print('\n\n{}\n'.format(result))
+            sys.exit(0)
+        else:
+            show_usage(name, 'example', exit_code=1)
+    else:
+        if re.match('example', txt):
+            show_usage(name, 'example', exit_code=1)
 
 
 def get_global_usage():
