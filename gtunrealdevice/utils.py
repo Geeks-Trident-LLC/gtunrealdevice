@@ -182,6 +182,27 @@ class File:
             return ''
 
     @classmethod
+    def get_content(cls, file_path):
+        """get content of file
+
+        Parameters
+        ----------
+        file_path (string): file path
+
+        Returns
+        -------
+        str: content of file
+        """
+        filename = cls.get_path(file_path)
+        try:
+            with open(filename) as stream:
+                content = stream.read()
+                return content
+        except Exception as ex:
+            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            return ''
+
+    @classmethod
     def save(cls, filename, data):
         """Create a file path
 
