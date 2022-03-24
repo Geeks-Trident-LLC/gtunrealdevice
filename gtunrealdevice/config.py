@@ -28,6 +28,11 @@ class Data:
     devices_info_filename = File.get_path(app_directory, 'devices_info.yaml')
     serialized_filename = File.get_path(app_directory, 'serialized_data.yaml')
 
+    # app sample data
+    sample_devices_info_text = File.get_content(
+        File.get_path(File.get_dir(__file__), 'sample_devices_info.yaml')
+    )
+
     # main app
     main_app_text = 'gtunrealdevice v{}'.format(version)
 

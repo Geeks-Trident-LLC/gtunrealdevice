@@ -193,41 +193,7 @@ class DevicesData(dict):
         return True
 
     def get_sample_device_info_format(self):    # noqa
-        text = dedent('''
-            ####################################################################
-            # sample device info                                               #
-            # name, login, and testcases nodes are optional                    #
-            ####################################################################
-            host_address_1:
-              name: host_name (optional)
-              login: |-
-                output_of_login (optional)
-              cmdlines:
-                cmdline_1: |-
-                  line 1 output_of_cmdline_1
-                  ...
-                  line n output_of_cmdline_1
-                cmdline_k_for_multiple_output:
-                  - |-
-                    line 1 - output_of_cmdline_k
-                    ...
-                    line n - output_of_cmdline_k
-                  - |-
-                    line 1 - other_output_of_cmdline_k
-                    ...
-                    line n - other_output_of_cmdline_k
-              testcases:
-                name_of_testcase_1:
-                  cmdline_1: |-
-                    line 1 output_of_cmdline_1_of_testcase_1
-                    ...
-                    line n output_of_cmdline_1_of_testcase_1
-              configs:
-                cfg_1: |-
-                  line 1 of cfg_1 
-                  ...
-                  line n of cfg_1
-        ''').strip()
+        text = Data.sample_devices_info_text
         return text
 
     def get_data(self, data):       # noqa
