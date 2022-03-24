@@ -108,7 +108,7 @@ def show_info(options):
             lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
             lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
             if len(DEVICES_DATA):
-                fmt = '    + address: {:20} name: {}'
+                fmt = '    ~ host: {:16} name: {}'
                 for host in DEVICES_DATA:
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
