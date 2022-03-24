@@ -78,7 +78,7 @@ class SerializedFile:
         dict_obj.update({name: pickle.dumps(node)})
         with (open(cls.filename, 'w')) as stream:
             yaml.dump(dict_obj, stream)
-            fmt = '+++ Successfully added unreal "{}" device.'
+            fmt = '+++ Successfully added "{}" unreal-device.'
             cls.message = fmt.format(name)
             return True
 
@@ -86,7 +86,7 @@ class SerializedFile:
     def remove_instance(cls, name):
         tbl = cls.get_info()
         if tbl.get('total') == 0:
-            fmt = '''*** CANT remove because unreal "{}" device isn't initialized.'''
+            fmt = '''*** CANT remove because "{}" unreal-device isn't initialized.'''
             cls.message = fmt.format(name)
             return False
         else:
@@ -98,11 +98,11 @@ class SerializedFile:
                     instance.is_connected and instance.disconnect()
                     with (open(cls.filename, 'w')) as write_stream:
                         yaml.dump(dict_obj, write_stream)
-                    fmt = '+++ Successfully removed unreal {} device.'
+                    fmt = '+++ Successfully removed {} unreal-device.'
                     cls.message = fmt.format(name)
                     return True
                 else:
-                    fmt = '*** CANT remove because there is no unreal "{}" device.'
+                    fmt = '*** CANT remove because there is no "{}" unreal-device.'
                     cls.message = fmt.format(name)
                     return False
 
