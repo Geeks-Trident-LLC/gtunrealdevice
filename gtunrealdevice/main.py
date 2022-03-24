@@ -17,12 +17,15 @@ from gtunrealdevice.operation import do_device_execute
 from gtunrealdevice.operation import do_device_configure
 from gtunrealdevice.operation import do_device_reload
 from gtunrealdevice.operation import do_device_destroy
+from gtunrealdevice.operation import do_device_release
 
 from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import show_usage
 from gtunrealdevice.usage import get_global_usage
 
 from gtunrealdevice.utils import File
+
+from gtunrealdevice.example import LoadExample
 
 
 def run_gui_application(options):
@@ -40,18 +43,6 @@ def run_gui_application(options):
     if options.command == 'app' or options.command == 'gui':
         app = Application()
         app.run()
-        sys.exit(0)
-
-
-def show_dependency(options):
-    if options.command == 'dependency':
-        lst = [Data.get_app_info()]
-
-        for pkg in Data.get_dependency().values():
-            lst.append('  + Package: {0[package]}'.format(pkg))
-            lst.append('             {0[url]}'.format(pkg))
-
-        Printer.print(lst)
         sys.exit(0)
 
 
@@ -85,26 +76,48 @@ def view_device_info(options):
 
 
 def show_info(options):
-    if options.command == 'info':
+    command, operands = options.command, options.operands
+    if command == 'info':
+        validate_usage(command, operands)
+
+        op_txt = ''.join(operands).strip().lower()
+
+        if op_txt == 'sample_devices_info':
+            Printer.print('Sample Format of Device Info:')
+            print('\n{}\n'.format(Data.sample_devices_info_text))
+            sys.exit(0)
+
+        if not op_txt:
+            Printer.print(Data.get_app_info())
+            sys.exit(0)
+        elif op_txt not in ['all', 'dependency', 'device', 'serialization']:
+            show_usage(command, exit_code=1)
+
         lst = [
             Data.get_app_info(),
-            '--------------------',
-            'Dependencies:'
         ]
 
-        for pkg in Data.get_dependency().values():
-            lst.append('  + Package: {0[package]}'.format(pkg))
-            lst.append('             {0[url]}'.format(pkg))
+        if op_txt in ['dependency', 'all']:
+            lst.append('--------------------')
+            lst.append('Dependencies:')
+            for pkg in Data.get_dependency().values():
+                lst.append('  + Package: {0[package]}'.format(pkg))
+                lst.append('             {0[url]}'.format(pkg))
 
-        lst.append('--------------------')
+        if op_txt in ['device', 'all']:
+            lst.append('--------------------')
+            lst.append('Devices Info:')
+            lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+            lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
+            if len(DEVICES_DATA):
+                fmt = '    ~ host: {:16} name: {}'
+                for host in DEVICES_DATA:
+                    name = DEVICES_DATA.get(host).get('name', 'host')
+                    lst.append(fmt.format(host, name))
 
-        lst.append('Devices Info:')
-        lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
-        lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
-
-        lst.append('--------------------')
-
-        lst.append(SerializedFile.get_info_text())
+        if op_txt in ['serialization', 'all']:
+            lst.append('--------------------')
+            lst.append(SerializedFile.get_info_text())
 
         Printer.print(lst)
         sys.exit(0)
@@ -114,9 +127,22 @@ def load_device_info(options):
     command, operands = options.command, options.operands
     if command == 'load':
         validate_usage(command, operands)
+
+        op_txt = ' '.join(operands).rstrip()
+        op_count = len(operands)
+
+        if op_txt.lower().startswith('example'):
+            index = str(operands[-1]).strip()
+            if op_count == 2 and re.match('1$', index):
+                result = LoadExample.get(index)
+                print('\n\n{}\n'.format(result))
+                sys.exit(0)
+            else:
+                show_usage(command, 'example', exit_code=1)
+
         total = len(operands)
         if total < 1 or total > 2:
-            show_usage(command)
+            show_usage(command, exit_code=1)
 
         keep, fn = str(operands[0]).lower(), str(operands[-1])
         is_file = File.is_exist(fn)
@@ -124,7 +150,7 @@ def load_device_info(options):
         if not is_file or (total == 2 and not is_kept):
             if not is_file:
                 print('*** operand MUST BE a file name.')
-            show_usage(command)
+            show_usage(command, exit_code=1)
 
         is_valid = DEVICES_DATA.is_valid_file(fn)
         if not is_valid:
@@ -145,7 +171,7 @@ def load_device_info(options):
         sys.exit(0)
 
 
-def show_usage(options):
+def show_global_usage(options):
     if options.command == 'usage':
         print(get_global_usage())
         sys.exit(0)
@@ -156,8 +182,8 @@ class Cli:
     prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
-                'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reload', 'usage', 'version', 'view']
+                'disconnect', 'execute', 'gui', 'info', 'load',
+                'release', 'reload', 'usage', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -174,8 +200,8 @@ class Cli:
         parser.add_argument(
             'command', type=str,
             help='command must be either app, configure, connect, '
-                 'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reload, usage, version, or view'
+                 'destroy, disconnect, execute, gui, info, load, '
+                 'release, reload, usage, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -192,8 +218,8 @@ class Cli:
         Returns
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
-        command is not  app, configure, connect, dependency, destroy,
-        disconnect, execute, gui, info, load, reload, usage,
+        command is not  app, configure, connect, destroy,
+        disconnect, execute, gui, info, load, release, reload, usage,
         version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
@@ -207,12 +233,11 @@ class Cli:
         """Take CLI arguments, parse it, and process."""
         self.validate_command()
         run_gui_application(self.options)
-        show_dependency(self.options)
         show_version(self.options)
         show_info(self.options)
         view_device_info(self.options)
         load_device_info(self.options)
-        show_usage(self.options)
+        show_global_usage(self.options)
 
         # device action
         do_device_connect(self.options)
@@ -221,6 +246,7 @@ class Cli:
         do_device_configure(self.options)
         do_device_reload(self.options)
         do_device_destroy(self.options)
+        do_device_release(self.options)
 
 
 def execute():

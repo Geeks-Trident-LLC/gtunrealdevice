@@ -193,41 +193,7 @@ class DevicesData(dict):
         return True
 
     def get_sample_device_info_format(self):    # noqa
-        text = dedent('''
-            ####################################################################
-            # sample device info                                               #
-            # name, login, and testcases nodes are optional                    #
-            ####################################################################
-            host_address_1:
-              name: host_name (optional)
-              login: |-
-                output_of_login (optional)
-              cmdlines:
-                cmdline_1: |-
-                  line 1 output_of_cmdline_1
-                  ...
-                  line n output_of_cmdline_1
-                cmdline_k_for_multiple_output:
-                  - |-
-                    line 1 - output_of_cmdline_k
-                    ...
-                    line n - output_of_cmdline_k
-                  - |-
-                    line 1 - other_output_of_cmdline_k
-                    ...
-                    line n - other_output_of_cmdline_k
-              testcases:
-                name_of_testcase_1:
-                  cmdline_1: |-
-                    line 1 output_of_cmdline_1_of_testcase_1
-                    ...
-                    line n output_of_cmdline_1_of_testcase_1
-              configs:
-                cfg_1: |-
-                  line 1 of cfg_1 
-                  ...
-                  line n of cfg_1
-        ''').strip()
+        text = Data.sample_devices_info_text
         return text
 
     def get_data(self, data):       # noqa
@@ -399,17 +365,27 @@ class UnrealDevice:
                 if testcase in self.data.get('testcases', dict()):
                     self.testcase = testcase
                 else:
-                    fmt = '*** "{}" test case is unavailable for this connection ***'
+                    fmt = 'Warning: "{}" test case is unavailable for this connection ***'
                     print(fmt.format(testcase))
 
             if kwargs.get('showed', True):
                 login_result = self.data.get('login', '')
-                if login_result:
-                    is_timestamp = kwargs.get('is_timestamp', True)
-                    login_result = self.render_data(
-                        login_result, is_timestamp=is_timestamp
-                    )
-                    print(login_result)
+                fmt = 'login unreal-device {}@dummy_username:dummy_password'
+                extra = fmt.format(self.address)
+                if testcase:
+                    if testcase in self.data.get('testcases', dict()):
+                        extra = '{} for "{}"'.format(extra, testcase)
+                    else:
+                        extra = '{} fallback to default.'.format(extra)
+
+                fmt = 'login unreal-device {}@dummy_username:dummy_password'
+                is_timestamp = kwargs.get('is_timestamp', True)
+                login_result = self.render_data(
+                    login_result, is_timestamp=is_timestamp,
+                    service='authentication',
+                    extra=extra
+                )
+                print(login_result)
             return self.is_connected
         else:
             fmt = '{} is unavailable for connection.'
@@ -447,7 +423,8 @@ class UnrealDevice:
                 if reconnect_txt:
                     is_timestamp = kwargs.get('is_timestamp', True)
                     reconnect_txt = self.render_data(
-                        reconnect_txt, is_timestamp=is_timestamp
+                        reconnect_txt, is_timestamp=is_timestamp,
+                        service='reload', extra='reload unreal-device'
                     )
                     print(reconnect_txt)
             return self.is_connected
@@ -470,7 +447,11 @@ class UnrealDevice:
         if kwargs.get('showed', True):
             is_timestamp = kwargs.get('is_timestamp', True)
             msg = '{} is disconnected.'.format(self.name)
-            msg = self.render_data(msg, is_timestamp=is_timestamp)
+            msg = self.render_data(
+                msg, is_timestamp=is_timestamp,
+                service='authentication',
+                extra='logout {} unreal-device'.format(self.address),
+            )
             print(msg)
         return self._is_connected
 
@@ -503,7 +484,10 @@ class UnrealDevice:
             output = result[index]
 
         is_timestamp = kwargs.get('is_timestamp', True)
-        output = self.render_data(output, is_timestamp=is_timestamp)
+        output = self.render_data(
+            output, is_timestamp=is_timestamp,
+            service='execution', extra=cmdline,
+        )
         if kwargs.get('showed', True):
             print(output)
         return output
@@ -522,12 +506,12 @@ class UnrealDevice:
         str: result of configuration
         """
         is_timestamp = kwargs.get('is_timestamp', True)
-        result = self.render_data(config, is_cfg=True, is_timestamp=is_timestamp)
+        result = self.render_data(config, is_timestamp=is_timestamp, service='configuration')
         if kwargs.get('showed', True):
             print(result)
         return result
 
-    def render_data(self, data, is_cfg=False, is_timestamp=True):
+    def render_data(self, data, extra='', service='execution', is_timestamp=True):
 
         if isinstance(data, str):
             lst = data.splitlines()
@@ -539,7 +523,7 @@ class UnrealDevice:
                 else:
                     lst.extend(item)
 
-        if is_cfg:
+        if service == 'configuration':
             prompt = '{}(configure)#'.format(self.name)
             
             for index, item in enumerate(lst):
@@ -549,10 +533,14 @@ class UnrealDevice:
 
         if is_timestamp:
             dt = datetime.now()
-            fmt = '+++ {:%b %d %Y %T}.{} from "unreal-device" for "{}"'
-            timestamp = fmt.format(dt, str(dt.microsecond)[:3], self.name)
-            lst.insert(int(is_cfg), timestamp)
-        
+            fmt = '+++ {:%b %d %Y %T}.{} from unreal-device {} service for "{}"'
+            timestamp = fmt.format(dt, str(dt.microsecond)[:3], service, self.name)
+            index = 1 if service == 'configuration' else 0
+            lst.insert(index, timestamp)
+
+        if extra:
+            lst.insert(0, extra)
+
         result = '\n'.join(lst)
         return result
 

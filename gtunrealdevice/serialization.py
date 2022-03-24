@@ -29,6 +29,7 @@ class SerializedFile:
     @classmethod
     def get_info(cls):
         tbl = dict(filename=cls.filename)
+        instances = []
         if cls.is_file_exist():
             tbl.update(existed=True)
             with open(cls.filename) as stream:
@@ -41,6 +42,7 @@ class SerializedFile:
                             try:
                                 obj = pickle.loads(byte_data)
                                 if isinstance(obj, UnrealDevice):
+                                    instances.append(obj)
                                     continue
                                 type_name = type(obj).__name__
                                 fmt = 'Expecting UnrealDevice instance but received {} type'
@@ -62,6 +64,14 @@ class SerializedFile:
                '  - Existed: {}'.format('Yes' if tbl['existed'] else 'No'),
                '  - Total serialized instances: {}'.format(tbl['total'])]
 
+        if instances:
+            fmt = '    ~ host: {:16} name: {}'
+            other_fmt = '      +-> current assigned testcase: {}'
+            for instance in instances:
+                lst.append(fmt.format(instance.address, instance.name))
+                if instance.testcase:
+                    lst.append(other_fmt.format(instance.testcase))
+
         tbl.update(text='\n'.join(lst))
         return tbl
 
@@ -78,7 +88,7 @@ class SerializedFile:
         dict_obj.update({name: pickle.dumps(node)})
         with (open(cls.filename, 'w')) as stream:
             yaml.dump(dict_obj, stream)
-            fmt = '+++ Successfully added unreal "{}" device.'
+            fmt = '+++ Successfully added "{}" unreal-device.'
             cls.message = fmt.format(name)
             return True
 
@@ -86,7 +96,7 @@ class SerializedFile:
     def remove_instance(cls, name):
         tbl = cls.get_info()
         if tbl.get('total') == 0:
-            fmt = '''*** CANT remove because unreal "{}" device isn't initialized.'''
+            fmt = '''*** CANT remove because "{}" unreal-device isn't initialized.'''
             cls.message = fmt.format(name)
             return False
         else:
@@ -98,11 +108,11 @@ class SerializedFile:
                     instance.is_connected and instance.disconnect()
                     with (open(cls.filename, 'w')) as write_stream:
                         yaml.dump(dict_obj, write_stream)
-                    fmt = '+++ Successfully removed unreal {} device.'
+                    fmt = '+++ Successfully removed {} unreal-device.'
                     cls.message = fmt.format(name)
                     return True
                 else:
-                    fmt = '*** CANT remove because there is no unreal "{}" device.'
+                    fmt = '*** CANT remove because there is no "{}" unreal-device.'
                     cls.message = fmt.format(name)
                     return False
 
