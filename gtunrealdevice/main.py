@@ -17,6 +17,7 @@ from gtunrealdevice.operation import do_device_execute
 from gtunrealdevice.operation import do_device_configure
 from gtunrealdevice.operation import do_device_reload
 from gtunrealdevice.operation import do_device_destroy
+from gtunrealdevice.operation import do_device_release
 
 from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import show_usage
@@ -221,6 +222,7 @@ class Cli:
         do_device_configure(self.options)
         do_device_reload(self.options)
         do_device_destroy(self.options)
+        do_device_release(self.options)
 
 
 def execute():
