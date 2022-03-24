@@ -47,6 +47,7 @@ class DestroyUsage:
         'unreal-device release <host_name>',
     ])
 
+
 class ReleaseUsage:
     usage = '\n'.join([
         Printer.get('Unreal Device Destroy/Release Usage'),
@@ -69,6 +70,18 @@ class ExecuteUsage:
         Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <host_address>::<cmdline>',
         'unreal-device execute <host_name>::<cmdline>'
+    ])
+
+
+class InfoUsage:
+    usage = '\n'.join([
+        Printer.get('Unreal Device Information Usage'),
+        'unreal-device info',
+        'unreal-device info all',
+        'unreal-device info dependency',
+        'unreal-device info device',
+        'unreal-device info serialization',
+        'unreal-device info sample_devices_info'
     ])
 
 
@@ -96,6 +109,7 @@ class Usage:
     disconnect = DisconnectUsage
     destroy = DestroyUsage
     execute = ExecuteUsage
+    info = InfoUsage
     load = LoadUsage
     reload = ReloadUsage
     release = ReleaseUsage

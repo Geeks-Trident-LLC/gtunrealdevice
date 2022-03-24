@@ -86,26 +86,48 @@ def view_device_info(options):
 
 
 def show_info(options):
-    if options.command == 'info':
+    command, operands = options.command, options.operands
+    if command == 'info':
+        validate_usage(command, operands)
+
+        op_txt = ''.join(operands).strip().lower()
+
+        if op_txt == 'sample_devices_info':
+            Printer.print('Sample Format of Device Info:')
+            print('\n{}\n'.format(Data.sample_devices_info_text))
+            sys.exit(0)
+
+        if not op_txt:
+            Printer.print(Data.get_app_info())
+            sys.exit(0)
+        elif op_txt not in ['all', 'dependency', 'device', 'serialization']:
+            show_usage(command, exit_code=1)
+
         lst = [
             Data.get_app_info(),
-            '--------------------',
-            'Dependencies:'
         ]
 
-        for pkg in Data.get_dependency().values():
-            lst.append('  + Package: {0[package]}'.format(pkg))
-            lst.append('             {0[url]}'.format(pkg))
+        if op_txt in ['dependency', 'all']:
+            lst.append('--------------------')
+            lst.append('Dependencies:')
+            for pkg in Data.get_dependency().values():
+                lst.append('  + Package: {0[package]}'.format(pkg))
+                lst.append('             {0[url]}'.format(pkg))
 
-        lst.append('--------------------')
+        if op_txt in ['device', 'all']:
+            lst.append('--------------------')
+            lst.append('Devices Info:')
+            lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+            lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
+            if len(DEVICES_DATA):
+                fmt = '    + address: {:20} name: {}'
+                for host in DEVICES_DATA:
+                    name = DEVICES_DATA.get(host).get('name', 'host')
+                    lst.append(fmt.format(host, name))
 
-        lst.append('Devices Info:')
-        lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
-        lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
-
-        lst.append('--------------------')
-
-        lst.append(SerializedFile.get_info_text())
+        if op_txt in ['serialization', 'all']:
+            lst.append('--------------------')
+            lst.append(SerializedFile.get_info_text())
 
         Printer.print(lst)
         sys.exit(0)
