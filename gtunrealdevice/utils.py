@@ -160,6 +160,28 @@ class File:
         return file_path
 
     @classmethod
+    def get_dir(cls, file_path):
+        """get directory from existing file path
+
+        Parameters
+        ----------
+        file_path (string): file path
+
+        Returns
+        -------
+        str: directory
+        """
+        file_obj = Path(file_path).expanduser().absolute()
+        if file_obj.is_dir():
+            return str(file_obj)
+        elif file_obj.is_file():
+            return str(file_obj.parent)
+        else:
+            fmt = 'FileNotFoundError: No such file or directory "{}"'
+            cls.message = fmt.format(file_path)
+            return ''
+
+    @classmethod
     def save(cls, filename, data):
         """Create a file path
 
