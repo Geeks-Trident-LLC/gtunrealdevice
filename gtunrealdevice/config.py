@@ -29,9 +29,41 @@ class Data:
     serialized_filename = File.get_path(app_directory, 'serialized_data.yaml')
 
     # app sample data
-    sample_devices_info_text = File.get_content(
-        File.get_path(File.get_dir(__file__), 'sample_devices_info.yaml')
-    )
+    sample_devices_info_text = dedent("""
+        ####################################################################
+        # sample devices info                                              #
+        # Note: name, login, testcases, and configs nodes are optional     #
+        ####################################################################
+        host_address_1:
+          name: host_name (optional)
+          login: |-
+            output_of_login (optional)
+          cmdlines:
+            cmdline_1: |-
+              line 1 output_of_cmdline_1
+              ...
+              line n output_of_cmdline_1
+            cmdline_k_for_multiple_output:
+              - |-
+                line 1 - output_of_cmdline_k
+                ...
+                line n - output_of_cmdline_k
+              - |-
+                line 1 - other_output_of_cmdline_k
+                ...
+                line n - other_output_of_cmdline_k
+          testcases:
+            name_of_testcase_1:
+              cmdline_1: |-
+                line 1 output_of_cmdline_1_of_testcase_1
+                ...
+                line n output_of_cmdline_1_of_testcase_1
+          configs:
+            cfg_1_reference: |-
+              line 1 of cfg_1 
+              ...
+              line n of cfg_1
+    """).strip()
 
     # main app
     main_app_text = 'gtunrealdevice v{}'.format(version)
