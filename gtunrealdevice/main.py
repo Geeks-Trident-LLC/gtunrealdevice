@@ -116,7 +116,7 @@ def load_device_info(options):
         validate_usage(command, operands)
         total = len(operands)
         if total < 1 or total > 2:
-            show_usage(command)
+            show_usage(command, exit_code=1)
 
         keep, fn = str(operands[0]).lower(), str(operands[-1])
         is_file = File.is_exist(fn)
@@ -124,7 +124,7 @@ def load_device_info(options):
         if not is_file or (total == 2 and not is_kept):
             if not is_file:
                 print('*** operand MUST BE a file name.')
-            show_usage(command)
+            show_usage(command, exit_code=1)
 
         is_valid = DEVICES_DATA.is_valid_file(fn)
         if not is_valid:
@@ -145,7 +145,7 @@ def load_device_info(options):
         sys.exit(0)
 
 
-def show_usage(options):
+def show_global_usage(options):
     if options.command == 'usage':
         print(get_global_usage())
         sys.exit(0)
@@ -157,7 +157,7 @@ class Cli:
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
                 'dependency', 'disconnect', 'execute', 'gui', 'info', 'load',
-                'reload', 'usage', 'version', 'view']
+                'release', 'reload', 'usage', 'version', 'view']
 
     def __init__(self):
         parser = argparse.ArgumentParser(
@@ -175,7 +175,7 @@ class Cli:
             'command', type=str,
             help='command must be either app, configure, connect, '
                  'destroy, dependency, disconnect, execute, gui, info, load, '
-                 'reload, usage, version, or view'
+                 'release, reload, usage, version, or view'
         )
         parser.add_argument(
             'operands', nargs='*', type=str,
@@ -193,7 +193,7 @@ class Cli:
         -------
         bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
         command is not  app, configure, connect, dependency, destroy,
-        disconnect, execute, gui, info, load, reload, usage,
+        disconnect, execute, gui, info, load, release, reload, usage,
         version, or view, otherwise, return True
         """
         self.options.command = self.options.command.lower()
@@ -212,7 +212,7 @@ class Cli:
         show_info(self.options)
         view_device_info(self.options)
         load_device_info(self.options)
-        show_usage(self.options)
+        show_global_usage(self.options)
 
         # device action
         do_device_connect(self.options)

@@ -3,19 +3,18 @@
 import sys
 
 from gtunrealdevice.utils import Printer
+from gtunrealdevice.utils import Misc
 
 
 class ConfigureUsage:
     usage = '\n'.join([
-        'configure syntax:',
-        '-----------------',
+        Printer.get('Unreal Device Configure Usage'),
         'unreal-device configure <cfg_reference>',
         'unreal-device configure <host_address>::<cfg_reference>',
         'unreal-device configure <host_name>::<cfg_reference>'
     ])
     other_usage = '\n'.join([
-        'configure syntax:',
-        '-----------------',
+        Printer.get('Unreal Device Configure Usage'),
         'unreal-device configure <host_address>::<cfg_reference>',
         'unreal-device configure <host_name>::<cfg_reference>'
     ])
@@ -23,8 +22,7 @@ class ConfigureUsage:
 
 class ConnectUsage:
     usage = '\n'.join([
-        'connect syntax:',
-        '---------------',
+        Printer.get('Unreal Device Connect Usage'),
         'unreal-device connect <host_address>',
         'unreal-device connect <host_address> <testcase>',
         'unreal-device connect <host_name>',
@@ -34,8 +32,7 @@ class ConnectUsage:
 
 class DisconnectUsage:
     usage = '\n'.join([
-        'disconnect syntax:',
-        '------------------',
+        Printer.get('Unreal Device Disconnect Usage'),
         'unreal-device disconnect <host_address>',
         'unreal-device disconnect <host_name>',
     ])
@@ -43,25 +40,33 @@ class DisconnectUsage:
 
 class DestroyUsage:
     usage = '\n'.join([
-        'destroy syntax:',
-        '---------------',
+        Printer.get('Unreal Device Destroy/Release Usage'),
         'unreal-device destroy <host_address>',
         'unreal-device destroy <host_name>',
+        'unreal-device release <host_address>',
+        'unreal-device release <host_name>',
+    ])
+
+class ReleaseUsage:
+    usage = '\n'.join([
+        Printer.get('Unreal Device Destroy/Release Usage'),
+        'unreal-device destroy <host_address>',
+        'unreal-device destroy <host_name>',
+        'unreal-device release <host_address>',
+        'unreal-device release <host_name>',
     ])
 
 
 class ExecuteUsage:
     usage = '\n'.join([
-        'execute syntax:',
-        '---------------',
+        Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <cmdline>',
         'unreal-device execute <host_address>::<cmdline>',
         'unreal-device execute <host_name>::<cmdline>'
     ])
 
     other_usage = '\n'.join([
-        'execute syntax:',
-        '---------------',
+        Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <host_address>::<cmdline>',
         'unreal-device execute <host_name>::<cmdline>'
     ])
@@ -69,8 +74,7 @@ class ExecuteUsage:
 
 class LoadUsage:
     usage = '\n'.join([
-        'load syntax:',
-        '---------------',
+        Printer.get('Unreal Device Load Usage'),
         'unreal-device load <filename>',
         'unreal-device load keep <filename>',
     ])
@@ -78,8 +82,7 @@ class LoadUsage:
 
 class ReloadUsage:
     usage = '\n'.join([
-        'reload syntax:',
-        '--------------',
+        Printer.get('Unreal Device Reload Usage'),
         'unreal-device reload <host_address>',
         'unreal-device reload <host_address> <testcase>',
         'unreal-device reload <host_name>',
@@ -95,70 +98,73 @@ class Usage:
     execute = ExecuteUsage
     load = LoadUsage
     reload = ReloadUsage
+    release = ReleaseUsage
 
 
 def validate_usage(name, operands):
-    result = ''.join(operands) if isinstance(operands, list) else str(operands)
+    result = ''.join(operands) if Misc.is_list_instance(operands) else str(operands)
     if result.strip().lower() == 'usage':
-        show_usage(name)
+        show_usage(name, exit_code=0)
 
 
-def show_usage(name, *args):
+def show_usage(name, *args, exit_code=None):
     obj = getattr(Usage, name, None)
     if getattr(obj, 'usage', None):
         attr = '_'.join(list(args) + ['usage'])
-        Printer.print(getattr(obj, attr))
-        sys.exit(0)
+        print(getattr(obj, attr))
+        Misc.is_integer(exit_code) and sys.exit(exit_code)
     else:
-        fmt = '***Usage of "{}" has not defined or unavailable.'
+        fmt = '*** ErrorUsage: "{}" has not defined or unavailable.'
         print(fmt.format(name))
         sys.exit(1)
 
 
 def get_global_usage():
     lst = [
-        Printer.get('Global Usages', width=60),
+        Printer.get('Global Usages'),
         'unreal-device app',
         'unreal-device version',
         'unreal-device info',
         '',
-        Printer.get('Device Info File Usage', width=60),
+        Printer.get('Info File Usage'),
         'unreal-device view',
         'unreal-device view device::<host_address>',
         'unreal-device view device::<host_address> testcase::<testcase_name>',
         'unreal-device view device::<host_address> cmdlines',
         'unreal-device view device::<host_address> testcases',
         '',
-        Printer.get('Loading/Saving Device Info Usage', width=60),
+        Printer.get('Loading/Saving Device Info Usage'),
         'unreal-device load <filename>',
         'unreal-device load keep <filename>',
         '',
-        Printer.get('Device Connect Usage', width=60),
+        Printer.get('Unreal Device Connect Usage'),
         'unreal-device connect <host_address>',
         'unreal-device connect <host_address> <testcase>',
         'unreal-device connect <host_name>',
         'unreal-device connect <host_name> <testcase>',
         '',
-        Printer.get('Device Reload Usage', width=60),
+        Printer.get('Unreal Device Reload Usage'),
         'unreal-device reload <host_address>',
         'unreal-device reload <host_address> <testcase>',
         'unreal-device reload <host_name>',
         'unreal-device reload <host_name> <testcase>',
         '',
-        Printer.get('Device Disconnect Usage', width=60),
+        Printer.get('Unreal Device Disconnect Usage'),
         'unreal-device disconnect <host_address>',
         'unreal-device disconnect <host_name>',
         '',
-        Printer.get('Device Destroy Usage', width=60),
+        Printer.get('Unreal Device Destroy/Release Usage'),
         'unreal-device destroy <host_address>',
         'unreal-device destroy <host_name>',
+        'unreal-device release <host_address>',
+        'unreal-device release <host_name>',
         '',
-        Printer.get('Device Configure Usage', width=60),
+        Printer.get('Unreal Device Configure Usage'),
         'unreal-device configure <cfg_reference>',
         'unreal-device configure <host_address>::<cfg_reference>',
         'unreal-device configure <host_name>::<cfg_reference>',
         '',
-        Printer.get('Device Execute Usage', width=60),
+        Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <cmdline>',
         'unreal-device execute <host_address>::<cmdline>',
         'unreal-device execute <host_name>::<cmdline>',
