@@ -186,6 +186,66 @@ class Cli:
         )
 
         parser.add_argument(
+            '--host', type=str, default='',
+            help="host address or host name"
+        ),
+
+        parser.add_argument(
+            '--testcase', type=str, default='',
+            help="showing test case data of device"
+        ),
+
+        parser.add_argument(
+            '--filename', type=str, default='',
+            help="file name"
+        ),
+
+        parser.add_argument(
+            '--status', action='store_true',
+            help="device status"
+        ),
+
+        parser.add_argument(
+            '--testcases', action='store_true',
+            help="showing test cases data of device"
+        ),
+
+        parser.add_argument(
+            '--cmdlines', action='store_true',
+            help="showing command lines data of device"
+        ),
+
+        parser.add_argument(
+            '--save', action='store_true',
+            help="saving devices info to devices_info.yaml"
+        ),
+
+        parser.add_argument(
+            '--all', action='store_true',
+            help="showing all information"
+        ),
+
+        parser.add_argument(
+            '--dependency', action='store_true',
+            help="showing package dependencies"
+        ),
+
+        parser.add_argument(
+            '--devices-data', action='store_true',
+            help="showing devices data"
+        ),
+
+        parser.add_argument(
+            '--serialization', action='store_true',
+            help="showing serialization info"
+        ),
+
+        parser.add_argument(
+            '--sample-devices-info', action='store_true',
+            help="showing sample devices info format"
+        ),
+
+        parser.add_argument(
             'command', type=str,
             help='command must be either app, configure, connect, '
                  'destroy, disconnect, execute, gui, info, load, '
