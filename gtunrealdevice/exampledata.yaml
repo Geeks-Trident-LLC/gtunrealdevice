@@ -165,3 +165,59 @@ connect:
       test@test_machine ~ % echo $?
       0
       test@test_machine ~ %
+
+execute:
+  example1:
+    header: |-
+      Example: What execution failure messge will show when user tries to
+      execute command line on unconnected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device execute 1.1.1.1::show version                                          
+      CANT execute cmdline because 1.1.1.1 has not connected.
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: What is output of executing valid command line on connected device?
+    body: |-
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device view 1.1.1.1
+      +------------------------------------------------------------------------------+
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 1                                                         |
+      +------------------------------------------------------------------------------+
+      cmdlines:
+        show ver: software version is 2.0.2.2
+        show version: software version is 2.0.2.2
+      login: device1 is successfully connected.
+      name: device1
+      testcases:
+        test1:
+          show version: software version is 2.0.2.2.a
+      
+      test@test_machine ~ % 
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device execute 1.1.1.1::show version
+      show version
+      +++ Mar 24 2022 17:44:29.753 from unreal-device execution service for "1.1.1.1"
+      software version is 2.0.2.2
+      test@test_machine ~ % 
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ % 
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device execute 1.1.1.1::show ver    
+      show ver
+      +++ Mar 24 2022 17:44:35.634 from unreal-device execution service for "1.1.1.1"
+      software version is 2.0.2.2
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ % 
+      test@test_machine ~ %

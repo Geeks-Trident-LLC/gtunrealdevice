@@ -27,3 +27,7 @@ class LoadExample(Example):
 
 class ConnectExample(Example):
     name = 'connect'
+
+
+class ExecuteExample(Example):
+    name = 'execute'

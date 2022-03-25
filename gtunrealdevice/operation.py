@@ -9,27 +9,14 @@ from gtunrealdevice.core import DEVICES_DATA
 from gtunrealdevice.serialization import SerializedFile
 
 from gtunrealdevice.usage import validate_usage
+from gtunrealdevice.usage import validate_example_usage
 from gtunrealdevice.usage import show_usage
-
-from gtunrealdevice.example import ConnectExample
 
 
 def do_device_connect(options):
-    command, operands = options.command, options.operands
     if options.command == 'connect':
         validate_usage(options.command, options.operands)
-
-        op_txt = ' '.join(operands).rstrip()
-        op_count = len(operands)
-
-        if op_txt.lower().startswith('example'):
-            index = str(operands[-1]).strip()
-            if op_count == 2 and re.match('[1-5]$', index):
-                result = ConnectExample.get(index)
-                print('\n\n{}\n'.format(result))
-                sys.exit(0)
-            else:
-                show_usage(command, 'example', exit_code=1)
+        validate_example_usage(options.command, options.operands, max_count=5)
 
         total = len(options.operands)
         if total == 1 or total == 2:
@@ -141,6 +128,7 @@ def do_device_release(options):
 def do_device_execute(options):
     if options.command == 'execute':
         validate_usage(options.command, options.operands)
+        # validate_example_usage(options.command, options.operands, max_count=5)
 
         data = ' '.join(options.operands).strip()
         pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
@@ -174,7 +162,7 @@ def do_device_execute(options):
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
                 print(fmt.format(host_addr))
-                sys.exit(0)
+                sys.exit(1)
         else:
             show_usage(options.command)
 
@@ -215,7 +203,7 @@ def do_device_configure(options):
             else:
                 fmt = 'CANT configure because {} has not connected.'
                 print(fmt.format(host_addr))
-                sys.exit(0)
+                sys.exit(1)
         else:
             show_usage(options.command)
 
