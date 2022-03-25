@@ -74,13 +74,23 @@ class ExecuteUsage:
         Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <cmdline>',
         'unreal-device execute <host_address>::<cmdline>',
-        'unreal-device execute <host_name>::<cmdline>'
+        'unreal-device execute <host_name>::<cmdline>',
+        'unreal-device execute example {1, 2, 3, 4, or 5}',
     ])
 
     other_usage = '\n'.join([
         Printer.get('Unreal Device Execute Usage'),
         'unreal-device execute <host_address>::<cmdline>',
         'unreal-device execute <host_name>::<cmdline>'
+    ])
+
+    example_usage = '\n'.join([
+        Printer.get('Unreal Device Execute Example'),
+        'unreal-device execute example 1',
+        'unreal-device execute example 2',
+        'unreal-device execute example 3',
+        'unreal-device execute example 4',
+        'unreal-device execute example 5'
     ])
 
 

@@ -128,6 +128,7 @@ def do_device_release(options):
 def do_device_execute(options):
     if options.command == 'execute':
         validate_usage(options.command, options.operands)
+        # validate_example_usage(options.command, options.operands, max_count=5)
 
         data = ' '.join(options.operands).strip()
         pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
@@ -161,7 +162,7 @@ def do_device_execute(options):
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
                 print(fmt.format(host_addr))
-                sys.exit(0)
+                sys.exit(1)
         else:
             show_usage(options.command)
 
@@ -202,7 +203,7 @@ def do_device_configure(options):
             else:
                 fmt = 'CANT configure because {} has not connected.'
                 print(fmt.format(host_addr))
-                sys.exit(0)
+                sys.exit(1)
         else:
             show_usage(options.command)
 
