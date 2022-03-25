@@ -2,132 +2,204 @@
 
 import sys
 import re
+from enum import IntFlag
 
-from gtunrealdevice.utils import Printer
 from gtunrealdevice.utils import Misc
+
+from gtunrealdevice import example
+
+tool = 'unreal-device'
+
+
+class FLAG(IntFlag):
+    HOST = 1
+    STATUS = 2
+    TESTCASE = 4
+    TESTCASES = 8
+    CMDLINES = 16
+    FILENAME = 32
+    SAVE = 64
+    ALL = 128
+    DEPENDENCY = 256
+    DEVICES_DATA = 512
+    SERIALIZATION = 1024
+    SAMPLE_DEVICES_INFO = 2048
+    HOST_TESTCASE = HOST | TESTCASE
+    VIEW_USAGE = HOST | STATUS | TESTCASE | TESTCASES | CMDLINES
+    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | SAMPLE_DEVICES_INFO
+
+
+class UData:
+    def __init__(self, *args, is_header=False):
+        self.args = args
+        lst = []
+        if self.args:
+            for arg in self.args:
+                if Misc.is_list_instance(arg):
+                    lst.extend([str(item) for item in arg])
+                else:
+                    lst.append(str(arg))
+            self.data = '\n'.join(lst)
+            if is_header:
+                self.data = '{0}\n{1}\n{0}'.format('+' * 80, self.data)
+        else:
+            self.data = ''
+
+        if not self.data.strip():
+            self.data = self.data.strip()
+
+        self.data_len = len(self.data)
+
+        self._count = len(lst)
+
+    def __len__(self):
+        return self.data_len
+
+    def __repr__(self):
+        return self.data
+
+    def __str__(self):
+        return self.data
+
+    @property
+    def count(self):
+        return self._count
+
+
+class UsageData(UData):
+    def __init__(self, header_data, body_data):
+        super().__init__(header_data, '{}\n'.format(body_data), is_header=False)
+        self._count = body_data.count
+
+
+class UHeaderData(UData):
+    def __init__(self, *args):
+        if len(args) > 1:
+            item0 = args[0]
+            lst = [item0, '-' * len(str(item0)), *args[1:]]
+        else:
+            lst = args
+        super().__init__(*lst, is_header=True)
+
+
+class UBodyData(UData):
+    def __init__(self, *args):
+        super().__init__(*args, is_header=False)
+
+
+def get_usage_header(name, flags=0):
+    name = str(name).lower()
+    lst = ['{} {} usage'.format(tool, name)]
+    args = [
+        '  --host HOST                  host address or host name',
+        '  --status                     device status',
+        '  --testcase TESTCASE          showing test case data of device',
+        '  --testcases                  showing test cases data of device',
+        '  --cmdlines                   showing command lines data of device',
+        '  --filename FILENAME          file name',
+        '  --save                       saving devices info to devices_info.yaml',
+        '  --all                        showing all information',
+        '  --dependency                 showing package dependencies',
+        '  --devices-data               showing devices data',
+        '  --serialization              showing serialization info',
+        '  --sample-devices-info        sample sample devices info format',
+    ]
+    if flags:
+        bits = list(map(int, list(bin(int(flags))[2:][::-1])))
+        lst.append('optional arguments:')
+        lst.append('-------------------')
+        for index, bit in enumerate(bits):
+            bit and lst.append(args[index])
+
+    header_usage = UHeaderData(lst)
+    return header_usage
+
+
+def get_usage(name, flags=0, count=0):
+    name = str(name).lower()
+    header_usage = get_usage_header(name, flags=flags)
+
+    lst = ['{} {} [options]'.format(tool, name)]
+    if count > 0:
+        lst1 = list(map(str, range(1, count + 1)))
+        s = lst1[0] if len(lst1) == 1 else '{%s}' % (','.join(lst1))
+        lst.append('%s %s example %s' % (tool, name, s))
+
+    body_usage = UBodyData(*lst)
+
+    usage = UsageData(header_usage, body_usage)
+    return usage
+
+
+def get_example_usage(name, count=1):
+    name = str(name).lower()
+    fmt = '{} {} example {}'
+
+    example_usage = UsageData(
+        UHeaderData('{} {} example syntax:'.format(tool, name)),
+        UBodyData(*[fmt.format(tool, name, i + 1) for i in range(count)])
+    )
+    return example_usage
 
 
 class ConfigureUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Configure Usage'),
-        'unreal-device configure <cfg_reference>',
-        'unreal-device configure <host_address>::<cfg_reference>',
-        'unreal-device configure <host_name>::<cfg_reference>'
-    ])
-    other_usage = '\n'.join([
-        Printer.get('Unreal Device Configure Usage'),
-        'unreal-device configure <host_address>::<cfg_reference>',
-        'unreal-device configure <host_name>::<cfg_reference>'
-    ])
+    usage = get_usage('configure', flags=FLAG.HOST, count=1)
+    other_usage = get_usage('configure', flags=FLAG.HOST)
+    example_usage = get_example_usage('configure', count=1)
 
 
 class ConnectUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Connect Usage'),
-        'unreal-device connect <host_address>',
-        'unreal-device connect <host_address> <testcase>',
-        'unreal-device connect <host_name>',
-        'unreal-device connect <host_name> <testcase>',
-        'unreal-device connect {1, 2, 3, 4, or 5}',
-    ])
-
-    example_usage = '\n'.join([
-        Printer.get('Unreal Device Connect Example'),
-        'unreal-device connect example 1',
-        'unreal-device connect example 2',
-        'unreal-device connect example 3',
-        'unreal-device connect example 4',
-        'unreal-device connect example 5',
-    ])
+    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE, count=5)
+    other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE)
+    example_usage = get_example_usage('connect', count=5)
 
 
 class DisconnectUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Disconnect Usage'),
-        'unreal-device disconnect <host_address>',
-        'unreal-device disconnect <host_name>',
-    ])
+    usage = get_usage('disconnect', flags=FLAG.HOST, count=1)
+    other_usage = get_usage('disconnect', flags=FLAG.HOST)
+    example_usage = get_example_usage('disconnect', count=1)
 
 
 class DestroyUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Destroy/Release Usage'),
-        'unreal-device destroy <host_address>',
-        'unreal-device destroy <host_name>',
-        'unreal-device release <host_address>',
-        'unreal-device release <host_name>',
-    ])
-
-
-class ReleaseUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Destroy/Release Usage'),
-        'unreal-device destroy <host_address>',
-        'unreal-device destroy <host_name>',
-        'unreal-device release <host_address>',
-        'unreal-device release <host_name>',
-    ])
+    usage = get_usage('destroy', flags=FLAG.HOST, count=1)
+    other_usage = get_usage('destroy', flags=FLAG.HOST)
+    example_usage = get_example_usage('destroy', count=1)
 
 
 class ExecuteUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Execute Usage'),
-        'unreal-device execute <cmdline>',
-        'unreal-device execute <host_address>::<cmdline>',
-        'unreal-device execute <host_name>::<cmdline>',
-        'unreal-device execute example {1, 2, 3, 4, or 5}',
-    ])
-
-    other_usage = '\n'.join([
-        Printer.get('Unreal Device Execute Usage'),
-        'unreal-device execute <host_address>::<cmdline>',
-        'unreal-device execute <host_name>::<cmdline>'
-    ])
-
-    example_usage = '\n'.join([
-        Printer.get('Unreal Device Execute Example'),
-        'unreal-device execute example 1',
-        'unreal-device execute example 2',
-        'unreal-device execute example 3',
-        'unreal-device execute example 4',
-        'unreal-device execute example 5'
-    ])
+    usage = get_usage('execute', flags=FLAG.HOST, count=5)
+    other_usage = get_usage('execute', flags=FLAG.HOST)
+    example_usage = get_example_usage('execute', count=5)
 
 
 class InfoUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Information Usage'),
-        'unreal-device info',
-        'unreal-device info all',
-        'unreal-device info dependency',
-        'unreal-device info device',
-        'unreal-device info serialization',
-        'unreal-device info sample_devices_info'
-    ])
+    usage = get_usage('info', flags=FLAG.INFO_USAGE, count=1)
+    other_usage = get_usage('info', flags=FLAG.INFO_USAGE)
+    example_usage = get_example_usage('info', count=1)
 
 
 class LoadUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Load Usage'),
-        'unreal-device load <filename>',
-        'unreal-device load keep <filename>',
-        'unreal-device load example 1',
-    ])
+    usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE, count=1)
+    other_usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE)
+    example_usage = get_example_usage('load', count=1)
 
-    example_usage = '\n'.join([
-        Printer.get('Unreal Device Load Example'),
-        'unreal-device load example 1',
-    ])
+
+class ReleaseUsage:
+    usage = get_usage('release', flags=FLAG.HOST, count=1)
+    other_usage = get_usage('release', flags=FLAG.HOST)
+    example_usage = get_example_usage('release', count=1)
 
 
 class ReloadUsage:
-    usage = '\n'.join([
-        Printer.get('Unreal Device Reload Usage'),
-        'unreal-device reload <host_address>',
-        'unreal-device reload <host_address> <testcase>',
-        'unreal-device reload <host_name>',
-        'unreal-device reload <host_name> <testcase>'
-    ])
+    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE, count=1)
+    other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE)
+    example_usage = get_example_usage('reload', count=1)
+
+
+class ViewUsage:
+    usage = get_usage('view', flags=FLAG.VIEW_USAGE, count=2)
+    other_usage = get_usage('view', flags=FLAG.VIEW_USAGE)
+    example_usage = get_example_usage('view', count=2)
 
 
 class Usage:
@@ -140,6 +212,7 @@ class Usage:
     load = LoadUsage
     reload = ReloadUsage
     release = ReleaseUsage
+    view = ViewUsage
 
 
 def validate_usage(name, operands):
@@ -167,9 +240,8 @@ def validate_example_usage(name, operands, max_count=1):
     if m:
         index = m.group('index')
         if 1 <= int(index) <= max_count:
-            module = __import__('gtunrealdevice')
             cls_name = '{}Example'.format(name.title())
-            cls = getattr(module.example, cls_name)
+            cls = getattr(example, cls_name)
             result = cls.get(str(index))
             print('\n\n{}\n'.format(result))
             sys.exit(0)
@@ -182,59 +254,21 @@ def validate_example_usage(name, operands, max_count=1):
 
 def get_global_usage():
     lst = [
-        Printer.get('Global Usages'),
-        'unreal-device app',
-        'unreal-device version',
-        'unreal-device info',
-        'unreal-device info all',
-        'unreal-device info dependency',
-        'unreal-device info device',
-        'unreal-device info serialization',
-        'unreal-device info sample_devices_info',
+        UHeaderData('{} other usages'.format(tool)),
+        UBodyData(
+            'unreal-device app',
+            'unreal-device version',
+        ),
         '',
-        Printer.get('Viewing devices_info.yaml Usage'),
-        'unreal-device view',
-        'unreal-device view device::<host_address>',
-        'unreal-device view device::<host_address> testcase::<testcase_name>',
-        'unreal-device view device::<host_address> cmdlines',
-        'unreal-device view device::<host_address> testcases',
-        '',
-        Printer.get('Loading/Saving Device Info Usage'),
-        'unreal-device load <filename>',
-        'unreal-device load keep <filename>',
-        '',
-        Printer.get('Unreal Device Connect Usage'),
-        'unreal-device connect <host_address>',
-        'unreal-device connect <host_address> <testcase>',
-        'unreal-device connect <host_name>',
-        'unreal-device connect <host_name> <testcase>',
-        '',
-        Printer.get('Unreal Device Reload Usage'),
-        'unreal-device reload <host_address>',
-        'unreal-device reload <host_address> <testcase>',
-        'unreal-device reload <host_name>',
-        'unreal-device reload <host_name> <testcase>',
-        '',
-        Printer.get('Unreal Device Disconnect Usage'),
-        'unreal-device disconnect <host_address>',
-        'unreal-device disconnect <host_name>',
-        '',
-        Printer.get('Unreal Device Destroy/Release Usage'),
-        'unreal-device destroy <host_address>',
-        'unreal-device destroy <host_name>',
-        'unreal-device release <host_address>',
-        'unreal-device release <host_name>',
-        '',
-        Printer.get('Unreal Device Configure Usage'),
-        'unreal-device configure <cfg_reference>',
-        'unreal-device configure <host_address>::<cfg_reference>',
-        'unreal-device configure <host_name>::<cfg_reference>',
-        '',
-        Printer.get('Unreal Device Execute Usage'),
-        'unreal-device execute <cmdline>',
-        'unreal-device execute <host_address>::<cmdline>',
-        'unreal-device execute <host_name>::<cmdline>',
-        '',
+        InfoUsage.usage,
+        ViewUsage.usage,
+        LoadUsage.usage,
+        ConnectUsage.usage,
+        ReloadUsage.usage,
+        DisconnectUsage.usage,
+        ReloadUsage.usage,
+        ConfigureUsage.usage,
+        ExecuteUsage.usage
     ]
 
-    return '\n'.join(lst)
+    return '\n'.join(str(item) for item in lst)
