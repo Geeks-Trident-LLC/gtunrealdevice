@@ -78,32 +78,25 @@ def show_info(options):
     command, operands = options.command, options.operands
     if command == 'info':
         validate_usage(command, operands)
+        operands and show_usage(command, exit_code=1)
 
-        op_txt = ''.join(operands).strip().lower()
-
-        if op_txt == 'sample_devices_info':
+        if options.sample_devices_info:
             Printer.print('Sample Format of Device Info:')
             print('\n{}\n'.format(Data.sample_devices_info_text))
             sys.exit(0)
-
-        if not op_txt:
-            Printer.print(Data.get_app_info())
-            sys.exit(0)
-        elif op_txt not in ['all', 'dependency', 'device', 'serialization']:
-            show_usage(command, exit_code=1)
 
         lst = [
             Data.get_app_info(),
         ]
 
-        if op_txt in ['dependency', 'all']:
+        if options.all or options.dependency:
             lst.append('--------------------')
             lst.append('Dependencies:')
             for pkg in Data.get_dependency().values():
                 lst.append('  + Package: {0[package]}'.format(pkg))
                 lst.append('             {0[url]}'.format(pkg))
 
-        if op_txt in ['device', 'all']:
+        if options.all or options.devices_data:
             lst.append('--------------------')
             lst.append('Devices Info:')
             lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
@@ -114,7 +107,7 @@ def show_info(options):
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
 
-        if op_txt in ['serialization', 'all']:
+        if options.all or options.serialization:
             lst.append('--------------------')
             lst.append(SerializedFile.get_info_text())
 
