@@ -120,17 +120,14 @@ def load_device_info(options):
     if command == 'load':
         validate_usage(command, operands)
         validate_example_usage(options.command, options.operands, max_count=1)
+        operands and show_usage(command, exit_code=1)
 
-        total = len(operands)
-        if total < 1 or total > 2:
-            show_usage(command, exit_code=1)
-
-        keep, fn = str(operands[0]).lower(), str(operands[-1])
-        is_file = File.is_exist(fn)
-        is_kept = keep == 'keep'
-        if not is_file or (total == 2 and not is_kept):
-            if not is_file:
-                print('*** operand MUST BE a file name.')
+        fn = options.filename.strip()
+        if fn:
+            if not File.is_exist(fn):
+                print('\n*** FileNotFound: {}\n'.format(fn))
+                show_usage(command, exit_code=1)
+        else:
             show_usage(command, exit_code=1)
 
         is_valid = DEVICES_DATA.is_valid_file(fn)
@@ -139,7 +136,7 @@ def load_device_info(options):
             print(sample_format)
             sys.exit(1)
 
-        if is_kept:
+        if options.save:
             DEVICES_DATA.load(fn)
             DEVICES_DATA.save()
             lst = ['+++ Successfully loaded "{}" device info and'.format(fn),
