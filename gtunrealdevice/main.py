@@ -196,9 +196,13 @@ class Cli:
             help='operands are a list of data such as command line and output'
         )
 
-        self.parser = parser
-        self.options = self.parser.parse_args()
         self.kwargs = dict()
+        self.parser = parser
+        try:
+            self.options = self.parser.parse_args()
+        except SystemExit as ex:    # noqa
+            self.parser.print_help()
+            sys.exit(1)
 
     def validate_command(self):
         """Validate argparse `options.command`.
