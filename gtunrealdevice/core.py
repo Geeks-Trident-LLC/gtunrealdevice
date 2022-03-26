@@ -129,12 +129,38 @@ class DevicesData(dict):
 
         Returns
         -------
-        bool: device address or empty string
+        str: device address or original name
         """
-        for addr, node in self.items():
-            if node.get('name') == name:
-                return addr
-        return ''
+        if name in self:
+            return name
+        else:
+            for addr, node in self.items():
+                if node.get('name') == name:
+                    return addr
+            return name
+
+    def is_testcase_exist(self, address, testcase):
+        """Check if test case is existed.
+
+        Parameters
+        ----------
+        address (str):
+        testcase (str): a test case name
+
+        Returns
+        -------
+        bool: True if found, otherwise False
+        """
+        testcase = str(testcase).strip()
+        if not testcase:
+            return False
+
+        address = self.get_address_from_name(address)
+        if address not in self:
+            return False
+
+        testcases = self.get(address).get('testcases', dict())
+        return testcase in testcases
 
     def is_valid_file(self, filename):
         """Check filename
