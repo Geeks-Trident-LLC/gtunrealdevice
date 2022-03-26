@@ -120,6 +120,22 @@ class DevicesData(dict):
         with open(path.expanduser(filename), 'w') as stream:
             self and yaml.safe_dump(dict(self), stream)
 
+    def get_address_from_name(self, name):
+        """Get device address from device name
+
+        Parameters
+        ----------
+        name (str): a device name
+
+        Returns
+        -------
+        bool: device address or empty string
+        """
+        for addr, node in self.items():
+            if node.get('name') == name:
+                return addr
+        return ''
+
     def is_valid_file(self, filename):
         """Check filename
 
