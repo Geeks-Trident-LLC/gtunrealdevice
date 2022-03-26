@@ -18,26 +18,22 @@ def do_device_connect(options):
         validate_usage(options.command, options.operands)
         validate_example_usage(options.command, options.operands, max_count=5)
 
-        total = len(options.operands)
-        if total == 1 or total == 2:
-            host_addr = options.operands[0]
-            testcase = options.operands[1] if total == 2 else ''
+        host_addr, testcase = options.host.strip(), options.testcase.strip()
 
+        if host_addr:
             if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+                host_addr = DEVICES_DATA.get_address_from_name(host_addr)
 
             if SerializedFile.check_instance(host_addr, testcase=testcase):
                 instance = SerializedFile.get_instance(host_addr)
 
                 if instance.is_connected:
-                    Printer.print('\n'.join(
-                        ['{} is already connected.'.format(host_addr),
-                         'Use reload for a new connection.']
-                    ))
-                    sys.exit(0)
+                    if instance.testcase == testcase:
+                        fmt = ('UnrealDeviceWarning: {}{} is already '
+                               'connected.  Use reload for a new connection')
+                        extra = '@testcase={}'.format(testcase) if testcase else ''
+                        print(fmt.format(host_addr, extra))
+                        sys.exit(0)
                 else:
                     instance.connect(testcase=testcase)
                     SerializedFile.add_instance(host_addr, instance)
@@ -53,7 +49,7 @@ def do_device_connect(options):
                 print(failure)
                 sys.exit(1)
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_disconnect(options):
