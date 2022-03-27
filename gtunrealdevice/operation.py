@@ -105,20 +105,17 @@ def do_device_destroy(options):
 def do_device_release(options):
     if options.command == 'release':
         validate_usage(options.command, options.operands)
-        if len(options.operands) == 1:
-            host_addr = options.operands[0]
+        validate_example_usage(options.command, options.operands, max_count=2)
 
-            if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+        host_addr = options.host.strip()
+        host_addr = DEVICES_DATA.get_address_from_name(host_addr)
 
+        if host_addr:
             result = SerializedFile.remove_instance(host_addr)
-            print(SerializedFile.message)
+            Printer.print_unreal_device_msg(SerializedFile.message)
             sys.exit(int(result))
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_execute(options):
