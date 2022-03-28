@@ -1,5 +1,7 @@
 """Module containing the logic for utilities."""
 
+import re
+
 from pathlib import Path
 from pathlib import PurePath
 from datetime import datetime
@@ -318,3 +320,28 @@ class Misc:
     @classmethod
     def is_string(cls, obj):
         return isinstance(obj, str)
+
+
+class DictObject(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key, value in self.items():
+            if re.match(r'(?i)[a-z]\w*', key):
+                setattr(self, key, value)
+
+
+class MiscDevice:
+    @classmethod
+    def parse_cmdline(cls, data):
+        data = str(data)
+        pattern = r'(?i)(?P<host>[a-z]([\w-]*[a-z0-9])*::)? *(?P<cmdline>.+)'
+        m = re.match(pattern, data)
+        if m:
+            host, cmdline = m.group('host'), m.group('cmdline')
+            if host:
+                host = host.strip(':')
+                return DictObject(host=host, cmdline=cmdline)
+            else:
+                return DictObject(host='', cmdline=data)
+        else:
+            return DictObject(host='', cmdline=data)
