@@ -5,7 +5,6 @@ import yaml
 import functools
 from os import path
 from datetime import datetime
-from textwrap import dedent
 
 from gtunrealdevice.config import Data
 from gtunrealdevice.exceptions import WrapperError
@@ -14,6 +13,7 @@ from gtunrealdevice.exceptions import UnrealDeviceConnectionError
 from gtunrealdevice.exceptions import UnrealDeviceOfflineError
 
 from gtunrealdevice.utils import Printer
+from gtunrealdevice.utils import Misc
 
 
 def check_active_device(func):
@@ -41,6 +41,7 @@ def check_active_device(func):
                     result = func(*args, **kwargs)
                     return result
                 else:
+                    device.success_code = 1
                     fmt = '{} device is offline.'
                     raise UnrealDeviceOfflineError(fmt.format(device.name))
             else:
@@ -383,6 +384,7 @@ class UnrealDevice:
         self.data = None
         self.table = dict()
         self.testcase = ''
+        self.success_code = 0
 
     @property
     def is_connected(self):
@@ -412,8 +414,8 @@ class UnrealDevice:
                 if testcase in self.data.get('testcases', dict()):
                     self.testcase = testcase
                 else:
-                    fmt = 'Warning: "{}" test case is unavailable for this connection ***'
-                    print(fmt.format(testcase))
+                    fmt = '"{}" test case is unavailable for this connection ***'
+                    Printer.print_message(fmt, testcase, prefix='UnrealDeviceWarning:')
 
             if kwargs.get('showed', True):
                 login_result = self.data.get('login', '')
@@ -421,11 +423,10 @@ class UnrealDevice:
                 extra = fmt.format(self.address)
                 if testcase:
                     if testcase in self.data.get('testcases', dict()):
-                        extra = '{} for "{}"'.format(extra, testcase)
+                        extra = '{}@testcase={}'.format(extra, testcase)
                     else:
                         extra = '{} fallback to default.'.format(extra)
 
-                fmt = 'login unreal-device {}@dummy_username:dummy_password'
                 is_timestamp = kwargs.get('is_timestamp', True)
                 login_result = self.render_data(
                     login_result, is_timestamp=is_timestamp,
@@ -433,9 +434,11 @@ class UnrealDevice:
                     extra=extra
                 )
                 print(login_result)
+            self.success_code = 0
             return self.is_connected
         else:
-            fmt = '{} is unavailable for connection.'
+            self.success_code = 1
+            fmt = '"{}" is unavailable for connection.'
             raise UnrealDeviceConnectionError(fmt.format(self.name))
 
     def reconnect(self, **kwargs):
@@ -451,31 +454,26 @@ class UnrealDevice:
         """
         if self.address in DEVICES_DATA:
             self.data = DEVICES_DATA.get(self.address)
-            self._is_connected = True
-
-            testcase = kwargs.get('testcase', '')
-            if testcase:
-                if testcase in self.data.get('testcases', dict()):
-                    self.testcase = testcase
-                else:
-                    fmt = '*** "{}" test case is unavailable for this reconnection ***'
-                    print(fmt.format(testcase))
 
             if kwargs.get('showed', True):
                 reload_txt = self.data.get('reload', '')
                 if not reload_txt:
                     reload_txt = kwargs.get('reload_data', '')
-                login_txt = self.data.get('login', '')
-                reconnect_txt = '{}\n{}'.format(reload_txt, login_txt).strip()
-                if reconnect_txt:
+
+                if reload_txt:
                     is_timestamp = kwargs.get('is_timestamp', True)
                     reconnect_txt = self.render_data(
-                        reconnect_txt, is_timestamp=is_timestamp,
+                        reload_txt, is_timestamp=is_timestamp,
                         service='reload', extra='reload unreal-device'
                     )
-                    print(reconnect_txt)
+                    print('{}\n\n'.format(reconnect_txt))
+
+            self._is_connected = False
+            self.connect(testcase=kwargs.get('testcase', ''))
+
             return self.is_connected
         else:
+            self.success_code = 1
             fmt = '{} is unavailable for reconnection.'
             raise UnrealDeviceConnectionError(fmt.format(self.name))
 
@@ -497,9 +495,10 @@ class UnrealDevice:
             msg = self.render_data(
                 msg, is_timestamp=is_timestamp,
                 service='authentication',
-                extra='logout {} unreal-device'.format(self.address),
+                extra='logout unreal-device {}'.format(self.address),
             )
             print(msg)
+        self.success_code = 0
         return self._is_connected
 
     @check_active_device
@@ -516,12 +515,27 @@ class UnrealDevice:
         str: output of a command line
         """
 
-        data = self.data.get('cmdlines')
+        if not cmdline.strip():
+            is_timestamp = kwargs.get('is_timestamp', True)
+            output = self.render_data(
+                cmdline, is_timestamp=is_timestamp,
+                service='execution', extra=cmdline,
+            )
+            if kwargs.get('showed', True):
+                print(output)
+            self.success_code = 0
+            return output
+
+        data = self.data.get('cmdlines', dict())
         if self.testcase:
             data = self.data.get('testcases').get(self.testcase, data)
 
-        no_output = '*** "{}" does not have output ***'.format(cmdline)
+        no_output = Printer.get_message('"{}" does not have output', cmdline,
+                                        prefix='UnrealDeviceCmdline:')
+
         result = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        self.success_code = 1 if str(result).endswith('" does not have output') else 0
+
         if not isinstance(result, (list, tuple)):
             output = str(result)
         else:
@@ -537,6 +551,7 @@ class UnrealDevice:
         )
         if kwargs.get('showed', True):
             print(output)
+
         return output
 
     @check_active_device
@@ -552,16 +567,40 @@ class UnrealDevice:
         -------
         str: result of configuration
         """
+
+        if Misc.is_list_instance(config):
+            config = '\n'.join(str(item) for item in config)
+        else:
+            config = str(config)
+
+        if kwargs.get('from_console_cmdline', False):
+            pattern = r'(\\r\\n)|\\r|\\n'
+            config = re.sub(pattern, '\n', config)
+
+        config = config.strip()
+
+        if not config:
+            config = 'configure\nend'
+
+        if not re.match(r'(?i)conf(i(g(u(r(e)?)?)?)?)?', config):
+            config = 'configure\n{}'.format(config)
+
+        if not config.splitlines()[-1].lower() == 'end':
+            config = '{}\nend'.format(config)
+
         is_timestamp = kwargs.get('is_timestamp', True)
         result = self.render_data(config, is_timestamp=is_timestamp, service='configuration')
         if kwargs.get('showed', True):
             print(result)
+
+        self.success_code = 0
         return result
 
-    def render_data(self, data, extra='', service='execution', is_timestamp=True):
+    def render_data(self, data, extra=None, service='execution', is_timestamp=True):
 
         if isinstance(data, str):
             lst = data.splitlines()
+            lst = lst or ['']
         else:
             lst = []
             for item in data:
@@ -580,12 +619,12 @@ class UnrealDevice:
 
         if is_timestamp:
             dt = datetime.now()
-            fmt = '+++ {:%b %d %Y %T}.{} from unreal-device {} service for "{}"'
-            timestamp = fmt.format(dt, str(dt.microsecond)[:3], service, self.name)
+            fmt = '{:%b %d %Y %T}.{} for "{}" - UNREAL-DEVICE-{}-SERVICE-TIMESTAMP'
+            timestamp = fmt.format(dt, str(dt.microsecond)[:3], self.name, service.upper())
             index = 1 if service == 'configuration' else 0
             lst.insert(index, timestamp)
 
-        if extra:
+        if extra is not None:
             lst.insert(0, extra)
 
         result = '\n'.join(lst)
@@ -672,4 +711,36 @@ def configure(device, config, **kwargs):
     str: result of configuration
     """
     result = device.configure(config, **kwargs)
+    return result
+
+
+def reconnect(device, **kwargs):
+    """Reconnect an unreal device
+
+    Parameters
+    ----------
+    device (UnrealDevice): an unreal device instance
+    kwargs (dict): keyword arguments
+
+    Returns
+    -------
+    bool: connection status
+    """
+    result = device.reconnect(**kwargs)
+    return result
+
+
+def reload(device, **kwargs):
+    """Reload an unreal device
+
+    Parameters
+    ----------
+    device (UnrealDevice): an unreal device instance
+    kwargs (dict): keyword arguments
+
+    Returns
+    -------
+    bool: connection status
+    """
+    result = device.reconnect(**kwargs)
     return result
