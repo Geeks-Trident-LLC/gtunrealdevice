@@ -334,7 +334,7 @@ class MiscDevice:
     @classmethod
     def parse_host(cls, data):
         data = str(data)
-        pattern = r'(?i)(?P<host>[a-z]([\w-]*[a-z0-9])*::)? *(?P<data>.+)'
+        pattern = r'(?i)(?P<host>[a-z0-9]([\w:.-]*[a-z0-9])*::)? *(?P<data>.+)'
         m = re.match(pattern, data)
         if m:
             host, data = m.group('host'), m.group('data')
@@ -345,3 +345,11 @@ class MiscDevice:
                 return DictObject(host='', data=data)
         else:
             return DictObject(host='', data=data)
+
+    @classmethod
+    def parse_host_and_testcase(cls, *args):
+        if not args:
+            return DictObject(host='', testcase='')
+        host, testcase = args[0].strip(), args[1].strip() if len(args) > 1 else ''
+
+        return DictObject(host=host, testcase=testcase)
