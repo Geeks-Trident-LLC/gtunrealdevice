@@ -1,7 +1,6 @@
 """Module containing the logic for unreal device operation"""
 
 import sys
-import re
 
 from gtunrealdevice import UnrealDevice
 from gtunrealdevice.utils import Printer
@@ -20,12 +19,17 @@ def do_device_connect(options):
         validate_usage(options.command, options.operands)
         validate_example_usage(options.command, options.operands, max_count=5)
 
-        host_addr, testcase = options.host.strip(), options.testcase.strip()
+        if len(options.operands) > 2:
+            show_usage(options.command, exit_code=1)
+
+        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+
+        host = options.host or parsed_node.host
+        testcase = options.testcase or parsed_node.testcase
+
+        host_addr = DEVICES_DATA.get_address_from_name(host)
 
         if host_addr:
-            if host_addr not in DEVICES_DATA:
-                host_addr = DEVICES_DATA.get_address_from_name(host_addr)
-
             if SerializedFile.check_instance(host_addr, testcase=testcase):
                 instance = SerializedFile.get_instance(host_addr)
 
@@ -39,13 +43,13 @@ def do_device_connect(options):
                 else:
                     instance.connect(testcase=testcase)
                     SerializedFile.add_instance(host_addr, instance)
-                    sys.exit(0)
+                    sys.exit(instance.success_code)
 
             try:
                 instance = UnrealDevice(host_addr)
                 instance.connect(testcase=testcase)
                 SerializedFile.add_instance(host_addr, instance)
-                sys.exit(0)
+                sys.exit(instance.success_code)
             except Exception as ex:
                 Printer.print_message('{}: {}', type(ex).__name__, ex)
                 sys.exit(1)
@@ -199,6 +203,9 @@ def do_device_reload(options):
     if options.command == 'reload':
         validate_usage(options.command, options.operands)
         validate_example_usage(options.command, options.operands, max_count=3)
+
+        if len(options.operands) > 2:
+            show_usage(options.command, exit_code=1)
 
         parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
 
