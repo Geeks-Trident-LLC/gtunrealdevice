@@ -12,6 +12,8 @@ from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import validate_example_usage
 from gtunrealdevice.usage import show_usage
 
+from gtunrealdevice.utils import MiscDevice
+
 
 def do_device_connect(options):
     if options.command == 'connect':
@@ -121,28 +123,17 @@ def do_device_release(options):
 def do_device_execute(options):
     if options.command == 'execute':
         validate_usage(options.command, options.operands)
-        # validate_example_usage(options.command, options.operands, max_count=5)
+        validate_example_usage(options.command, options.operands, max_count=5)
 
         data = ' '.join(options.operands).strip()
-        pattern = r'(?P<host_addr>\S+::)? *(?P<cmdline>.+)'
-        match = re.match(pattern, data)
-        if match:
-            host_addr = match.group('host_addr') or ''
-            cmdline = match.group('cmdline').strip()
+        parsed_node = MiscDevice.parse_cmdline(data)
 
-            if host_addr:
-                host_addr = host_addr.strip(':')
-                if host_addr not in DEVICES_DATA:
-                    for addr, node in DEVICES_DATA.items():
-                        if node.get('name') == host_addr:
-                            host_addr = addr
-                            break
-            else:
-                if len(DEVICES_DATA) == 1:
-                    host_addr = list(DEVICES_DATA)[0]
-                else:
-                    show_usage(options.command, 'other')
+        host = options.host or parsed_node.host
+        cmdline = parsed_node.cmdline
 
+        host_addr = DEVICES_DATA.get_address_from_name(host)
+
+        if host_addr:
             instance = SerializedFile.get_instance(host_addr)
             if instance:
                 if instance.is_connected:
@@ -150,14 +141,14 @@ def do_device_execute(options):
                     sys.exit(0)
                 else:
                     fmt = 'CANT execute cmdline because {} is disconnected.'
-                    print(fmt.format(host_addr))
+                    Printer.print_unreal_device_msg(fmt, host_addr)
                     sys.exit(0)
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
-                print(fmt.format(host_addr))
+                Printer.print_unreal_device_msg(fmt, host_addr)
                 sys.exit(1)
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_configure(options):
