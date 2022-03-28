@@ -29,10 +29,10 @@ def do_device_connect(options):
 
                 if instance.is_connected:
                     if instance.testcase == testcase:
-                        fmt = ('UnrealDeviceWarning: {}{} is already '
-                               'connected.  Use reload for a new connection')
+                        fmt = ('{}{} is already connected.  Use reload for '
+                               'a new connection.')
                         extra = '@testcase={}'.format(testcase) if testcase else ''
-                        print(fmt.format(host_addr, extra))
+                        Printer.print_unreal_device_msg(fmt, host_addr, extra)
                         sys.exit(0)
                 else:
                     instance.connect(testcase=testcase)
@@ -45,8 +45,7 @@ def do_device_connect(options):
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(0)
             except Exception as ex:
-                failure = '{}: {}'.format(type(ex).__name__, ex)
-                print(failure)
+                Printer.print_message('{}: {}', type(ex).__name__, ex)
                 sys.exit(1)
         else:
             show_usage(options.command, exit_code=1)
@@ -55,70 +54,68 @@ def do_device_connect(options):
 def do_device_disconnect(options):
     if options.command == 'disconnect':
         validate_usage(options.command, options.operands)
-        if len(options.operands) == 1:
-            host_addr = options.operands[0]
-            original_addr = host_addr
+        validate_example_usage(options.command, options.operands, max_count=3)
+
+        host_addr = options.host.strip()
+        original_addr = host_addr
+
+        if host_addr:
 
             if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+                host_addr = DEVICES_DATA.get_address_from_name(host_addr)
 
             instance = SerializedFile.get_instance(host_addr)
             if instance:
-                instance.disconnect()
-                SerializedFile.add_instance(host_addr, instance)
+                if instance.is_connected:
+                    instance.disconnect()
+                    SerializedFile.add_instance(host_addr, instance)
+                else:
+                    fmt = '{} is already disconnected.'
+                    Printer.print_unreal_device_msg(fmt, original_addr)
                 sys.exit(0)
             else:
                 if host_addr in DEVICES_DATA:
                     fmt = 'CANT disconnect because {} has not connected.'
-                    print(fmt.format(original_addr))
+                    Printer.print_unreal_device_msg(fmt, original_addr)
                     sys.exit(1)
                 else:
                     fmt = 'CANT disconnect because {} is not available.'
-                    print(fmt.format(original_addr))
+                    Printer.print_unreal_device_msg(fmt, original_addr)
                     sys.exit(1)
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_destroy(options):
     if options.command == 'destroy':
         validate_usage(options.command, options.operands)
-        if len(options.operands) == 1:
-            host_addr = options.operands[0]
+        validate_example_usage(options.command, options.operands, max_count=2)
 
-            if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+        host_addr = options.host.strip()
+        host_addr = DEVICES_DATA.get_address_from_name(host_addr)
 
+        if host_addr:
             result = SerializedFile.remove_instance(host_addr)
-            print(SerializedFile.message)
+            Printer.print_unreal_device_msg(SerializedFile.message)
             sys.exit(int(result))
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_release(options):
     if options.command == 'release':
         validate_usage(options.command, options.operands)
-        if len(options.operands) == 1:
-            host_addr = options.operands[0]
+        validate_example_usage(options.command, options.operands, max_count=2)
 
-            if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+        host_addr = options.host.strip()
+        host_addr = DEVICES_DATA.get_address_from_name(host_addr)
 
+        if host_addr:
             result = SerializedFile.remove_instance(host_addr)
-            print(SerializedFile.message)
+            Printer.print_unreal_device_msg(SerializedFile.message)
             sys.exit(int(result))
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_execute(options):

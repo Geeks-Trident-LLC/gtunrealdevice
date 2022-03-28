@@ -91,6 +91,61 @@ class Printer:
         print_func = print_func if callable(print_func) else print
         print_func(txt)
 
+    @classmethod
+    def get_message(cls, fmt, *args, style='format', prefix=''):
+        """Get a message
+
+        Parameters
+        ----------
+        fmt (str): string format.
+        args (tuple): list of parameters for string interpolation.
+        style (str): either format or %.
+        prefix (str): a prefix.
+
+        Returns
+        -------
+        str: a message.
+        """
+
+        if args:
+            message = fmt.format(*args) if style == 'format' else fmt % args
+        else:
+            message = fmt
+
+        message = '{} {}'.format(prefix, message) if prefix else message
+        return message
+
+    @classmethod
+    def print_message(cls, fmt, *args, style='format', prefix='', print_func=None):
+        """Print a message
+
+        Parameters
+        ----------
+        fmt (str): string format.
+        args (tuple): list of parameters for string interpolation.
+        style (str): either format or %.
+        prefix (str): a prefix.
+        print_func (function): a print function.
+        """
+        message = cls.get_message(fmt, *args, style=style, prefix=prefix)
+        print_func = print_func if callable(print_func) else print
+        print_func(message)
+
+    @classmethod
+    def print_unreal_device_msg(cls, fmt, *args, style='format', print_func=None):
+        """Print a message
+
+        Parameters
+        ----------
+        fmt (str): string format.
+        args (tuple): list of parameters for string interpolation.
+        style (str): either format or %.
+        print_func (function): a print function.
+        """
+        message = cls.get_message(fmt, *args, style=style, prefix='UnrealDeviceMessage:')
+        print_func = print_func if callable(print_func) else print
+        print_func(message)
+
 
 class File:
     message = ''
