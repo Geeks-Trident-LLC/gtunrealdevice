@@ -183,40 +183,39 @@ def do_device_configure(options):
 
 
 def do_device_reload(options):
+    reload_default_fmt = '\n'.join([
+        'Reloading "{0}" device ...',
+        '...',
+        'Closing all applications ... Application are closed.',
+        'Unload device drivers ... Unload completed',
+        '... ',
+        'Booting "{0}" device ...',
+        '...'
+        'Checking memory ... memory tests are PASSED.',
+        'Loading device drivers ... Device drivers are loaded.',
+        '...',
+        'System is ready for login.'
+    ])
     if options.command == 'reload':
         validate_usage(options.command, options.operands)
-        total = len(options.operands)
-        if total == 1 or total == 2:
-            host_addr = options.operands[0]
-            testcase = options.operands[1] if total == 2 else ''
+        validate_example_usage(options.command, options.operands, max_count=3)
 
-            if host_addr not in DEVICES_DATA:
-                for addr, node in DEVICES_DATA.items():
-                    if node.get('name') == host_addr:
-                        host_addr = addr
-                        break
+        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
 
-            try:
-                reload_data = '\n'.join([
-                    'Reloading "{}" device ...'.format(host_addr),
-                    '...',
-                    'Closing all applications ... Application are closed.',
-                    'Unload device drivers ... Unload completed',
-                    '... ',
-                    'Booting "{}" device ...'.format(host_addr),
-                    '...'
-                    'Checking memory ... memory tests are PASSED.',
-                    'Loading device drivers ... Device drivers are loaded.',
-                    '...',
-                    'System is ready for login.'
-                ])
-                instance = UnrealDevice(host_addr)
+        host = options.host or parsed_node.host
+        testcase = options.testcase or parsed_node.testcase
+
+        host_addr = DEVICES_DATA.get_address_from_name(host)
+        if host_addr:
+            instance = SerializedFile.get_instance(host_addr)
+            if instance:
+                reload_data = reload_default_fmt.format(host_addr)
                 instance.reconnect(testcase=testcase, reload_data=reload_data)
                 SerializedFile.add_instance(host_addr, instance)
-                sys.exit(0)
-            except Exception as ex:
-                failure = '{}: {}'.format(type(ex).__name__, ex)
-                print(failure)
+                sys.exit(instance.success_code)
+            else:
+                fmt = 'CANT reload because {} has not connected.'
+                Printer.print_unreal_device_msg(fmt, host_addr)
                 sys.exit(1)
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
