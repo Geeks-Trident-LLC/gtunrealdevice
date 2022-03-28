@@ -136,7 +136,7 @@ def load_device_info(options):
             print(sample_format)
             sys.exit(1)
 
-        if options.save:
+        if options.saved:
             DEVICES_DATA.load(fn)
             DEVICES_DATA.save()
             lst = ['+++ Successfully loaded "{}" device info and'.format(fn),
@@ -196,17 +196,17 @@ class Cli:
         ),
 
         parser.add_argument(
-            '--testcases', action='store_true',
+            '--showed-testcases', action='store_true',
             help="showing test cases data of device"
         ),
 
         parser.add_argument(
-            '--cmdlines', action='store_true',
+            '--showed-cmdlines', action='store_true',
             help="showing command lines data of device"
         ),
 
         parser.add_argument(
-            '--save', action='store_true',
+            '--saved', action='store_true',
             help="saving devices info to devices_info.yaml"
         ),
 
