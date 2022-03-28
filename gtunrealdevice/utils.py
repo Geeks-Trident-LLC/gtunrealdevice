@@ -332,16 +332,16 @@ class DictObject(dict):
 
 class MiscDevice:
     @classmethod
-    def parse_cmdline(cls, data):
+    def parse_host(cls, data):
         data = str(data)
-        pattern = r'(?i)(?P<host>[a-z]([\w-]*[a-z0-9])*::)? *(?P<cmdline>.+)'
+        pattern = r'(?i)(?P<host>[a-z]([\w-]*[a-z0-9])*::)? *(?P<data>.+)'
         m = re.match(pattern, data)
         if m:
-            host, cmdline = m.group('host'), m.group('cmdline')
+            host, data = m.group('host'), m.group('data')
             if host:
                 host = host.strip(':')
-                return DictObject(host=host, cmdline=cmdline)
+                return DictObject(host=host, data=data)
             else:
-                return DictObject(host='', cmdline=data)
+                return DictObject(host='', data=data)
         else:
-            return DictObject(host='', cmdline=data)
+            return DictObject(host='', data=data)
