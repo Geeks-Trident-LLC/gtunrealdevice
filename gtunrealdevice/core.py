@@ -131,6 +131,11 @@ class DevicesData(dict):
         -------
         str: device address or original name
         """
+        name = str(name).strip()
+
+        if not name and len(self) == 1:
+            return list(self)[0]
+
         if name in self:
             return name
         else:
