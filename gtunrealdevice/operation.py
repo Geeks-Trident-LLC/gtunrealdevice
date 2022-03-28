@@ -126,10 +126,10 @@ def do_device_execute(options):
         validate_example_usage(options.command, options.operands, max_count=5)
 
         data = ' '.join(options.operands).strip()
-        parsed_node = MiscDevice.parse_cmdline(data)
+        parsed_node = MiscDevice.parse_host(data)
 
         host = options.host or parsed_node.host
-        cmdline = parsed_node.cmdline
+        cmdline = parsed_node.data
 
         host_addr = DEVICES_DATA.get_address_from_name(host)
 
@@ -138,11 +138,11 @@ def do_device_execute(options):
             if instance:
                 if instance.is_connected:
                     instance.execute(cmdline)
-                    sys.exit(0)
+                    sys.exit(instance.success_code)
                 else:
                     fmt = 'CANT execute cmdline because {} is disconnected.'
                     Printer.print_unreal_device_msg(fmt, host_addr)
-                    sys.exit(0)
+                    sys.exit(1)
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
                 Printer.print_unreal_device_msg(fmt, host_addr)
@@ -154,42 +154,32 @@ def do_device_execute(options):
 def do_device_configure(options):
     if options.command == 'configure':
         validate_usage(options.command, options.operands)
+        validate_example_usage(options.command, options.operands, max_count=5)
 
         data = ' '.join(options.operands).strip()
-        pattern = r'(?P<host_addr>\S+::)? *(?P<cfg_ref>.+)'
-        match = re.match(pattern, data)
-        if match:
-            host_addr = match.group('host_addr') or ''
-            cfg_ref = match.group('cfg_ref').strip()
+        parsed_node = MiscDevice.parse_host(data)
 
-            if host_addr:
-                host_addr = host_addr.strip(':')
-                if host_addr not in DEVICES_DATA:
-                    for addr, node in DEVICES_DATA.items():
-                        if node.get('name') == host_addr:
-                            host_addr = addr
-                            break
-            else:
-                if len(DEVICES_DATA) == 1:
-                    host_addr = list(DEVICES_DATA)[0]
-                else:
-                    show_usage(options.command, 'other')
+        host = options.host or parsed_node.host
+        cfg_data = parsed_node.data
 
+        host_addr = DEVICES_DATA.get_address_from_name(host)
+
+        if host_addr:
             instance = SerializedFile.get_instance(host_addr)
             if instance:
                 if instance.is_connected:
-                    instance.configure(cfg_ref)
-                    sys.exit(0)
+                    instance.configure(cfg_data, from_console_cmdline=True)
+                    sys.exit(instance.success_code)
                 else:
                     fmt = 'CANT configure because {} is disconnected.'
-                    print(fmt.format(host_addr))
-                    sys.exit(0)
+                    Printer.print_unreal_device_msg(fmt, host_addr)
+                    sys.exit(1)
             else:
                 fmt = 'CANT configure because {} has not connected.'
-                print(fmt.format(host_addr))
+                Printer.print_unreal_device_msg(fmt, host_addr)
                 sys.exit(1)
         else:
-            show_usage(options.command)
+            show_usage(options.command, exit_code=1)
 
 
 def do_device_reload(options):
