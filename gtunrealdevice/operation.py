@@ -62,14 +62,15 @@ def do_device_disconnect(options):
         validate_usage(options.command, options.operands)
         validate_example_usage(options.command, options.operands, max_count=3)
 
-        host_addr = options.host.strip()
-        original_addr = host_addr
+        if len(options.operands) > 1:
+            show_usage(options.command, exit_code=1)
+
+        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        host = options.host or parsed_node.host
+        original_addr = host
+        host_addr = DEVICES_DATA.get_address_from_name(host)
 
         if host_addr:
-
-            if host_addr not in DEVICES_DATA:
-                host_addr = DEVICES_DATA.get_address_from_name(host_addr)
-
             instance = SerializedFile.get_instance(host_addr)
             if instance:
                 if instance.is_connected:
@@ -95,10 +96,14 @@ def do_device_disconnect(options):
 def do_device_destroy(options):
     if options.command == 'destroy':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands, max_count=2)
+        validate_example_usage(options.command, options.operands, max_count=3)
 
-        host_addr = options.host.strip()
-        host_addr = DEVICES_DATA.get_address_from_name(host_addr)
+        if len(options.operands) > 1:
+            show_usage(options.command, exit_code=1)
+
+        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        host = options.host or parsed_node.host
+        host_addr = DEVICES_DATA.get_address_from_name(host)
 
         if host_addr:
             result = SerializedFile.remove_instance(host_addr)
@@ -111,10 +116,14 @@ def do_device_destroy(options):
 def do_device_release(options):
     if options.command == 'release':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands, max_count=2)
+        validate_example_usage(options.command, options.operands, max_count=3)
 
-        host_addr = options.host.strip()
-        host_addr = DEVICES_DATA.get_address_from_name(host_addr)
+        if len(options.operands) > 1:
+            show_usage(options.command, exit_code=1)
+
+        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        host = options.host or parsed_node.host
+        host_addr = DEVICES_DATA.get_address_from_name(host)
 
         if host_addr:
             result = SerializedFile.remove_instance(host_addr)
