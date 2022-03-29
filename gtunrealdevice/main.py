@@ -161,13 +161,13 @@ def load_device_info(options):
     command, operands = options.command, options.operands
     if command == 'load':
         validate_usage(command, operands)
-        validate_example_usage(options.command, options.operands, max_count=1)
-        operands and show_usage(command, exit_code=1)
+        validate_example_usage(options.command, options.operands, max_count=2)
 
-        fn = options.filename.strip()
+        fn = options.filename.strip() or operands[0] if len(operands) > 0 else ''
         if fn:
             if not File.is_exist(fn):
-                print('\n*** FileNotFound: {}\n'.format(fn))
+                print()
+                Printer.print_unreal_device_msg('*** FileNotFound *** {}\n', fn)
                 show_usage(command, exit_code=1)
         else:
             show_usage(command, exit_code=1)
@@ -178,16 +178,21 @@ def load_device_info(options):
             print(sample_format)
             sys.exit(1)
 
-        if options.saved:
+        txt = operands[1].lower() if len(operands) > 1 else ''
+
+        is_saved = options.saved or txt.startswith('save')
+
+        if is_saved:
             DEVICES_DATA.load(fn)
             DEVICES_DATA.save()
-            lst = ['+++ Successfully loaded "{}" device info and'.format(fn),
-                   'saved to "{}" file'.format(Data.devices_info_filename)]
-            Printer.print(lst)
+            fmt = ('Successfully loaded "{}" device info and '
+                   'saved to "{}" file')
+            Printer.print_unreal_device_msg(fmt, fn, Data.devices_info_filename)
         else:
             DEVICES_DATA.load(fn)
-            msg = '+++ successfully loaded "{}" device info'.format(fn)
-            Printer.print(msg)
+            fmt = ('loaded "{}" device info, but not '
+                   'permanently save to devices info')
+            Printer.print_unreal_device_msg(fmt, fn)
         sys.exit(0)
 
 
