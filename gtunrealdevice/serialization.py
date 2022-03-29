@@ -12,6 +12,8 @@ from gtunrealdevice.config import Data
 from gtunrealdevice.utils import File
 from gtunrealdevice.utils import DictObject
 
+from gtunrealdevice.core import DEVICES_DATA
+
 
 class SerializedFile:
     filename = Data.serialized_filename
@@ -91,14 +93,19 @@ class SerializedFile:
             if name:
                 for device in node.devices:
                     status = 'connected' if device.is_connected else 'disconnected'
-                    if name == device.name or device.address:
+                    if name in [device.name, device.address]:
                         l1 = [device.address, status, device.name]
                         device.testcase and l1.append(device.testcase)
                         fmt = fmt2 if device.testcase else fmt1
                         lst.append(fmt.format(*l1))
                         return '\n'.join(lst)
 
-                lst.append('  - "{}" device is not connected'.format(name))
+                host = DEVICES_DATA.get_address_from_name(name)
+                if host in DEVICES_DATA:
+                    lst.append('  - "{}" device is not connected'.format(name))
+                else:
+                    fmt = '  - No info or data regarding or relating to "{}" device'
+                    lst.append(fmt.format(name))
                 return '\n'.join(lst)
             else:
                 for device in node.devices:

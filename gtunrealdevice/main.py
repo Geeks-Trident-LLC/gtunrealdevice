@@ -1,5 +1,5 @@
 """Module containing the logic for the gtunrealdevice entry-points."""
-import re
+
 import sys
 import argparse
 
@@ -66,8 +66,9 @@ def view_device_info(options):
 
         other = parsed_node.other
 
-        if options.status or other.lower() == 'status':
-            result = SerializedFile.get_connected_info(name=host)
+        if options.status or other.lower() == 'status' or host.lower() == 'status':
+            name = host if host.lower() != 'status' else ''
+            result = SerializedFile.get_connected_info(name=name)
             Printer.print(result)
         else:
             node = DictObject(device='',
