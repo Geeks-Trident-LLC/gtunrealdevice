@@ -353,9 +353,9 @@ class MiscDevice:
             return DictObject(host='', data=data)
 
     @classmethod
-    def parse_host_and_testcase(cls, *args):
+    def parse_host_and_other(cls, *args):
         if not args:
-            return DictObject(host='', testcase='')
-        host, testcase = args[0].strip(), args[1].strip() if len(args) > 1 else ''
+            return DictObject(host='', other='')
+        host, other = args[0].strip(), args[1].strip() if len(args) > 1 else ''
 
-        return DictObject(host=host, testcase=testcase)
+        return DictObject(host=host, other=other)

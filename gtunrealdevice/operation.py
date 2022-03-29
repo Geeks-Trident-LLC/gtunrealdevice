@@ -22,10 +22,10 @@ def do_device_connect(options):
         if len(options.operands) > 2:
             show_usage(options.command, exit_code=1)
 
-        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
         host = options.host or parsed_node.host
-        testcase = options.testcase or parsed_node.testcase
+        testcase = options.testcase or parsed_node.other
 
         host_addr = DEVICES_DATA.get_address_from_name(host)
 
@@ -65,7 +65,7 @@ def do_device_disconnect(options):
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
 
-        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
         original_addr = host
         host_addr = DEVICES_DATA.get_address_from_name(host)
@@ -101,7 +101,7 @@ def do_device_destroy(options):
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
 
-        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
         host_addr = DEVICES_DATA.get_address_from_name(host)
 
@@ -121,7 +121,7 @@ def do_device_release(options):
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
 
-        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
         host_addr = DEVICES_DATA.get_address_from_name(host)
 
@@ -216,10 +216,10 @@ def do_device_reload(options):
         if len(options.operands) > 2:
             show_usage(options.command, exit_code=1)
 
-        parsed_node = MiscDevice.parse_host_and_testcase(*options.operands)
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
         host = options.host or parsed_node.host
-        testcase = options.testcase or parsed_node.testcase
+        testcase = options.testcase or parsed_node.other
 
         host_addr = DEVICES_DATA.get_address_from_name(host)
         if host_addr:

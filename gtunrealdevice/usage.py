@@ -22,11 +22,11 @@ class FLAG(IntFlag):
     ALL = 128
     DEPENDENCY = 256
     DEVICES_DATA = 512
-    SERIALIZATION = 1024
+    CONNECTED = 1024
     SAMPLE_DEVICES_INFO = 2048
     HOST_TESTCASE = HOST | TESTCASE
     VIEW_USAGE = HOST | STATUS | TESTCASE | TESTCASES | CMDLINES
-    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | SAMPLE_DEVICES_INFO
+    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | CONNECTED | SAMPLE_DEVICES_INFO
 
 
 class UData:
@@ -101,7 +101,7 @@ def get_usage_header(name, flags=0):
         '  --all                        showing all information',
         '  --dependency                 showing package dependencies',
         '  --devices-data               showing devices data',
-        '  --serialization              showing serialization info',
+        '  --connected-devices          showing info of connected devices',
         '  --sample-devices-info        sample sample devices info format',
     ]
     if flags:
@@ -119,7 +119,7 @@ def get_usage(name, flags=0, count=0):
     name = str(name).lower()
     header_usage = get_usage_header(name, flags=flags)
 
-    lst = ['{} {} [options]'.format(tool, name)]
+    lst = ['{} {} operands [options]'.format(tool, name)]
     if count > 0:
         lst1 = list(map(str, range(1, count + 1)))
         s = lst1[0] if len(lst1) == 1 else '{%s}' % (','.join(lst1))
