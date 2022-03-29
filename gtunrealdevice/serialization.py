@@ -107,7 +107,7 @@ class SerializedFile:
                     device.testcase and l1.append(device.testcase)
                     fmt = fmt2 if device.testcase else fmt1
                     lst.append(fmt.format(*l1))
-                return '\n'.join()
+                return '\n'.join(lst)
         else:
             return 'Total connected unreal-device: {}'.format(node.total)
 
