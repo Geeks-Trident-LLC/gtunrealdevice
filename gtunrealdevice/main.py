@@ -116,6 +116,14 @@ def show_info(options):
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
 
+        if options.all or options.serialization:
+            tbl = SerializedFile.get_info()
+            lst.append('--------------------')
+            lst.append('Serialization File Info:')
+            lst.append('  - File: {filename}'.format(**tbl))
+            lst.append('  - Existed: {existed}'.format(**tbl))
+            lst.append('  - Total serialized instance(s): {total}'.format(**tbl))
+
         if options.all or options.connected_devices:
             lst.append('--------------------')
             lst.append(SerializedFile.get_info_text())
@@ -227,6 +235,11 @@ class Cli:
         parser.add_argument(
             '--dependency', action='store_true',
             help="showing package dependencies"
+        ),
+
+        parser.add_argument(
+            '--serialization', action='store_true',
+            help="showing serialization file info"
         ),
 
         parser.add_argument(

@@ -15,18 +15,19 @@ class FLAG(IntFlag):
     HOST = 1
     STATUS = 2
     TESTCASE = 4
-    TESTCASES = 8
-    CMDLINES = 16
+    SHOWED_TESTCASES = 8
+    SHOWED_CMDLINES = 16
     FILENAME = 32
     SAVE = 64
     ALL = 128
     DEPENDENCY = 256
     DEVICES_DATA = 512
-    CONNECTED = 1024
-    SAMPLE_DEVICES_INFO = 2048
+    SERIALIZATION = 1024
+    CONNECTED = 2048
+    SAMPLE_DEVICES_INFO = 4096
     HOST_TESTCASE = HOST | TESTCASE
-    VIEW_USAGE = HOST | STATUS | TESTCASE | TESTCASES | CMDLINES
-    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | CONNECTED | SAMPLE_DEVICES_INFO
+    VIEW_USAGE = HOST | STATUS | TESTCASE | SHOWED_TESTCASES | SHOWED_CMDLINES
+    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | CONNECTED | SAMPLE_DEVICES_INFO
 
 
 class UData:
@@ -101,6 +102,7 @@ def get_usage_header(name, flags=0):
         '  --all                        showing all information',
         '  --dependency                 showing package dependencies',
         '  --devices-data               showing devices data',
+        '  --serialization              showing serialization file info',
         '  --connected-devices          showing info of connected devices',
         '  --sample-devices-info        sample sample devices info format',
     ]
