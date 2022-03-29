@@ -299,9 +299,8 @@ class DevicesData(dict):
             else:
                 self[device] = dict(cmdlines={cmdline: output})
 
-    def view(self, device='', cmdlines=False, testcase='',
-             testcases=False, status=False):
-        lst = ['Devices Info:']
+    def view(self, device='', cmdlines=False, testcase='', testcases=False):
+        lst = ['Devices Data:']
         lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
         lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
         Printer.print(lst)
@@ -309,11 +308,7 @@ class DevicesData(dict):
         if not self:
             print('There is zero device.')
 
-        if any([device, cmdlines, testcase, testcases, status]):
-            # if status:
-            #     connected_info = SerializedFile.get_connected_info(name=device)
-            #     print(connected_info)
-
+        if any([device, cmdlines, testcase, testcases]):
             if device:
                 if device in self:
                     tcs = self[device].get('testcases', None)
