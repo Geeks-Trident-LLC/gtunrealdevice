@@ -25,6 +25,7 @@ from gtunrealdevice.usage import show_usage
 from gtunrealdevice.usage import get_global_usage
 
 from gtunrealdevice.utils import File
+from gtunrealdevice.utils import MiscDevice
 
 
 def run_gui_application(options):
@@ -53,22 +54,27 @@ def show_version(options):
 
 def view_device_info(options):
     if options.command == 'view':
-        kwargs = dict()
-        pattern = r'(?i) *(?P<key>testcases?|cmdlines|device)::(?P<value>.*)?'
-        for item in options.operands:
-            match = re.match(pattern, item)
-            if match:
-                key = match.group('key')
-                if key == 'testcases' or key == 'cmdlines':
-                    kwargs[key] = True
-                else:
-                    kwargs[key] = match.group('value').strip()
-            else:
-                if item in DEVICES_DATA:
-                    kwargs['device'] = item
-                else:
-                    if not kwargs.get('device', ''):
-                        kwargs['device'] = item
+        validate_usage(options.command, options.operands)
+        validate_example_usage(options.command, options.operands, max_count=3)
+
+        if len(options.operands) > 2:
+            show_usage(options.command, exit_code=1)
+
+        parsed_node = MiscDevice.parse_host_and_other(*options.operands)
+        host = options.host or parsed_node.host
+
+        other = parsed_node.other
+
+        kwargs = dict(device='',
+                      status=options.status,
+                      testcases=options.showed_testcases,
+                      cmdlines=options.showed_cmdlines,
+                      testcase=options.testcase)
+        if host:
+            kwargs['device'] = DEVICES_DATA.get_address_from_name(host)
+
+        other.lower() == 'status' and kwargs.update(status=True)
+        other.lower() != 'status' and kwargs.update(testcase=other)
 
         DEVICES_DATA.view(**kwargs)
         sys.exit(0)
@@ -107,7 +113,7 @@ def show_info(options):
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
 
-        if options.all or options.serialization:
+        if options.all or options.connected_devices:
             lst.append('--------------------')
             lst.append(SerializedFile.get_info_text())
 
@@ -166,7 +172,7 @@ class Cli:
     def __init__(self):
         parser = argparse.ArgumentParser(
             prog=self.prog,
-            usage='%(prog)s [options] command operands',
+            usage='%(prog)s command operands [options]',
             description='Geeks Trident Unreal Device Application',
         )
 
@@ -226,8 +232,8 @@ class Cli:
         ),
 
         parser.add_argument(
-            '--serialization', action='store_true',
-            help="showing serialization info"
+            '--connected-devices', action='store_true',
+            help="showing info of connected devices"
         ),
 
         parser.add_argument(

@@ -1,5 +1,7 @@
 """Module containing the logic for utilities."""
 
+import re
+
 from pathlib import Path
 from pathlib import PurePath
 from datetime import datetime
@@ -318,3 +320,42 @@ class Misc:
     @classmethod
     def is_string(cls, obj):
         return isinstance(obj, str)
+
+
+class DictObject(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key, value in self.items():
+            if re.match(r'(?i)[a-z]\w*', key):
+                setattr(self, key, value)
+    
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        for key, value in self.items():
+            if re.match(r'(?i)[a-z]\w*', key):
+                setattr(self, key, value)
+
+
+class MiscDevice:
+    @classmethod
+    def parse_host(cls, data):
+        data = str(data)
+        pattern = r'(?i)(?P<host>[a-z0-9]([\w:.-]*[a-z0-9])*::)? *(?P<data>.+)'
+        m = re.match(pattern, data)
+        if m:
+            host, data = m.group('host'), m.group('data')
+            if host:
+                host = host.strip(':')
+                return DictObject(host=host, data=data)
+            else:
+                return DictObject(host='', data=data)
+        else:
+            return DictObject(host='', data=data)
+
+    @classmethod
+    def parse_host_and_other(cls, *args):
+        if not args:
+            return DictObject(host='', other='')
+        host, other = args[0].strip(), args[1].strip() if len(args) > 1 else ''
+
+        return DictObject(host=host, other=other)
