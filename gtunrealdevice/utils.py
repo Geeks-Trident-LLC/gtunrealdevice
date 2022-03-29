@@ -325,15 +325,23 @@ class Misc:
 class DictObject(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for key, value in self.items():
-            if re.match(r'(?i)[a-z]\w*', key):
-                setattr(self, key, value)
-    
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        for key, value in self.items():
-            if re.match(r'(?i)[a-z]\w*', key):
-                setattr(self, key, value)
+        self.update(*args, **kwargs)
+
+    def __setattr__(self, attr, value):
+        super().__setattr__(attr, value)
+        self.update(**{attr: value, 'is_updated_attr': False})
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.update(**{key: value})
+
+    def update(self, *args, is_updated_attr=True, **kwargs):
+        obj = dict(*args, **kwargs)
+        super().update(**obj)
+        if is_updated_attr:
+            for attr, value in obj.items():
+                if re.match(r'(?i)[a-z]\w*$', attr):
+                    setattr(self, attr, value)
 
 
 class MiscDevice:
