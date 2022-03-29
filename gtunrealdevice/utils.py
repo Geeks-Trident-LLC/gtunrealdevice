@@ -8,6 +8,8 @@ from datetime import datetime
 
 from textwrap import wrap
 
+import yaml
+
 
 class Printer:
     """A printer class.
@@ -258,6 +260,38 @@ class File:
         except Exception as ex:
             cls.message = '{}: {}'.format(type(ex).__name__, ex)
             return ''
+
+    @classmethod
+    def get_result_from_yaml_file(cls, file_path, default=dict(), is_stripped=True):
+        """get result of YAML file
+
+        Parameters
+        ----------
+        file_path (string): file path
+        default (object): a default result file is not found.  Default is empty dict.
+        is_stripped (bool): removing leading or trailing space.  Default is True.
+
+        Returns
+        -------
+        object: YAML result
+        """
+        try:
+            filename = cls.get_path(file_path)
+            with open(filename) as stream:
+                content = stream.read()
+                if is_stripped:
+                    content = content.strip()
+
+                if content:
+                    yaml_result = yaml.safe_load(content)
+                    cls.message = 'loaded {}'.format(filename)
+                    return yaml_result
+                else:
+                    cls.message = '"{}" file is empty.'.format(filename)
+                    return default
+        except Exception as ex:
+            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            return default
 
     @classmethod
     def save(cls, filename, data):
