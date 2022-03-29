@@ -10,6 +10,7 @@ from gtunrealdevice import UnrealDevice
 
 from gtunrealdevice.config import Data
 from gtunrealdevice.utils import File
+from gtunrealdevice.utils import DictObject
 
 
 class SerializedFile:
@@ -28,7 +29,7 @@ class SerializedFile:
 
     @classmethod
     def get_info(cls):
-        tbl = dict(filename=cls.filename)
+        tbl = DictObject(filename=cls.filename)
         instances = []
         if cls.is_file_exist():
             tbl.update(existed=True)
@@ -59,26 +60,56 @@ class SerializedFile:
             tbl.update(existed=False)
             tbl.update(total=0)
 
-        lst = ['Serialized Device(s) Info:',
-               '  - Location: {}'.format(tbl['filename']),
-               '  - Existed: {}'.format('Yes' if tbl['existed'] else 'No'),
-               '  - Total serialized instances: {}'.format(tbl['total'])]
+        lst = ['Connected Device(s) Info:',
+               'Total connected unreal-device: {}'.format(tbl['total'])]
 
         if instances:
-            fmt = '    ~ host: {:16} name: {}'
-            other_fmt = '      +-> current assigned testcase: {}'
+            fmt1 = '  - {} is {} (name={})'
+            fmt2 = '  - {} is {} (name={}, testcase={})'
             for instance in instances:
-                lst.append(fmt.format(instance.address, instance.name))
-                if instance.testcase:
-                    lst.append(other_fmt.format(instance.testcase))
-
+                status = 'connected' if instance.is_connected else 'disconnected'
+                l1 = [instance.address, status, instance.name]
+                instance.testcase and l1.append(instance.testcase)
+                fmt = fmt2 if instance.testcase else fmt1
+                lst.append(fmt.format(*l1))
+        tbl.update(devices=instances)
         tbl.update(text='\n'.join(lst))
         return tbl
 
     @classmethod
     def get_info_text(cls):
-        tbl = cls.get_info()
-        return tbl.get('text')
+        node = cls.get_info()
+        return node.text
+
+    @classmethod
+    def get_connected_info(cls, name=''):
+        node = cls.get_info()
+        lst = ['Unreal-device connection status: {} device(s)'.format(node.total)]
+        fmt1 = '  - {} is {} (name={})'
+        fmt2 = '  - {} is {} (name={}, testcase={})'
+        if node.total:
+            if name:
+                for device in node.devices:
+                    status = 'connected' if device.is_connected else 'disconnected'
+                    if name == device.name or device.address:
+                        l1 = [device.address, status, device.name]
+                        device.testcase and l1.append(device.testcase)
+                        fmt = fmt2 if device.testcase else fmt1
+                        lst.append(fmt.format(*l1))
+                        return '\n'.join(lst)
+
+                lst.append('  - "{}" device is not connected'.format(name))
+                return '\n'.join(lst)
+            else:
+                for device in node.devices:
+                    status = 'connected' if device.is_connected else 'disconnected'
+                    l1 = [device.address, status, device.name]
+                    device.testcase and l1.append(device.testcase)
+                    fmt = fmt2 if device.testcase else fmt1
+                    lst.append(fmt.format(*l1))
+                return '\n'.join()
+        else:
+            return 'Total connected unreal-device: {}'.format(node.total)
 
     @classmethod
     def add_instance(cls, name, node):
