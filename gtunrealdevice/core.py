@@ -407,6 +407,9 @@ class UnrealDevice:
 
         if self.address in DEVICES_DATA:
             self.data = DEVICES_DATA.get(self.address)
+            name = self.data.get('name', '')
+            name and setattr(self, 'name', name)
+
             self._is_connected = True
 
             testcase = kwargs.get('testcase', '')
