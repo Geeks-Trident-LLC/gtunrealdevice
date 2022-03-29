@@ -102,26 +102,34 @@ def show_info(options):
     command, operands = options.command, options.operands
     if command == 'info':
         validate_usage(command, operands)
-        operands and show_usage(command, exit_code=1)
 
-        if options.sample_devices_info:
+        op_txt = ' '.join(options.operands).lower()
+        is_sample = 'sample' in op_txt or options.sample_devices_info
+        is_all = 'all' in op_txt or options.all
+        is_dependency = 'depend' in op_txt or options.dependency
+        is_devices_data = 'devices' in op_txt or options.devices_data
+        is_serialization = 'serial' in op_txt or options.serialization
+        is_connected = 'connect' in op_txt or options.connected_devices
+
+        if is_sample:
             Printer.print('Sample Format of Device Info:')
             print('\n{}\n'.format(Data.sample_devices_info_text))
             sys.exit(0)
 
-        lst = [
-            Data.get_app_info(),
-        ]
+        lst = []
 
-        if options.all or options.dependency:
-            lst.append('--------------------')
+        if is_all:
+            lst.append(Data.get_app_info())
+
+        if is_all or is_dependency:
+            lst and lst.append('--------------------')
             lst.append('Dependencies:')
             for pkg in Data.get_dependency().values():
                 lst.append('  + Package: {0[package]}'.format(pkg))
                 lst.append('             {0[url]}'.format(pkg))
 
-        if options.all or options.devices_data:
-            lst.append('--------------------')
+        if is_all or is_devices_data:
+            lst and lst.append('--------------------')
             lst.append('Devices Info:')
             lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
             lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
@@ -131,17 +139,19 @@ def show_info(options):
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
 
-        if options.all or options.serialization:
+        if is_all or is_serialization:
             tbl = SerializedFile.get_info()
-            lst.append('--------------------')
+            lst and lst.append('--------------------')
             lst.append('Serialization File Info:')
             lst.append('  - File: {filename}'.format(**tbl))
             lst.append('  - Existed: {existed}'.format(**tbl))
             lst.append('  - Total serialized instance(s): {total}'.format(**tbl))
 
-        if options.all or options.connected_devices:
-            lst.append('--------------------')
+        if is_all or is_connected:
+            lst and lst.append('--------------------')
             lst.append(SerializedFile.get_info_text())
+
+        not lst and lst.append(Data.get_app_info())
 
         Printer.print(lst)
         sys.exit(0)
