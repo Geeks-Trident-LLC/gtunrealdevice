@@ -29,6 +29,20 @@ from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
 
 
+class ArgumentParser(argparse.ArgumentParser):
+
+    def parse_args(self, *args, **kwargs):
+        try:
+            options = super().parse_args(*args, **kwargs)
+        except SystemExit as ex:    # noqa
+            self.print_help()
+            sys.exit(1)
+
+        if options.help:
+            validate_usage(options.command, ['usage'])
+        return options
+
+
 def run_gui_application(options):
     """Run gtunrealdevice application.
 
@@ -182,10 +196,17 @@ class Cli:
                 'release', 'reload', 'usage', 'version', 'view']
 
     def __init__(self):
-        parser = argparse.ArgumentParser(
+        # parser = argparse.ArgumentParser(
+        parser = ArgumentParser(
             prog=self.prog,
             usage='%(prog)s command operands [options]',
             description='Geeks Trident Unreal Device Application',
+            add_help=False
+        )
+
+        parser.add_argument(
+            '-h', '--help', action='store_true',
+            help='show this help message and exit'
         )
 
         parser.add_argument(
@@ -271,11 +292,8 @@ class Cli:
 
         self.kwargs = dict()
         self.parser = parser
-        try:
-            self.options = self.parser.parse_args()
-        except SystemExit as ex:    # noqa
-            self.parser.print_help()
-            sys.exit(1)
+
+        self.options = self.parser.parse_args()
 
     def validate_command(self):
         """Validate argparse `options.command`.
