@@ -328,6 +328,12 @@ class DictObject(dict):
         for key, value in self.items():
             if re.match(r'(?i)[a-z]\w*', key):
                 setattr(self, key, value)
+    
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        for key, value in self.items():
+            if re.match(r'(?i)[a-z]\w*', key):
+                setattr(self, key, value)
 
 
 class MiscDevice:
