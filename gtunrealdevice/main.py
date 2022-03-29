@@ -26,6 +26,7 @@ from gtunrealdevice.usage import get_global_usage
 
 from gtunrealdevice.utils import File
 from gtunrealdevice.utils import MiscDevice
+from gtunrealdevice.utils import DictObject
 
 
 def run_gui_application(options):
@@ -65,18 +66,20 @@ def view_device_info(options):
 
         other = parsed_node.other
 
-        kwargs = dict(device='',
-                      status=options.status,
-                      testcases=options.showed_testcases,
-                      cmdlines=options.showed_cmdlines,
-                      testcase=options.testcase)
-        if host:
-            kwargs['device'] = DEVICES_DATA.get_address_from_name(host)
+        if options.status or other.lower() == 'status':
+            result = SerializedFile.get_connected_info(name=host)
+            Printer.print(result)
+        else:
+            node = DictObject(device='',
+                              testcases=options.showed_testcases,
+                              cmdlines=options.showed_cmdlines,
+                              testcase=options.testcase.strip())
+            if host:
+                node.device = DEVICES_DATA.get_address_from_name(host)
 
-        other.lower() == 'status' and kwargs.update(status=True)
-        other.lower() != 'status' and kwargs.update(testcase=other)
+            other and node.update(testcase=other)
 
-        DEVICES_DATA.view(**kwargs)
+            DEVICES_DATA.view(**node)
         sys.exit(0)
 
 
@@ -112,6 +115,14 @@ def show_info(options):
                 for host in DEVICES_DATA:
                     name = DEVICES_DATA.get(host).get('name', 'host')
                     lst.append(fmt.format(host, name))
+
+        if options.all or options.serialization:
+            tbl = SerializedFile.get_info()
+            lst.append('--------------------')
+            lst.append('Serialization File Info:')
+            lst.append('  - File: {filename}'.format(**tbl))
+            lst.append('  - Existed: {existed}'.format(**tbl))
+            lst.append('  - Total serialized instance(s): {total}'.format(**tbl))
 
         if options.all or options.connected_devices:
             lst.append('--------------------')
@@ -224,6 +235,11 @@ class Cli:
         parser.add_argument(
             '--dependency', action='store_true',
             help="showing package dependencies"
+        ),
+
+        parser.add_argument(
+            '--serialization', action='store_true',
+            help="showing serialization file info"
         ),
 
         parser.add_argument(

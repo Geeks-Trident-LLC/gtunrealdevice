@@ -8,6 +8,8 @@ from datetime import datetime
 
 from textwrap import wrap
 
+import yaml
+
 
 class Printer:
     """A printer class.
@@ -260,6 +262,38 @@ class File:
             return ''
 
     @classmethod
+    def get_result_from_yaml_file(cls, file_path, default=dict(), is_stripped=True):
+        """get result of YAML file
+
+        Parameters
+        ----------
+        file_path (string): file path
+        default (object): a default result file is not found.  Default is empty dict.
+        is_stripped (bool): removing leading or trailing space.  Default is True.
+
+        Returns
+        -------
+        object: YAML result
+        """
+        try:
+            filename = cls.get_path(file_path)
+            with open(filename) as stream:
+                content = stream.read()
+                if is_stripped:
+                    content = content.strip()
+
+                if content:
+                    yaml_result = yaml.safe_load(content)
+                    cls.message = 'loaded {}'.format(filename)
+                    return yaml_result
+                else:
+                    cls.message = '"{}" file is empty.'.format(filename)
+                    return default
+        except Exception as ex:
+            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            return default
+
+    @classmethod
     def save(cls, filename, data):
         """Create a file path
 
@@ -325,15 +359,23 @@ class Misc:
 class DictObject(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for key, value in self.items():
-            if re.match(r'(?i)[a-z]\w*', key):
-                setattr(self, key, value)
-    
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        for key, value in self.items():
-            if re.match(r'(?i)[a-z]\w*', key):
-                setattr(self, key, value)
+        self.update(*args, **kwargs)
+
+    def __setattr__(self, attr, value):
+        super().__setattr__(attr, value)
+        self.update(**{attr: value, 'is_updated_attr': False})
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.update(**{key: value})
+
+    def update(self, *args, is_updated_attr=True, **kwargs):
+        obj = dict(*args, **kwargs)
+        super().update(**obj)
+        if is_updated_attr:
+            for attr, value in obj.items():
+                if re.match(r'(?i)[a-z]\w*$', attr):
+                    setattr(self, attr, value)
 
 
 class MiscDevice:
