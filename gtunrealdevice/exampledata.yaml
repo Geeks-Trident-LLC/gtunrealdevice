@@ -83,7 +83,7 @@ connect:
   example2:
     header: |-
       Example: Assuming there is none of device in devices_info.yaml.
-      What connection failure messge will show when connect to unavaliable host?
+      What connection messge will show when connect to unavaliable host?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ % unreal-device view 1.1.1.1
@@ -232,7 +232,7 @@ execute:
 
   example2:
     header: |-
-      Example: What execution failure messge will show when user tries to
+      Example: What execution messge will show when user tries to
       execute command line on unconnected device?
     body: |-
       test@test_machine ~ %
@@ -253,7 +253,7 @@ execute:
 
   example3:
     header: |-
-      Example: What execution failure messge will show when user tries to
+      Example: What execution messge will show when user tries to
       execute command line on disconnected device?
     body: |-
       test@test_machine ~ %
@@ -382,7 +382,7 @@ configure:
   example2:
     header: |-
       Example: Assuming there is no "5.5.5.5" device in devices_info.yaml.
-      What configuration failure messge will show when configure on unavaliable host?
+      What configuration messge will show when configure on unavaliable host?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ % unreal-device view --host=5.5.5.5
@@ -405,7 +405,7 @@ configure:
 
   example3:
     header: |-
-      Example: What configuration failure messge will show when configure 
+      Example: What configuration messge will show when configure 
       on disconnected host?
     body: |-
       test@test_machine ~ %
@@ -530,7 +530,7 @@ reload:
 
   example2:
     header: |-
-      Example: What is failure message when try to reload unavailabe device?
+      Example: What is a message when try to reload unavailabe device?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ %
@@ -702,4 +702,125 @@ reload:
       |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
       |   - 2.2.2.2 is connected (name=device2)                                      |
       +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+
+disconnect:
+  example1:
+    header: |-
+      Example: How to use unreal-device disconnect command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device disconnect --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device disconnect usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device disconnect operands [options]
+      unreal-device disconnect example {1,2,3,4,5}
+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: What is a message when try to disconnect unavailabe device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=5.5.5.5
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      There is no '5.5.5.5' device.
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device disconnect --host=5.5.5.5
+      UnrealDeviceMessage: CANT disconnect because 5.5.5.5 is not available.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: What is a message when try to disconnect connected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device disconnect 2.2.2.2
+      logout unreal-device 2.2.2.2
+      Mar 30 2022 12:16:14.472 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device2 is disconnected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example4:
+    header: |-
+      Example: What is a message when try to disconnect offline device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device disconnect 2.2.2.2
+      UnrealDeviceMessage: 2.2.2.2 is already disconnected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: What is a message when try to disconnect un-connected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected    
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 1                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %  unreal-device disconnect 2.2.2.2
+      UnrealDeviceMessage: CANT disconnect because 2.2.2.2 has not connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
       test@test_machine ~ %

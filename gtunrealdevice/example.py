@@ -48,3 +48,7 @@ class ConfigureExample(Example):
 
 class ReloadExample(Example):
     name = 'reload'
+
+
+class DisconnectExample(Example):
+    name = 'disconnect'
