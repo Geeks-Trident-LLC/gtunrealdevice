@@ -12,6 +12,9 @@ from gtunrealdevice.usage import validate_example_usage
 from gtunrealdevice.usage import show_usage
 
 from gtunrealdevice.utils import MiscDevice
+from gtunrealdevice.utils import Text
+
+from gtunrealdevice.utils import ECODE
 
 
 def do_device_connect(options):
@@ -20,7 +23,7 @@ def do_device_connect(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
@@ -39,7 +42,7 @@ def do_device_connect(options):
                                'a new connection.')
                         extra = '@testcase={}'.format(testcase) if testcase else ''
                         Printer.print_unreal_device_msg(fmt, host_addr, extra)
-                        sys.exit(0)
+                        sys.exit(ECODE.SUCCESS)
                 else:
                     instance.connect(testcase=testcase)
                     SerializedFile.add_instance(host_addr, instance)
@@ -51,10 +54,10 @@ def do_device_connect(options):
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(instance.success_code)
             except Exception as ex:
-                Printer.print_message('{}: {}', type(ex).__name__, ex)
-                sys.exit(1)
+                Printer.print_message(Text(ex))
+                sys.exit(ECODE.BAD)
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_disconnect(options):
@@ -63,7 +66,7 @@ def do_device_disconnect(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
@@ -79,18 +82,18 @@ def do_device_disconnect(options):
                 else:
                     fmt = '{} is already disconnected.'
                     Printer.print_unreal_device_msg(fmt, original_addr)
-                sys.exit(0)
+                sys.exit(ECODE.SUCCESS)
             else:
                 if host_addr in DEVICES_DATA:
                     fmt = 'CANT disconnect because {} has not connected.'
                     Printer.print_unreal_device_msg(fmt, original_addr)
-                    sys.exit(1)
+                    sys.exit(ECODE.BAD)
                 else:
                     fmt = 'CANT disconnect because {} is not available.'
                     Printer.print_unreal_device_msg(fmt, original_addr)
-                    sys.exit(1)
+                    sys.exit(ECODE.BAD)
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_destroy(options):
@@ -99,7 +102,7 @@ def do_device_destroy(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
@@ -110,7 +113,7 @@ def do_device_destroy(options):
             Printer.print_unreal_device_msg(SerializedFile.message)
             sys.exit(int(result))
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_release(options):
@@ -119,7 +122,7 @@ def do_device_release(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
@@ -130,7 +133,7 @@ def do_device_release(options):
             Printer.print_unreal_device_msg(SerializedFile.message)
             sys.exit(int(result))
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_execute(options):
@@ -155,13 +158,13 @@ def do_device_execute(options):
                 else:
                     fmt = 'CANT execute cmdline because {} is disconnected.'
                     Printer.print_unreal_device_msg(fmt, host_addr)
-                    sys.exit(1)
+                    sys.exit(ECODE.BAD)
             else:
                 fmt = 'CANT execute cmdline because {} has not connected.'
                 Printer.print_unreal_device_msg(fmt, host_addr)
-                sys.exit(1)
+                sys.exit(ECODE.BAD)
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_configure(options):
@@ -186,13 +189,13 @@ def do_device_configure(options):
                 else:
                     fmt = 'CANT configure because {} is disconnected.'
                     Printer.print_unreal_device_msg(fmt, host_addr)
-                    sys.exit(1)
+                    sys.exit(ECODE.BAD)
             else:
                 fmt = 'CANT configure because {} has not connected.'
                 Printer.print_unreal_device_msg(fmt, host_addr)
-                sys.exit(1)
+                sys.exit(ECODE.BAD)
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
 
 def do_device_reload(options):
@@ -214,7 +217,7 @@ def do_device_reload(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
@@ -232,6 +235,6 @@ def do_device_reload(options):
             else:
                 fmt = 'CANT reload because {} has not connected.'
                 Printer.print_unreal_device_msg(fmt, host_addr)
-                sys.exit(1)
+                sys.exit(ECODE.BAD)
         else:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
