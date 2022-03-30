@@ -28,8 +28,6 @@ from gtunrealdevice.utils import File
 from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
 
-from gtunrealdevice.example import get_number_of_example
-
 
 class ArgumentParser(argparse.ArgumentParser):
 

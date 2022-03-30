@@ -40,3 +40,7 @@ class ConnectExample(Example):
 
 class ExecuteExample(Example):
     name = 'execute'
+
+
+class ConfigureExample(Example):
+    name = 'configure'

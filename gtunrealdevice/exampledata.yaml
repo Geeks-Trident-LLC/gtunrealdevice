@@ -11,6 +11,7 @@ load:
       -------------------
         --filename FILENAME          file name
         --saved                      saving devices info to devices_info.yaml
+        -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device load operands [options]
       unreal-device load example 1
@@ -71,6 +72,7 @@ connect:
       -------------------
         --host HOST                  host address or host name
         --testcase TESTCASE          showing test case data of device
+        -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device connect operands [options]
       unreal-device connect example {1,2,3,4,5}
@@ -220,6 +222,7 @@ execute:
       optional arguments:
       -------------------
         --host HOST                  host address or host name
+        -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device execute operands [options]
       unreal-device execute example {1,2,3,4,5}
@@ -353,4 +356,153 @@ execute:
       test@test_machine ~ % echo $?
       0
       test@test_machine ~ % 
+      test@test_machine ~ %
+
+configure:
+  example1:
+    header: |-
+      Example: How to use unreal-device configure command line?
+    body: |-
+      
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device configure usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device configure operands [options]
+      unreal-device configure example {1,2,3,4,5,6}
+      
+       test@test_machine ~ %
+       test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: Assuming there is no "5.5.5.5" device in devices_info.yaml.
+      What configuration failure messge will show when configure on unavaliable host?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=5.5.5.5
+      +------------------------------------------------------------------------------+
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      There is no '5.5.5.5' device.
+      
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure turn off module 1 --host=5.5.5.5
+      UnrealDeviceMessage: CANT configure because 5.5.5.5 has not connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: What configuration failure messge will show when configure 
+      on disconnected host?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure turn off module 1 --host=2.2.2.2
+      UnrealDeviceMessage: CANT configure because 2.2.2.2 is disconnected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example4:
+    header: |-
+      Example: What is configuration result of empty configuration on connected host?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure  --host=1.1.1.1 
+      configure
+      Mar 30 2022 10:48:42.368 for "device1" - UNREAL-DEVICE-CONFIGURATION-SERVICE-TIMESTAMP
+      device1(configure)# end
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: Assuming the configuration line is:
+        
+        turn off module 1
+      
+      What is configuration result on connected host?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure turn off module 1 --host=1.1.1.1
+      configure
+      Mar 30 2022 10:44:23.155 for "device1" - UNREAL-DEVICE-CONFIGURATION-SERVICE-TIMESTAMP
+      device1(configure)# turn off module 1
+      device1(configure)# end
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example6:
+    header: |-
+      Example: Assuming the configuration lines are
+        
+        confi
+        turn off module 1
+        exit
+      
+      What is configuration result on connected host?
+
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device configure "confi\nturn off module 1\nexit" --host=1.1.1.1
+      confi
+      Mar 30 2022 10:55:26.558 for "device1" - UNREAL-DEVICE-CONFIGURATION-SERVICE-TIMESTAMP
+      device1(configure)# turn off module 1
+      device1(configure)# exit
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
       test@test_machine ~ %
