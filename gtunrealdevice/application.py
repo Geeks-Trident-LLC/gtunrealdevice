@@ -3,6 +3,8 @@
 from gtunrealdevice import version
 from gtunrealdevice import edition
 
+from gtunrealdevice.utils import ECODE
+
 
 __version__ = version
 __edition__ = edition
@@ -24,7 +26,7 @@ class Application:
         from textwrap import dedent
         import sys
         print(dedent(data))
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def execute():

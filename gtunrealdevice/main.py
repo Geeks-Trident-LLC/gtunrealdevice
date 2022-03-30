@@ -28,6 +28,8 @@ from gtunrealdevice.utils import File
 from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
 
+from gtunrealdevice.utils import ECODE
+
 
 class ArgumentParser(argparse.ArgumentParser):
 
@@ -36,7 +38,7 @@ class ArgumentParser(argparse.ArgumentParser):
             options = super().parse_args(*args, **kwargs)
         except SystemExit as ex:    # noqa
             self.print_help()
-            sys.exit(1)
+            sys.exit(ECODE.BAD)
 
         if options.help:
             validate_usage(options.command, ['usage'])
@@ -52,19 +54,19 @@ def run_gui_application(options):
 
     Returns
     -------
-    None: will invoke ``gtunrealdevice.Application().run()`` and ``sys.exit(0)``
+    None: will invoke ``gtunrealdevice.Application().run()`` and ``sys.exit(ECODE.SUCCESS)``
     if end user requests `--gui`
     """
     if options.command == 'app' or options.command == 'gui':
         app = Application()
         app.run()
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def show_version(options):
     if options.command == 'version':
         print('{} v{}'.format(Cli.prog, version))
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def view_device_info(options):
@@ -73,7 +75,7 @@ def view_device_info(options):
         validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
-            show_usage(options.command, exit_code=1)
+            show_usage(options.command, exit_code=ECODE.BAD)
 
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
         host = options.host or parsed_node.host
@@ -95,7 +97,7 @@ def view_device_info(options):
             other and node.update(testcase=other)
 
             DEVICES_DATA.view(**node)
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def show_info(options):
@@ -115,7 +117,7 @@ def show_info(options):
         if is_sample:
             Printer.print('Sample Format of Device Info:')
             print('\n{}\n'.format(Data.sample_devices_info_text))
-            sys.exit(0)
+            sys.exit(ECODE.SUCCESS)
 
         lst = []
 
@@ -155,7 +157,7 @@ def show_info(options):
         not lst and lst.append(Data.get_app_info())
 
         Printer.print(lst)
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def load_device_info(options):
@@ -169,15 +171,15 @@ def load_device_info(options):
             if not File.is_exist(fn):
                 print()
                 Printer.print_unreal_device_msg('*** FileNotFound *** {}\n', fn)
-                show_usage(command, exit_code=1)
+                show_usage(command, exit_code=ECODE.BAD)
         else:
-            show_usage(command, exit_code=1)
+            show_usage(command, exit_code=ECODE.BAD)
 
         is_valid = DEVICES_DATA.is_valid_file(fn)
         if not is_valid:
             sample_format = DEVICES_DATA.get_sample_device_info_format()
             print(sample_format)
-            sys.exit(1)
+            sys.exit(ECODE.BAD)
 
         txt = operands[1].lower() if len(operands) > 1 else ''
 
@@ -194,13 +196,13 @@ def load_device_info(options):
             fmt = ('loaded "{}" device info, but not '
                    'permanently save to devices info')
             Printer.print_unreal_device_msg(fmt, fn)
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 def show_global_usage(options):
     if options.command == 'usage':
         print(get_global_usage())
-        sys.exit(0)
+        sys.exit(ECODE.SUCCESS)
 
 
 class Cli:
@@ -316,7 +318,7 @@ class Cli:
 
         Returns
         -------
-        bool: show ``self.parser.print_help()`` and call ``sys.exit(1)`` if
+        bool: show ``self.parser.print_help()`` and call ``sys.exit(ECODE.BAD)`` if
         command is not  app, configure, connect, destroy,
         disconnect, execute, gui, info, load, release, reload, usage,
         version, or view, otherwise, return True
@@ -326,7 +328,7 @@ class Cli:
         if self.options.command in self.commands:
             return True
         self.parser.print_help()
-        sys.exit(1)
+        sys.exit(ECODE.BAD)
 
     def run(self):
         """Take CLI arguments, parse it, and process."""

@@ -5,6 +5,7 @@ import re
 from enum import IntFlag
 
 from gtunrealdevice.utils import Misc
+from gtunrealdevice.utils import ECODE
 
 from gtunrealdevice import example
 from gtunrealdevice.example import get_number_of_example
@@ -225,7 +226,7 @@ class Usage:
 def validate_usage(name, operands):
     result = ''.join(operands) if Misc.is_list(operands) else str(operands)
     if result.strip().lower() == 'usage':
-        show_usage(name, exit_code=0)
+        show_usage(name, exit_code=ECODE.SUCCESS)
 
 
 def show_usage(name, *args, exit_code=None):
@@ -237,7 +238,7 @@ def show_usage(name, *args, exit_code=None):
     else:
         fmt = '*** ErrorUsage: "{}" has not defined or unavailable.'
         print(fmt.format(name))
-        sys.exit(1)
+        sys.exit(ECODE.BAD)
 
 
 def validate_example_usage(name, operands):
@@ -252,12 +253,12 @@ def validate_example_usage(name, operands):
             cls = getattr(example, cls_name)
             result = cls.get(str(index))
             print('\n\n{}\n'.format(result))
-            sys.exit(0)
+            sys.exit(ECODE.SUCCESS)
         else:
-            show_usage(name, 'example', exit_code=1)
+            show_usage(name, 'example', exit_code=ECODE.BAD)
     else:
         if re.match('example', txt):
-            show_usage(name, 'example', exit_code=1)
+            show_usage(name, 'example', exit_code=ECODE.BAD)
 
 
 def get_global_usage():
