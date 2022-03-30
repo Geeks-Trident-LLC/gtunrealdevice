@@ -1,24 +1,57 @@
 load:
   example1:
     header: |-
+      Example: How to use unreal-device load command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device load --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device load usage
+      optional arguments:
+      -------------------
+        --filename FILENAME          file name
+        --saved                      saving devices info to devices_info.yaml
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device load operands [options]
+      unreal-device load example 1
+      
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
       Example: Assuming end-user doesn't know anything about unreal-device tool.
       How to use "unreal-device load ..." command line.
     body: |-
-      Step 1: understanding sample_devices_info format
+      Step 1: use --help or usage to view the usage of unreal-device load
           
+          unreal-device load --help
+          or
+          unreal-device load usage
+      
+      Step 2: understanding sample_devices_info format
+          
+          unreal-device info --sample_devices_info
+          or
           unreal-device info sample_devices_info
           
           Note: the structure of sample_devices_info is YAML syntax.
       
-      Step 2: create a file as user_devices_info.yaml
+      Step 3: create a file as user_devices_info.yaml
       
-      Step 3: load user_devices_info.yaml to unreal-device load user_devices_info.yaml
+      Step 4: load user_devices_info.yaml to unreal-device load user_devices_info.yaml
           
+          unreal-device load --filename=user_devices_info.yaml
+          or
           unreal-device load user_devices_info.yaml
       
-      Step 4: if user wants to save it for later uses, just add keep after load, e.g.
+      Step 5: if user wants to save it for later uses, just add saved after filename, e.g.
           
-          unreal-device load keep user_devices_info.yaml
+          unreal-device load --filelname=user_devices_info.yaml --saved
+          or
+          unreal-device load user_devices_info.yaml --saved
+          or
+          unreal-device load user_devices_info.yaml saved
           
           Note: "load keep" will overwrite any existing device info.
               Use text editor to check the file 
@@ -27,6 +60,25 @@ load:
 
 connect:
   example1:
+    header: |-
+      Example: How to use unreal-device connect command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device connect --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device connect usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        --testcase TESTCASE          showing test case data of device
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device connect operands [options]
+      unreal-device connect example {1,2,3,4,5}
+      
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
     header: |-
       Example: Assuming there is none of device in devices_info.yaml.
       What connection failure messge will show when connect to unavaliable host?
@@ -50,7 +102,7 @@ connect:
       1
       test@test_machine ~ %
 
-  example2:
+  example3:
     header: |-
       Example: Assuming "1.1.1.1" host in devices_info.yaml.
       What connection messge will show when connect to "1.1.1.1" host?
@@ -63,18 +115,18 @@ connect:
       |   - Total devices: 1                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
-        show ver: software version is 2.0.2.2
-        show version: software version is 2.0.2.2
+        show ver: software version is 1.0.1.1
+        show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
       testcases:
         test1:
-          show version: software version is 2.0.2.2.a
+          show version: software version is 1.0.1.1.a
 
       test@test_machine ~ %
       test@test_machine ~ % unreal-device connect 1.1.1.1
       login unreal-device 1.1.1.1@dummy_username:dummy_password
-      +++ Mar 24 2022 15:44:16.882 from unreal-device authentication service for "1.1.1.1"
+      Mar 29 2022 16:49:28.370 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
       device1 is successfully connected.
       test@test_machine ~ %
       test@test_machine ~ %
@@ -82,7 +134,7 @@ connect:
       0
       test@test_machine ~ %
 
-  example3:
+  example4:
     header: |-
       Example: Assuming "1.1.1.1" host in devices_info.yaml and it also 
       has data for testcase name as test1.
@@ -96,52 +148,18 @@ connect:
       |   - Total devices: 1                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
-        show ver: software version is 2.0.2.2
-        show version: software version is 2.0.2.2
+        show ver: software version is 1.0.1.1
+        show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
       testcases:
         test1:
-          show version: software version is 2.0.2.2.a
+          show version: software version is 1.0.1.1.a
 
       test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1
-      login unreal-device 1.1.1.1@dummy_username:dummy_password for "test1"
-      +++ Mar 24 2022 16:00:07.332 from unreal-device authentication service for "1.1.1.1"
-      device1 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-
-  example4:
-    header: |-
-      Example: Assuming "1.1.1.1" host in devices_info.yaml and it doesn't 
-      have data for testcase name as test2.
-      What connection messge will show when connect to "1.1.1.1" host of test2?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view 1.1.1.1 test1
-      +------------------------------------------------------------------------------+
-      | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 1                                                         |
-      +------------------------------------------------------------------------------+
-      cmdlines:
-        show ver: software version is 2.0.2.2
-        show version: software version is 2.0.2.2
-      login: device1 is successfully connected.
-      name: device1
-      testcases:
-        test1:
-          show version: software version is 2.0.2.2.a
-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1 test2
-      Warning: "test2" test case is unavailable for this connection ***
-      login unreal-device 1.1.1.1@dummy_username:dummy_password fallback to default.
-      +++ Mar 24 2022 16:01:40.588 from unreal-device authentication service for "1.1.1.1"
+      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
+      login unreal-device 1.1.1.1@dummy_username:dummy_password@testcase=test1
+      Mar 29 2022 16:52:30.842 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
       device1 is successfully connected.
       test@test_machine ~ %
       test@test_machine ~ %
@@ -151,15 +169,38 @@ connect:
 
   example5:
     header: |-
+      Example: Assuming "1.1.1.1" host in devices_info.yaml and it doesn't 
+      have data for testcase name as test2.
+      What connection messge will show when connect to "1.1.1.1" host of test2?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view 1.1.1.1 testcase=test2
+      +------------------------------------------------------------------------------+
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 1                                                         |
+      +------------------------------------------------------------------------------+
+      There is no test2 test case in '1.1.1.1' device.
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test2
+      UnrealDeviceWarning: "test2" test case is unavailable for this connection ***
+      login unreal-device 1.1.1.1@dummy_username:dummy_password fallback to default.
+      Mar 29 2022 16:55:22.745 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device1 is successfully connected.
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example6:
+    header: |-
       Example: What connection messge will show when connect to connected host?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1 test1
-      +------------------------------------------------------------------------------+
-      | 1.1.1.1 is already connected.                                                |
-      | Use reload for a new connection.                                             |
-      +------------------------------------------------------------------------------+
+      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
+      UnrealDeviceMessage: 1.1.1.1@testcase=test1 is already connected.  Use reload for a new connection.
       test@test_machine ~ %
       test@test_machine ~ %
       test@test_machine ~ % echo $?
@@ -169,19 +210,66 @@ connect:
 execute:
   example1:
     header: |-
+      Example: How to use unreal-device execute command line?
+    body: |-
+      
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device execute --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device execute usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device execute operands [options]
+      unreal-device execute example {1,2,3,4,5}
+      
+       test@test_machine ~ %
+       test@test_machine ~ %
+
+  example2:
+    header: |-
       Example: What execution failure messge will show when user tries to
       execute command line on unconnected device?
     body: |-
       test@test_machine ~ %
-      test@test_machine ~ % unreal-device execute 1.1.1.1::show version                                          
-      CANT execute cmdline because 1.1.1.1 has not connected.
+      test@test_machine ~ % unreal-device view 2.2.2.2 status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 1 device(s)                                 |
+      |   - "2.2.2.2" device is not connected                                        |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device execute show version --host=2.2.2.2                                          
+      UnrealDeviceMessage: CANT execute cmdline because 2.2.2.2 has not connected.
       test@test_machine ~ %
       test@test_machine ~ %
       test@test_machine ~ % echo $?
       1
       test@test_machine ~ %
 
-  example2:
+  example3:
+    header: |-
+      Example: What execution failure messge will show when user tries to
+      execute command line on disconnected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view 2.2.2.2 status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 2 device(s)                                 |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device execute show version --host=2.2.2.2                                          
+      UnrealDeviceMessage: CANT execute cmdline because 2.2.2.2 is disconnected.
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example4:
     header: |-
       Example: What is output of executing valid command line on connected device?
     body: |-
@@ -193,20 +281,20 @@ execute:
       |   - Total devices: 1                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
-        show ver: software version is 2.0.2.2
-        show version: software version is 2.0.2.2
+        show ver: software version is 1.0.1.1
+        show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
       testcases:
         test1:
-          show version: software version is 2.0.2.2.a
+          show version: software version is 1.0.1.1.a
       
       test@test_machine ~ % 
       test@test_machine ~ % 
-      test@test_machine ~ % unreal-device execute 1.1.1.1::show version
+      test@test_machine ~ % unreal-device execute show version --host=1.1.1.1
       show version
-      +++ Mar 24 2022 17:44:29.753 from unreal-device execution service for "1.1.1.1"
-      software version is 2.0.2.2
+      Mar 29 2022 16:59:38.799 for "device1" - UNREAL-DEVICE-EXECUTION-SERVICE-TIMESTAMP
+      software version is 1.0.1.1
       test@test_machine ~ % 
       test@test_machine ~ % echo $?
       0
@@ -214,8 +302,53 @@ execute:
       test@test_machine ~ % 
       test@test_machine ~ % unreal-device execute 1.1.1.1::show ver    
       show ver
-      +++ Mar 24 2022 17:44:35.634 from unreal-device execution service for "1.1.1.1"
-      software version is 2.0.2.2
+      Mar 29 2022 17:00:42.203 for "device1" - UNREAL-DEVICE-EXECUTION-SERVICE-TIMESTAMP
+      software version is 1.0.1.1
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ % 
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: How to execute show version command line of test case 1?
+    body: |-
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device view 1.1.1.1
+      +------------------------------------------------------------------------------+
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 1                                                         |
+      +------------------------------------------------------------------------------+
+      cmdlines:
+        show ver: software version is 1.0.1.1
+        show version: software version is 1.0.1.1
+      login: device1 is successfully connected.
+      name: device1
+      testcases:
+        test1:
+          show version: software version is 1.0.1.1.a
+      
+      test@test_machine ~ % 
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
+      login unreal-device 1.1.1.1@dummy_username:dummy_password@testcase=test1
+      Mar 29 2022 17:19:33.215 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device1 is successfully connected.
+      test@test_machine ~ % 
+      test@test_machine ~ % 
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device view 1.1.1.1 --status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 2 device(s)                                 |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ % unreal-device execute show version --host=1.1.1.1
+      show version
+      Mar 29 2022 17:21:29.626 for "device1" - UNREAL-DEVICE-EXECUTION-SERVICE-TIMESTAMP
+      software version is 1.0.1.1.a
+      test@test_machine ~ % 
       test@test_machine ~ %
       test@test_machine ~ % echo $?
       0
