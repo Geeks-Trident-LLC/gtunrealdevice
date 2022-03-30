@@ -12,6 +12,7 @@ from gtunrealdevice.usage import validate_example_usage
 from gtunrealdevice.usage import show_usage
 
 from gtunrealdevice.utils import MiscDevice
+from gtunrealdevice.utils import Text
 
 
 def do_device_connect(options):
@@ -51,7 +52,7 @@ def do_device_connect(options):
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(instance.success_code)
             except Exception as ex:
-                Printer.print_message('{}: {}', type(ex).__name__, ex)
+                Printer.print_message(Text(ex))
                 sys.exit(1)
         else:
             show_usage(options.command, exit_code=1)

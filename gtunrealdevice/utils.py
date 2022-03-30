@@ -13,6 +13,33 @@ import yaml
 import typing
 
 
+class Text(str):
+    def __new__(cls, *args, **kwargs):
+        if not args and not kwargs:
+            return str.__new__(cls, '')
+        encoding = kwargs.get('encoding', 'utf-8')
+        errors = kwargs.get('errors', 'strict')
+        obj = kwargs.get('object', '')
+        if args:
+            if len(args) == 1:
+                obj = args[0]
+                if isinstance(obj, bytes):
+                    return str.__new__(cls, obj, encoding=encoding, errors=errors)
+                elif isinstance(obj, BaseException):
+                    return str.__new__(cls, '{}: {}'.format(type(obj).__name__, obj))
+                else:
+                    return str.__new__(cls, obj)
+            else:
+                return str.__new__(cls, *args, **kwargs)
+        else:
+            if isinstance(obj, bytes):
+                return str.__new__(cls, obj, encoding=encoding, errors=errors)
+            elif isinstance(obj, BaseException):
+                return str.__new__(cls, '{}: {}'.format(type(obj).__name__, obj))
+            else:
+                return str.__new__(cls, obj)
+
+
 class Printer:
     """A printer class.
 
@@ -199,7 +226,7 @@ class File:
             cls.message = '{} file is created.'.format(filename)
             return True
         except Exception as ex:
-            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            cls.message = Text(ex)
             return False
 
     @classmethod
@@ -260,7 +287,7 @@ class File:
                 content = stream.read()
                 return content
         except Exception as ex:
-            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            cls.message = Text(ex)
             return ''
 
     @classmethod
@@ -293,7 +320,7 @@ class File:
                     cls.message = '"{}" file is empty.'.format(filename)
                     return default
         except Exception as ex:
-            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            cls.message = Text(ex)
             return default
 
     @classmethod
@@ -325,7 +352,7 @@ class File:
             cls.message = 'Successfully saved data to "{}" file'.format(filename)
             return True
         except Exception as ex:
-            cls.message = '{}: {}'.format(type(ex).__name__, ex)
+            cls.message = Text(ex)
             return False
 
 
@@ -379,7 +406,7 @@ class Misc:
                 num = return_type(result) if return_type in chk_lst else result
                 return True, num
             except Exception as ex:     # noqa
-                cls.message = '{}: {}'.format(type(ex).__name__, ex)
+                cls.message = Text(ex)
                 return False, obj
         else:
             is_number = cls.is_number(obj)
