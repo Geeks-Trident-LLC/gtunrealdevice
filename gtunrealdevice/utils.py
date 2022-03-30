@@ -10,6 +10,8 @@ from textwrap import wrap
 
 import yaml
 
+import typing
+
 
 class Printer:
     """A printer class.
@@ -34,7 +36,7 @@ class Printer:
         """
         headers = str(header).splitlines()
         footers = str(footer).splitlines()
-        data = data if Misc.is_sequence_instance(data) else [data]
+        data = data if Misc.is_mutable_sequence(data) else [data]
         lst = []
         result = []
 
@@ -262,7 +264,8 @@ class File:
             return ''
 
     @classmethod
-    def get_result_from_yaml_file(cls, file_path, default=dict(), is_stripped=True):
+    def get_result_from_yaml_file(cls, file_path, default=dict(),   # noqa
+                                  is_stripped=True):
         """get result of YAML file
 
         Parameters
@@ -307,7 +310,7 @@ class File:
         bool: True if successfully saved, otherwise, False
         """
         try:
-            if Misc.is_list_instance(data):
+            if Misc.is_list(data):
                 content = '\n'.join(str(item) for item in data)
             else:
                 content = str(data)
@@ -327,17 +330,65 @@ class File:
 
 
 class Misc:
-    @classmethod
-    def is_dict_instance(cls, obj):
-        return isinstance(obj, dict)
+
+    message = ''
 
     @classmethod
-    def is_list_instance(cls, obj):
-        return isinstance(obj, list)
+    def is_dict(cls, obj):
+        return isinstance(obj, typing.Dict)
 
     @classmethod
-    def is_sequence_instance(cls, obj):
-        return isinstance(obj, (list, tuple, set))
+    def is_mapping(cls, obj):
+        return isinstance(obj, typing.Mapping)
+
+    @classmethod
+    def is_list(cls, obj):
+        return isinstance(obj, typing.List)
+
+    @classmethod
+    def is_mutable_sequence(cls, obj):
+        return isinstance(obj, (typing.List, typing.Tuple, typing.Set))
+
+    @classmethod
+    def is_sequence(cls, obj):
+        return isinstance(obj, typing.Sequence)
+
+    @classmethod
+    def try_to_get_number(cls, obj, return_type=None):
+        """Try to get a number
+
+        Parameters
+        ----------
+        obj (object): a number or text number.
+        referred_return_type (int, float, bool): a referred return type.
+
+        Returns
+        -------
+        tuple: status of number and value of number per referred return type
+        """
+        chk_lst = [int, float, bool]
+
+        if cls.is_string(obj):
+            data = obj.strip()
+            try:
+                if data.lower() == 'true' or data.lower() == 'false':
+                    result = bool(data)
+                else:
+                    result = float(data) if '.' in data else int(data)
+
+                num = return_type(result) if return_type in chk_lst else result
+                return True, num
+            except Exception as ex:     # noqa
+                cls.message = '{}: {}'.format(type(ex).__name__, ex)
+                return False, obj
+        else:
+            is_number = cls.is_number(obj)
+            num = return_type(obj) if return_type in chk_lst else obj
+
+            if not is_number:
+                txt = obj if cls.is_class(obj) else type(obj)
+                cls.message = 'Expecting number type, but got {}'.format(txt)
+            return is_number, num
 
     @classmethod
     def is_integer(cls, obj):
@@ -352,8 +403,34 @@ class Misc:
         return isinstance(obj, float)
 
     @classmethod
+    def is_number(cls, obj):
+        result = cls.is_boolean(obj)
+        result |= cls.is_float(obj)
+        return result
+
+    @classmethod
     def is_string(cls, obj):
-        return isinstance(obj, str)
+        return isinstance(obj, typing.Text)
+
+    @classmethod
+    def is_class(cls, obj):
+        return isinstance(obj, typing.Type)     # noqa
+
+    @classmethod
+    def is_callable(cls, obj):
+        return isinstance(obj, typing.Callable)
+
+    @classmethod
+    def is_iterator(cls, obj):
+        return isinstance(obj, typing.Iterator)
+
+    @classmethod
+    def is_generator(cls, obj):
+        return isinstance(obj, typing.Generator)
+
+    @classmethod
+    def is_iterable(cls, obj):
+        return isinstance(obj, typing.Iterable)
 
 
 class DictObject(dict):

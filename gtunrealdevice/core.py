@@ -571,7 +571,7 @@ class UnrealDevice:
         str: result of configuration
         """
 
-        if Misc.is_list_instance(config):
+        if Misc.is_list(config):
             config = '\n'.join(str(item) for item in config)
         else:
             config = str(config)
