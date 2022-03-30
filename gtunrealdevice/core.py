@@ -428,6 +428,7 @@ class UnrealDevice:
                     if testcase in self.data.get('testcases', dict()):
                         extra = '{}@testcase={}'.format(extra, testcase)
                     else:
+                        self.testcase = ''
                         extra = '{} fallback to default.'.format(extra)
 
                 is_timestamp = kwargs.get('is_timestamp', True)
