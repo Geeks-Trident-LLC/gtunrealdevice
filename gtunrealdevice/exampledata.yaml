@@ -537,7 +537,7 @@ reload:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -649,7 +649,7 @@ reload:
       test@test_machine ~ % unreal-device view --host=2.2.2.2
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
@@ -665,7 +665,7 @@ reload:
       test@test_machine ~ % unreal-device view --host 2.2.2.2 --testcase=test999
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no test999 test case in '2.2.2.2' device.
@@ -733,7 +733,7 @@ disconnect:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -828,7 +828,7 @@ disconnect:
 destroy:
   example1:
     header: |-
-      Example: How to use unreal-device disconnect command line?
+      Example: How to use unreal-device destroy command line?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ % unreal-device destroy --help
@@ -901,7 +901,7 @@ destroy:
 release:
   example1:
     header: |-
-      Example: How to use unreal-device disconnect command line?
+      Example: How to use unreal-device release command line?
     body: |-
       test@test_machine ~ %
       test@test_machine ~ % unreal-device release --help
@@ -969,4 +969,213 @@ release:
       | Total connected unreal-device: 0                                             |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
+      test@test_machine ~ %
+
+view:
+  example1:
+    header: |-
+      Example: How to use unreal-device view command line?
+    body: |-
+      unreal-device view --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device view usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        --status                     device status
+        --testcase TESTCASE          showing test case data of device
+        --showed-testcases           showing test cases data of device
+        --showed-cmdlines            showing command lines data of device
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device view operands [options]
+      unreal-device view example {1,2,3,4,5,6,7,8,9}
+
+  example2:
+    header: |-
+      Example: How to view all devices data?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      1.1.1.1:
+        cmdlines:
+          show ver: software version is 1.0.1.1
+          show version: software version is 1.0.1.1
+        login: device1 is successfully connected.
+        name: device1
+        testcases:
+          test1:
+            show version: software version is 1.0.1.1.a
+      2.2.2.2:
+        cmdlines:
+          show ver: software version is 2.0.2.2
+          show version: software version is 2.0.2.2
+        login: device2 is successfully connected.
+        name: device2
+        testcases:
+          test1:
+            show version: software version is 2.0.2.2.a
+      3.3.3.3:
+        cmdlines:
+          show ver: software version is 3.0.3.3
+          show version: software version is 3.0.3.3
+        login: device3 is successfully connected.
+        name: device3
+        testcases:
+          test1:
+            show version: software version is 3.0.3.3.c
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: How to view all devices' status?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --status
+      +------------------------------------------------------------------------------+
+      | Total connected unreal-device: 0                                             |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device connect 1.1.1.1
+      login unreal-device 1.1.1.1@dummy_username:dummy_password
+      Mar 30 2022 14:46:45.511 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device1 is successfully connected.
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device connect 2.2.2.2
+      login unreal-device 2.2.2.2@dummy_username:dummy_password
+      Mar 30 2022 14:46:56.290 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device2 is successfully connected.
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device connect 3.3.3.3
+      login unreal-device 3.3.3.3@dummy_username:dummy_password
+      Mar 30 2022 14:47:03.836 for "device3" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device3 is successfully connected.
+      test@test_machine ~ % 
+      test@test_machine ~ % unreal-device view status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 3 device(s)                                 |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      |   - 3.3.3.3 is connected (name=device3)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ % 
+
+  example4:
+    header: |-
+      Example: How to view specific device's status?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=1.1.1.1 --status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 3 device(s)                                 |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view 1.1.1.1 --status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 3 device(s)                                 |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view 1.1.1.1 status
+      +------------------------------------------------------------------------------+
+      | Unreal-device connection status: 3 device(s)                                 |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: How to view specific device data?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=1.1.1.1
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      cmdlines:
+        show ver: software version is 1.0.1.1
+        show version: software version is 1.0.1.1
+      login: device1 is successfully connected.
+      name: device1
+      testcases:
+        test1:
+          show version: software version is 1.0.1.1.a
+      test@test_machine ~ %
+      
+  example6:
+    header: |-
+      Example: How to view list of testcase data from specific device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=1.1.1.1 --showed-testcases
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      test1:
+        show version: software version is 1.0.1.1.a
+      test@test_machine ~ %
+
+  example7:
+    header: |-
+      Example: How to view list of command lines data from specific device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=1.1.1.1 --showed-cmdlines
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      show ver: software version is 1.0.1.1
+      show version: software version is 1.0.1.1
+      test@test_machine ~ %
+
+  example8:
+    header: |-
+      Example: How to view list of command lines data of specific 
+      test case from specific device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=1.1.1.1 --testcase=test1
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      show version: software version is 1.0.1.1.a
+      test@test_machine ~ %
+
+  example9:
+    header: |-
+      Example: What is a message when user tries to find unavailable device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=5.5.5.5
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      There is no '5.5.5.5' device.
       test@test_machine ~ %

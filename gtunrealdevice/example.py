@@ -60,3 +60,7 @@ class DestroyExample(Example):
 
 class ReleaseExample(Example):
     name = 'release'
+
+
+class ViewExample(Example):
+    name = 'view'
