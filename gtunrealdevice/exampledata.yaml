@@ -976,7 +976,8 @@ view:
     header: |-
       Example: How to use unreal-device view command line?
     body: |-
-      unreal-device view --help
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --help
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device view usage
       optional arguments:
@@ -990,6 +991,8 @@ view:
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device view operands [options]
       unreal-device view example {1,2,3,4,5,6,7,8,9}
+      test@test_machine ~ %
+      test@test_machine ~ %
 
   example2:
     header: |-
@@ -1178,4 +1181,197 @@ view:
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
+      test@test_machine ~ %
+
+info:
+  example1:
+    header: |-
+      Example: How to use unreal-device info command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info -h
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device info usage
+      optional arguments:
+      -------------------
+        --all                        showing all information
+        --dependency                 showing package dependencies
+        --devices-data               showing devices data
+        --serialization              showing serialization file info
+        --connected-devices          showing info of connected devices
+        --sample-devices-info        sample sample devices info format
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device info operands [options]
+      unreal-device info example {1,2,3,4,5,6,7,8}
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: How to show generic information of unreal-device project?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info
+      +------------------------------------------------------------------------------+
+      | gtunrealdevice v0.2.1                                                        |
+      | Project : https://github.com/Geeks-Trident-LLC/gtunrealdevice                |
+      | License : BSD 3-Clause License                                               |
+      | Platform: Darwin 19.6.0 - Python 3.9.6                                       |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: How to show all information of unreal-device project?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --all
+      +------------------------------------------------------------------------------+
+      | gtunrealdevice v0.2.1                                                        |
+      | Project : https://github.com/Geeks-Trident-LLC/gtunrealdevice                |
+      | License : BSD 3-Clause License                                               |
+      | Platform: Darwin 19.6.0 - Python 3.9.6                                       |
+      | --------------------                                                         |
+      | Dependencies:                                                                |
+      |   + Package: pyyaml v6.0                                                     |
+      |              https://pypi.org/project/PyYAML/                                |
+      | --------------------                                                         |
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      |     ~ host: 1.1.1.1          name: device1                                   |
+      |     ~ host: 2.2.2.2          name: device2                                   |
+      |     ~ host: 3.3.3.3          name: device3                                   |
+      | --------------------                                                         |
+      | Serialization File Info:                                                     |
+      |   - File: /Users/test/.geekstrident/gtunrealdevice/serialized_data.yaml      |
+      |   - Existed: True                                                            |
+      |   - Total serialized instance(s): 3                                          |
+      | --------------------                                                         |
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 3                                             |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      |   - 3.3.3.3 is connected (name=device3)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example4:
+    header: |-
+      Example: How to show dependency package(s) of unreal-device project?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --dependency
+      +------------------------------------------------------------------------------+
+      | Dependencies:                                                                |
+      |   + Package: pyyaml v6.0                                                     |
+      |              https://pypi.org/project/PyYAML/                                |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: How to show information of devices data summary?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --devices-data
+      +------------------------------------------------------------------------------+
+      | Devices Info:                                                                |
+      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Total devices: 3                                                         |
+      |     ~ host: 1.1.1.1          name: device1                                   |
+      |     ~ host: 2.2.2.2          name: device2                                   |
+      |     ~ host: 3.3.3.3          name: device3                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example6:
+    header: |-
+      Example: How to show information of connected devices?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 3                                             |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      |   - 3.3.3.3 is connected (name=device3)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example7:
+    header: |-
+      Example: How to show information of connected devices serialization?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --serialization
+      +------------------------------------------------------------------------------+
+      | Serialization File Info:                                                     |
+      |   - File: /Users/test/.geekstrident/gtunrealdevice/serialized_data.yaml      |
+      |   - Existed: True                                                            |
+      |   - Total serialized instance(s): 3                                          |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example8:
+    header: |-
+      Example: If user doesn't know anything about devices data format
+      How to get the sample format of devices data information?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --sample-devices-info
+      +------------------------------------------------------------------------------+
+      | Sample Format of Device Info:                                                |
+      +------------------------------------------------------------------------------+
+      
+      ####################################################################
+      # sample devices info                                              #
+      # Note: name, login, testcases, and configs nodes are optional     #
+      ####################################################################
+      host_address_1:
+        name: host_name (optional)
+        login: |-
+          output_of_login (optional)
+        cmdlines:
+          cmdline_1: |-
+            line 1 output_of_cmdline_1
+            ...
+            line n output_of_cmdline_1
+          cmdline_k_for_multiple_output:
+            - |-
+              line 1 - output_of_cmdline_k
+              ...
+              line n - output_of_cmdline_k
+            - |-
+              line 1 - other_output_of_cmdline_k
+              ...
+              line n - other_output_of_cmdline_k
+        testcases:
+          name_of_testcase_1:
+            cmdline_1: |-
+              line 1 output_of_cmdline_1_of_testcase_1
+              ...
+              line n output_of_cmdline_1_of_testcase_1
+        configs:
+          cfg_1_reference: |-
+            line 1 of cfg_1 
+            ...
+            line n of cfg_1
+
+      test@test_machine ~ %
       test@test_machine ~ %

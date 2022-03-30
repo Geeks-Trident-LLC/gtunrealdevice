@@ -64,3 +64,7 @@ class ReleaseExample(Example):
 
 class ViewExample(Example):
     name = 'view'
+
+
+class InfoExample(Example):
+    name = 'info'
