@@ -588,7 +588,7 @@ class UnrealDevice:
         if not re.match(r'(?i)conf(i(g(u(r(e)?)?)?)?)?', config):
             config = 'configure\n{}'.format(config)
 
-        if not config.splitlines()[-1].lower() == 'end':
+        if not config.splitlines()[-1].lower() in ['end', 'exit']:
             config = '{}\nend'.format(config)
 
         is_timestamp = kwargs.get('is_timestamp', True)
