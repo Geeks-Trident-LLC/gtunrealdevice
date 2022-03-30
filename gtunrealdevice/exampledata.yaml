@@ -840,7 +840,7 @@ destroy:
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device destroy operands [options]
-      unreal-device destroy example {1,2}
+      unreal-device destroy example {1,2,3}
 
       test@test_machine ~ %
       test@test_machine ~ %
@@ -881,6 +881,79 @@ destroy:
       test@test_machine ~ % unreal-device destroy --host=1.1.1.1
       logout unreal-device 1.1.1.1
       Mar 30 2022 14:04:52.489 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device1 is disconnected.
+      UnrealDeviceMessage: +++ Successfully removed 1.1.1.1 unreal-device.
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected        
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 0                                             |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+release:
+  example1:
+    header: |-
+      Example: How to use unreal-device disconnect command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device release --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device release usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device release operands [options]
+      unreal-device release example {1,2,3}
+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: What is a message when user tries to release unconnected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 0                                             |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device release --host=1.1.1.1
+      UnrealDeviceMessage: *** CANT remove because "1.1.1.1" unreal-device isn't initialized.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: What is a message when user tries to release the connected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 1                                             |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device release --host=1.1.1.1
+      logout unreal-device 1.1.1.1
+      Mar 30 2022 14:14:48.745 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
       device1 is disconnected.
       UnrealDeviceMessage: +++ Successfully removed 1.1.1.1 unreal-device.
       test@test_machine ~ %

@@ -56,3 +56,7 @@ class DisconnectExample(Example):
 
 class DestroyExample(Example):
     name = 'destroy'
+
+
+class ReleaseExample(Example):
+    name = 'release'
