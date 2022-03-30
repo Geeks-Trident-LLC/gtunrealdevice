@@ -44,3 +44,7 @@ class ExecuteExample(Example):
 
 class ConfigureExample(Example):
     name = 'configure'
+
+
+class ReloadExample(Example):
+    name = 'reload'

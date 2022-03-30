@@ -506,3 +506,200 @@ configure:
       test@test_machine ~ % echo $?
       0
       test@test_machine ~ %
+
+reload:
+  example1:
+    header: |-
+      Example: How to use unreal-device reload command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device reload --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device reload usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        --testcase TESTCASE          showing test case data of device
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device reload operands [options]
+      unreal-device reload example {1,2,3,4,5}
+
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: What is failure message when try to reload unavailabe device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=5.5.5.5
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      There is no '5.5.5.5' device.
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device reload --host=5.5.5.5
+      UnrealDeviceMessage: CANT reload because 5.5.5.5 has not connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      1
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: What is reload output when request a reload?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is disconnected (name=device2)                                   |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device reload --host=2.2.2.2
+      reload unreal-device
+      Mar 30 2022 11:33:50.606 for "device2" - UNREAL-DEVICE-RELOAD-SERVICE-TIMESTAMP
+      Reloading "2.2.2.2" device ...
+      ...
+      Closing all applications ... Application are closed.
+      Unload device drivers ... Unload completed
+      ... 
+      Booting "2.2.2.2" device ...
+      ...Checking memory ... memory tests are PASSED.
+      Loading device drivers ... Device drivers are loaded.
+      ...
+      System is ready for login.
+      
+      
+      login unreal-device 2.2.2.2@dummy_username:dummy_password
+      Mar 30 2022 11:33:50.606 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device2 is successfully connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+
+  example4:
+    header: |-
+      Example: How to reload a device on specific testcase?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected        
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device reload --host=2.2.2.2 --testcase=test1
+      reload unreal-device
+      Mar 30 2022 11:40:38.404 for "device2" - UNREAL-DEVICE-RELOAD-SERVICE-TIMESTAMP
+      Reloading "2.2.2.2" device ...
+      ...
+      Closing all applications ... Application are closed.
+      Unload device drivers ... Unload completed
+      ... 
+      Booting "2.2.2.2" device ...
+      ...Checking memory ... memory tests are PASSED.
+      Loading device drivers ... Device drivers are loaded.
+      ...
+      System is ready for login.
+      
+      
+      login unreal-device 2.2.2.2@dummy_username:dummy_password@testcase=test1
+      Mar 30 2022 11:40:38.404 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device2 is successfully connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected        
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is connected (name=device2, testcase=test1)                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: What is a result after reload device of unavailable testcase?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected        
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is connected (name=device2, testcase=test1)                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host=2.2.2.2
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      cmdlines:
+        show ver: software version is 2.0.2.2
+        show version: software version is 2.0.2.2
+      login: device2 is successfully connected.
+      name: device2
+      testcases:
+        test1:
+          show version: software version is 2.0.2.2.a
+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device view --host 2.2.2.2 --testcase=test999
+      +------------------------------------------------------------------------------+
+      | Devices Data:                                                                |
+      |   - Location: /Users/tmduong/.geekstrident/gtunrealdevice/devices_info.yaml  |
+      |   - Total devices: 3                                                         |
+      +------------------------------------------------------------------------------+
+      There is no test999 test case in '2.2.2.2' device.
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device reload --host=2.2.2.2 --testcase=test999 
+      reload unreal-device
+      Mar 30 2022 11:48:55.497 for "device2" - UNREAL-DEVICE-RELOAD-SERVICE-TIMESTAMP
+      Reloading "2.2.2.2" device ...
+      ...
+      Closing all applications ... Application are closed.
+      Unload device drivers ... Unload completed
+      ... 
+      Booting "2.2.2.2" device ...
+      ...Checking memory ... memory tests are PASSED.
+      Loading device drivers ... Device drivers are loaded.
+      ...
+      System is ready for login.
+      
+      
+      UnrealDeviceWarning: "test999" test case is unavailable for this connection ***
+      login unreal-device 2.2.2.2@dummy_username:dummy_password fallback to default.
+      Mar 30 2022 11:48:55.498 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device2 is successfully connected.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info connected        
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 2.2.2.2 is connected (name=device2)                                      |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
