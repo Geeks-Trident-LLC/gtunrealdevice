@@ -26,9 +26,10 @@ class FLAG(IntFlag):
     SERIALIZATION = 1024
     CONNECTED = 2048
     SAMPLE_DEVICES_INFO = 4096
-    HOST_TESTCASE = HOST | TESTCASE
-    VIEW_USAGE = HOST | STATUS | TESTCASE | SHOWED_TESTCASES | SHOWED_CMDLINES
-    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | CONNECTED | SAMPLE_DEVICES_INFO
+    HELP = 8192
+    HOST_TESTCASE = HOST | TESTCASE | HELP
+    VIEW_USAGE = HOST | STATUS | TESTCASE | SHOWED_TESTCASES | SHOWED_CMDLINES | HELP
+    INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | CONNECTED | SAMPLE_DEVICES_INFO | HELP
 
 
 class UData:
@@ -106,6 +107,7 @@ def get_usage_header(name, flags=0):
         '  --serialization              showing serialization file info',
         '  --connected-devices          showing info of connected devices',
         '  --sample-devices-info        sample sample devices info format',
+        '  -h, --help                   show this help message and exit',
     ]
     if flags:
         bits = list(map(int, list(bin(int(flags))[2:][::-1])))
@@ -148,32 +150,32 @@ def get_example_usage(name):
 
 
 class ConfigureUsage:
-    usage = get_usage('configure', flags=FLAG.HOST)
+    usage = get_usage('configure', flags=FLAG.HOST | FLAG.HELP)
     other_usage = get_usage('configure', flags=FLAG.HOST)
     example_usage = get_example_usage('configure')
 
 
 class ConnectUsage:
-    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE)
-    other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE)
+    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
+    other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
     example_usage = get_example_usage('connect')
 
 
 class DisconnectUsage:
-    usage = get_usage('disconnect', flags=FLAG.HOST)
-    other_usage = get_usage('disconnect', flags=FLAG.HOST)
+    usage = get_usage('disconnect', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('disconnect', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('disconnect')
 
 
 class DestroyUsage:
-    usage = get_usage('destroy', flags=FLAG.HOST)
-    other_usage = get_usage('destroy', flags=FLAG.HOST)
+    usage = get_usage('destroy', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('destroy', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('destroy')
 
 
 class ExecuteUsage:
-    usage = get_usage('execute', flags=FLAG.HOST)
-    other_usage = get_usage('execute', flags=FLAG.HOST)
+    usage = get_usage('execute', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('execute', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('execute')
 
 
@@ -184,20 +186,20 @@ class InfoUsage:
 
 
 class LoadUsage:
-    usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE)
-    other_usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE)
+    usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE | FLAG.HELP)
+    other_usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE | FLAG.HELP)
     example_usage = get_example_usage('load')
 
 
 class ReleaseUsage:
-    usage = get_usage('release', flags=FLAG.HOST)
-    other_usage = get_usage('release', flags=FLAG.HOST)
+    usage = get_usage('release', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('release', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('release')
 
 
 class ReloadUsage:
-    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE)
-    other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE)
+    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
+    other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
     example_usage = get_example_usage('reload')
 
 
@@ -238,7 +240,8 @@ def show_usage(name, *args, exit_code=None):
         sys.exit(1)
 
 
-def validate_example_usage(name, operands, max_count=1):
+def validate_example_usage(name, operands):
+    max_count = get_number_of_example(name)
     pattern = r'example *(?P<index>[0-9]+)$'
     txt = ' '.join(operands).strip().lower()
     m = re.match(pattern, txt)
