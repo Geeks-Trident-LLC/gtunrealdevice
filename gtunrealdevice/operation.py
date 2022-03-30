@@ -13,14 +13,11 @@ from gtunrealdevice.usage import show_usage
 
 from gtunrealdevice.utils import MiscDevice
 
-from gtunrealdevice.example import get_number_of_example
-
 
 def do_device_connect(options):
     if options.command == 'connect':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
             show_usage(options.command, exit_code=1)
@@ -63,8 +60,7 @@ def do_device_connect(options):
 def do_device_disconnect(options):
     if options.command == 'disconnect':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
@@ -100,8 +96,7 @@ def do_device_disconnect(options):
 def do_device_destroy(options):
     if options.command == 'destroy':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
@@ -121,8 +116,7 @@ def do_device_destroy(options):
 def do_device_release(options):
     if options.command == 'release':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 1:
             show_usage(options.command, exit_code=1)
@@ -142,8 +136,7 @@ def do_device_release(options):
 def do_device_execute(options):
     if options.command == 'execute':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         data = ' '.join(options.operands).strip()
         parsed_node = MiscDevice.parse_host(data)
@@ -174,8 +167,7 @@ def do_device_execute(options):
 def do_device_configure(options):
     if options.command == 'configure':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         data = ' '.join(options.operands).strip()
         parsed_node = MiscDevice.parse_host(data)
@@ -219,8 +211,7 @@ def do_device_reload(options):
     ])
     if options.command == 'reload':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
             show_usage(options.command, exit_code=1)

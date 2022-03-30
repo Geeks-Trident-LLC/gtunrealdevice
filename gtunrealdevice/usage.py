@@ -238,7 +238,8 @@ def show_usage(name, *args, exit_code=None):
         sys.exit(1)
 
 
-def validate_example_usage(name, operands, max_count=1):
+def validate_example_usage(name, operands):
+    max_count = get_number_of_example(name)
     pattern = r'example *(?P<index>[0-9]+)$'
     txt = ' '.join(operands).strip().lower()
     m = re.match(pattern, txt)

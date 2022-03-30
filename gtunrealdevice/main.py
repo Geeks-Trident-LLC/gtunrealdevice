@@ -72,8 +72,7 @@ def show_version(options):
 def view_device_info(options):
     if options.command == 'view':
         validate_usage(options.command, options.operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         if len(options.operands) > 2:
             show_usage(options.command, exit_code=1)
@@ -105,8 +104,7 @@ def show_info(options):
     command, operands = options.command, options.operands
     if command == 'info':
         validate_usage(command, operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         op_txt = ' '.join(options.operands).lower()
         is_sample = 'sample' in op_txt or options.sample_devices_info
@@ -166,8 +164,7 @@ def load_device_info(options):
     command, operands = options.command, options.operands
     if command == 'load':
         validate_usage(command, operands)
-        validate_example_usage(options.command, options.operands,
-                               max_count=get_number_of_example(options.command))
+        validate_example_usage(options.command, options.operands)
 
         fn = options.filename.strip() or operands[0] if len(operands) > 0 else ''
         if fn:
