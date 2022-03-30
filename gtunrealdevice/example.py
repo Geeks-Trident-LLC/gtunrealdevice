@@ -52,3 +52,7 @@ class ReloadExample(Example):
 
 class DisconnectExample(Example):
     name = 'disconnect'
+
+
+class DestroyExample(Example):
+    name = 'destroy'
