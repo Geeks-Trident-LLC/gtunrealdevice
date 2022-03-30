@@ -38,7 +38,7 @@ class UData:
         lst = []
         if self.args:
             for arg in self.args:
-                if Misc.is_list_instance(arg):
+                if Misc.is_list(arg):
                     lst.extend([str(item) for item in arg])
                 else:
                     lst.append(str(arg))
@@ -223,7 +223,7 @@ class Usage:
 
 
 def validate_usage(name, operands):
-    result = ''.join(operands) if Misc.is_list_instance(operands) else str(operands)
+    result = ''.join(operands) if Misc.is_list(operands) else str(operands)
     if result.strip().lower() == 'usage':
         show_usage(name, exit_code=0)
 

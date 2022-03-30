@@ -40,3 +40,31 @@ class ConnectExample(Example):
 
 class ExecuteExample(Example):
     name = 'execute'
+
+
+class ConfigureExample(Example):
+    name = 'configure'
+
+
+class ReloadExample(Example):
+    name = 'reload'
+
+
+class DisconnectExample(Example):
+    name = 'disconnect'
+
+
+class DestroyExample(Example):
+    name = 'destroy'
+
+
+class ReleaseExample(Example):
+    name = 'release'
+
+
+class ViewExample(Example):
+    name = 'view'
+
+
+class InfoExample(Example):
+    name = 'info'

@@ -428,6 +428,7 @@ class UnrealDevice:
                     if testcase in self.data.get('testcases', dict()):
                         extra = '{}@testcase={}'.format(extra, testcase)
                     else:
+                        self.testcase = ''
                         extra = '{} fallback to default.'.format(extra)
 
                 is_timestamp = kwargs.get('is_timestamp', True)
@@ -571,7 +572,7 @@ class UnrealDevice:
         str: result of configuration
         """
 
-        if Misc.is_list_instance(config):
+        if Misc.is_list(config):
             config = '\n'.join(str(item) for item in config)
         else:
             config = str(config)
@@ -588,7 +589,7 @@ class UnrealDevice:
         if not re.match(r'(?i)conf(i(g(u(r(e)?)?)?)?)?', config):
             config = 'configure\n{}'.format(config)
 
-        if not config.splitlines()[-1].lower() == 'end':
+        if not config.splitlines()[-1].lower() in ['end', 'exit']:
             config = '{}\nend'.format(config)
 
         is_timestamp = kwargs.get('is_timestamp', True)
