@@ -7,6 +7,7 @@ from enum import IntFlag
 from gtunrealdevice.utils import Misc
 
 from gtunrealdevice import example
+from gtunrealdevice.example import get_number_of_example
 
 tool = 'unreal-device'
 
@@ -117,7 +118,8 @@ def get_usage_header(name, flags=0):
     return header_usage
 
 
-def get_usage(name, flags=0, count=0):
+def get_usage(name, flags=0):
+    count = get_number_of_example(name)
     name = str(name).lower()
     header_usage = get_usage_header(name, flags=flags)
 
@@ -133,7 +135,8 @@ def get_usage(name, flags=0, count=0):
     return usage
 
 
-def get_example_usage(name, count=1):
+def get_example_usage(name):
+    count = get_number_of_example(name)
     name = str(name).lower()
     fmt = '{} {} example {}'
 
@@ -145,63 +148,63 @@ def get_example_usage(name, count=1):
 
 
 class ConfigureUsage:
-    usage = get_usage('configure', flags=FLAG.HOST, count=1)
+    usage = get_usage('configure', flags=FLAG.HOST)
     other_usage = get_usage('configure', flags=FLAG.HOST)
-    example_usage = get_example_usage('configure', count=1)
+    example_usage = get_example_usage('configure')
 
 
 class ConnectUsage:
-    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE, count=5)
+    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE)
     other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE)
-    example_usage = get_example_usage('connect', count=5)
+    example_usage = get_example_usage('connect')
 
 
 class DisconnectUsage:
-    usage = get_usage('disconnect', flags=FLAG.HOST, count=1)
+    usage = get_usage('disconnect', flags=FLAG.HOST)
     other_usage = get_usage('disconnect', flags=FLAG.HOST)
-    example_usage = get_example_usage('disconnect', count=1)
+    example_usage = get_example_usage('disconnect')
 
 
 class DestroyUsage:
-    usage = get_usage('destroy', flags=FLAG.HOST, count=1)
+    usage = get_usage('destroy', flags=FLAG.HOST)
     other_usage = get_usage('destroy', flags=FLAG.HOST)
-    example_usage = get_example_usage('destroy', count=1)
+    example_usage = get_example_usage('destroy')
 
 
 class ExecuteUsage:
-    usage = get_usage('execute', flags=FLAG.HOST, count=5)
+    usage = get_usage('execute', flags=FLAG.HOST)
     other_usage = get_usage('execute', flags=FLAG.HOST)
-    example_usage = get_example_usage('execute', count=5)
+    example_usage = get_example_usage('execute')
 
 
 class InfoUsage:
-    usage = get_usage('info', flags=FLAG.INFO_USAGE, count=1)
+    usage = get_usage('info', flags=FLAG.INFO_USAGE)
     other_usage = get_usage('info', flags=FLAG.INFO_USAGE)
-    example_usage = get_example_usage('info', count=1)
+    example_usage = get_example_usage('info')
 
 
 class LoadUsage:
-    usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE, count=1)
+    usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE)
     other_usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE)
-    example_usage = get_example_usage('load', count=1)
+    example_usage = get_example_usage('load')
 
 
 class ReleaseUsage:
-    usage = get_usage('release', flags=FLAG.HOST, count=1)
+    usage = get_usage('release', flags=FLAG.HOST)
     other_usage = get_usage('release', flags=FLAG.HOST)
-    example_usage = get_example_usage('release', count=1)
+    example_usage = get_example_usage('release')
 
 
 class ReloadUsage:
-    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE, count=1)
+    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE)
     other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE)
-    example_usage = get_example_usage('reload', count=1)
+    example_usage = get_example_usage('reload')
 
 
 class ViewUsage:
-    usage = get_usage('view', flags=FLAG.VIEW_USAGE, count=2)
+    usage = get_usage('view', flags=FLAG.VIEW_USAGE)
     other_usage = get_usage('view', flags=FLAG.VIEW_USAGE)
-    example_usage = get_example_usage('view', count=2)
+    example_usage = get_example_usage('view')
 
 
 class Usage:
