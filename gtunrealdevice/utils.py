@@ -465,6 +465,17 @@ class Misc:
     def is_iterable(cls, obj):
         return isinstance(obj, typing.Iterable)
 
+    @classmethod
+    def join_string(cls, *args, **kwargs):
+        if not args:
+            return ''
+        if len(args) == 1:
+            return str(args[0])
+
+        sep = kwargs.get('separator', '')
+        sep = kwargs.get('sep', sep)
+        return sep.join(str(item) for item in args)
+
 
 class DictObject(dict):
     def __init__(self, *args, **kwargs):

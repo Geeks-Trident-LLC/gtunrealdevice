@@ -3,6 +3,9 @@ from os import path
 from gtunrealdevice import UnrealDevice
 
 from gtunrealdevice.core import DEVICES_DATA
+
+from gtunrealdevice.utils import Misc
+
 DEVICES_DATA.load(path.join(path.dirname(__file__), 'data/devices_info.yaml'))
 
 
@@ -56,7 +59,8 @@ class TestUnrealDevice:
         for _ in range(iteration):
             output = device.execute(cmdline, is_timestamp=False)
 
-        assert output == expected_output
+        actual_expected_result = Misc.join_string(cmdline, expected_output, sep='\n')
+        assert output == format(actual_expected_result)
 
     @pytest.mark.parametrize(
         ('ip_address', 'device_name', 'testcase', 'cmdline', 'iteration', 'expected_output'),
@@ -75,4 +79,5 @@ class TestUnrealDevice:
         for _ in range(iteration):
             output = device.execute(cmdline, is_timestamp=False)
 
-        assert output == expected_output
+        actual_expected_result = Misc.join_string(cmdline, expected_output, sep='\n')
+        assert output == actual_expected_result
