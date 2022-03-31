@@ -29,6 +29,7 @@ from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
 
 from gtunrealdevice.utils import ECODE
+from gtunrealdevice.utils import Text
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -36,12 +37,24 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_args(self, *args, **kwargs):
         try:
             options = super().parse_args(*args, **kwargs)
-        except SystemExit as ex:    # noqa
-            self.print_help()
-            sys.exit(ECODE.BAD)
+        except BaseException as ex:    # noqa
+            if isinstance(ex, SystemExit):
+                if ex.code == ECODE.SUCCESS:
+                    sys.exit(ECODE.SUCCESS)
+                else:
+                    self.print_help()
+                    sys.exit(ECODE.BAD)
+            else:
+                print('\n{}\n'.format(Text(ex)))
+                self.print_help()
+                sys.exit(ECODE.BAD)
 
         if options.help:
-            validate_usage(options.command, ['usage'])
+            if not options.command:
+                self.print_help()
+                sys.exit(ECODE.SUCCESS)
+            else:
+                validate_usage(options.command, ['usage'])
         return options
 
 
@@ -298,7 +311,7 @@ class Cli:
         ),
 
         parser.add_argument(
-            'command', type=str,
+            'command', type=str, nargs='?', default='',
             help='command must be either app, configure, connect, '
                  'destroy, disconnect, execute, gui, info, load, '
                  'release, reload, usage, version, or view'

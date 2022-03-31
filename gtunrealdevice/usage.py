@@ -107,7 +107,7 @@ def get_usage_header(name, flags=0):
         '  --devices-data               showing devices data',
         '  --serialization              showing serialization file info',
         '  --connected-devices          showing info of connected devices',
-        '  --sample-devices-info        sample sample devices info format',
+        '  --sample-devices-info        showing sample devices info format',
         '  -h, --help                   show this help message and exit',
     ]
     if flags:
