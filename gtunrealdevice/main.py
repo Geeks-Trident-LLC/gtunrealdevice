@@ -27,9 +27,9 @@ from gtunrealdevice.usage import get_global_usage
 from gtunrealdevice.utils import File
 from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
-
-from gtunrealdevice.utils import ECODE
 from gtunrealdevice.utils import Text
+
+from gtunrealdevice.constant import ECODE
 
 
 class ArgumentParser(argparse.ArgumentParser):

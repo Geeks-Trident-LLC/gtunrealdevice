@@ -3,7 +3,7 @@
 from gtunrealdevice import version
 from gtunrealdevice import edition
 
-from gtunrealdevice.utils import ECODE
+from gtunrealdevice.constant import ECODE
 
 
 __version__ = version

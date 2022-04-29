@@ -11,12 +11,6 @@ from textwrap import wrap
 import yaml
 
 import typing
-from enum import IntFlag
-
-
-class ECODE(IntFlag):
-    SUCCESS = 0
-    BAD = 1
 
 
 class Text(str):

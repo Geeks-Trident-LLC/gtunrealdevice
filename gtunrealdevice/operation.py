@@ -14,7 +14,7 @@ from gtunrealdevice.usage import show_usage
 from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import Text
 
-from gtunrealdevice.utils import ECODE
+from gtunrealdevice.constant import ECODE
 
 
 def do_device_connect(options):
