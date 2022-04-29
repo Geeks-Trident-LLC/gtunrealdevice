@@ -355,6 +355,13 @@ class File:
             cls.message = Text(ex)
             return False
 
+    @classmethod
+    def change_new_name(cls, filename, replaced='/<HOME_DIR>'):
+        """change file to new name"""
+        home_dir = str(Path.home())
+        new_name = filename.replace(home_dir, replaced)
+        return new_name
+
 
 class Misc:
 
