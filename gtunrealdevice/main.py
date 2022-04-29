@@ -27,9 +27,9 @@ from gtunrealdevice.usage import get_global_usage
 from gtunrealdevice.utils import File
 from gtunrealdevice.utils import MiscDevice
 from gtunrealdevice.utils import DictObject
-
-from gtunrealdevice.utils import ECODE
 from gtunrealdevice.utils import Text
+
+from gtunrealdevice.constant import ECODE
 
 
 class ArgumentParser(argparse.ArgumentParser):
@@ -147,7 +147,9 @@ def show_info(options):
         if is_all or is_devices_data:
             lst and lst.append('--------------------')
             lst.append('Devices Info:')
-            lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+            for fn in DEVICES_DATA.filenames:
+                new_fn = File.change_new_name(fn)
+                lst.append('  - Location: {}'.format(new_fn))
             lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
             if len(DEVICES_DATA):
                 fmt = '    ~ host: {:16} name: {}'
@@ -159,7 +161,7 @@ def show_info(options):
             tbl = SerializedFile.get_info()
             lst and lst.append('--------------------')
             lst.append('Serialization File Info:')
-            lst.append('  - File: {filename}'.format(**tbl))
+            lst.append('  - File: {}'.format(File.change_new_name(tbl.get('filename'))))
             lst.append('  - Existed: {existed}'.format(**tbl))
             lst.append('  - Total serialized instance(s): {total}'.format(**tbl))
 

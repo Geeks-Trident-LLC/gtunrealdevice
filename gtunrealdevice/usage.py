@@ -5,7 +5,8 @@ import re
 from enum import IntFlag
 
 from gtunrealdevice.utils import Misc
-from gtunrealdevice.utils import ECODE
+
+from gtunrealdevice.constant import ECODE
 
 from gtunrealdevice import example
 from gtunrealdevice.example import get_number_of_example

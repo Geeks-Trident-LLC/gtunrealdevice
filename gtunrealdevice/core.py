@@ -14,6 +14,7 @@ from gtunrealdevice.exceptions import UnrealDeviceOfflineError
 
 from gtunrealdevice.utils import Printer
 from gtunrealdevice.utils import Misc
+from gtunrealdevice.utils import File
 
 
 def check_active_device(func):
@@ -301,7 +302,9 @@ class DevicesData(dict):
 
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
         lst = ['Devices Data:']
-        lst.extend(['  - Location: {}'.format(fn) for fn in DEVICES_DATA.filenames])
+        for fn in DEVICES_DATA.filenames:
+            new_fn = File.change_new_name(fn)
+            lst.append('  - Location: {}'.format(new_fn))
         lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
         Printer.print(lst)
 
