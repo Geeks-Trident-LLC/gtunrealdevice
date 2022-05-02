@@ -303,8 +303,8 @@ class DevicesData(dict):
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
         lst = ['Devices Data:']
         for fn in DEVICES_DATA.filenames:
-            new_fn = File.change_new_name(fn)
-            lst.append('  - Location: {}'.format(new_fn))
+            generic_fn = File.change_home_dir_to_generic(fn)
+            lst.append('  - Location: {}'.format(generic_fn))
         lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
         Printer.print(lst)
 
