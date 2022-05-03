@@ -495,6 +495,46 @@ class Misc:
             new_data = '\n'.join(data.splitlines()[1:])
             return new_data
 
+    @classmethod
+    def convert_timedeta_to_string(cls, timedelta):
+        lst = []
+
+        if timedelta.days >= 0:
+            total_years = int(timedelta.days / 364)
+            total_weeks = int((timedelta.days - total_years * 364) / 7)
+            total_days = timedelta.days % 7
+            total_hours = int(timedelta.seconds / 3600)
+            total_minutes = int((timedelta.seconds - total_hours * 3600) / 60)
+            total_seconds = timedelta.seconds % 60
+            timedelta.microseconds
+
+            is_a_year = total_years == 1
+            is_a_week = total_weeks == 1
+            is_a_day = total_days == 1
+            is_a_hr = total_hours == 1
+            is_a_min = total_minutes == 1
+            is_a_sec = total_seconds == 1
+            if total_years:
+                lst += ['%s %s' % (total_years, 'year' if is_a_year else 'years')]
+            if total_weeks:
+                lst += ['%s %s' % (total_weeks, 'week' if is_a_week else 'weeks')]
+            if total_days:
+                lst += ['%s %s' % (total_days, 'day' if is_a_day else 'days')]
+            if total_hours:
+                lst += ['%s %s' % (total_hours, 'hour' if is_a_hr else 'hours')]
+            if total_minutes:
+                lst += ['%s %s' % (total_minutes, 'minute' if is_a_min else 'minutes')]
+            if not lst:
+                if total_seconds:
+                    lst += ['%s %s' % (total_seconds, 'second' if is_a_sec else 'seconds')]
+                else:
+                    lst += ['%s microseconds' % timedelta.microseconds]
+        else:
+            lst.append('0 minute')
+
+        timedelta_in_str = ', '.join(lst)
+        return timedelta_in_str
+
 
 class DictObject(dict):
     def __init__(self, *args, **kwargs):
