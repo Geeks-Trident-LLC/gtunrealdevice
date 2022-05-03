@@ -18,6 +18,9 @@ from gtunrealdevice.utils import File
 
 from gtunrealdevice.constant import ECODE
 
+from gtunrealdevice.baredevice import create_bare_device_info
+from gtunrealdevice.baredevice import get_builtin_output
+
 
 def check_active_device(func):
     """Wrapper for UnrealDevice methods.
@@ -396,11 +399,12 @@ class UnrealDevice:
         """Return device connection status"""
         return self._is_connected
 
-    def connect(self, **kwargs):
+    def connect(self, default=True, **kwargs):
         """Connect an unreal device
 
         Parameters
         ----------
+        default (bool): connect to default device if host is not found.
         kwargs (dict): keyword arguments
 
         Returns
@@ -446,9 +450,19 @@ class UnrealDevice:
             self.success_code = ECODE.SUCCESS
             return self.is_connected
         else:
-            self.success_code = ECODE.BAD
-            fmt = '"{}" is unavailable for connection.'
-            raise UnrealDeviceConnectionError(fmt.format(self.name))
+            if default:
+                bare_device = create_bare_device_info()
+                DEVICES_DATA.update({self.address: bare_device})
+                DEVICES_DATA.save()
+                try:
+                    self.connect()
+                except Exception as ex:
+                    failure = '<<< {}: {} >>>'.format(type(ex).__name__, ex)
+                    raise UnrealDeviceConnectionError(failure)
+            else:
+                self.success_code = ECODE.BAD
+                fmt = '"{}" is unavailable for connection.'
+                raise UnrealDeviceConnectionError(fmt.format(self.name))
 
     def reconnect(self, **kwargs):
         """Reconnect an unreal device
@@ -556,6 +570,7 @@ class UnrealDevice:
             output = result[index]
 
         is_timestamp = kwargs.get('is_timestamp', True)
+        output = get_builtin_output(output)
         output = self.render_data(
             output, is_timestamp=is_timestamp,
             service='execution', extra=cmdline,
