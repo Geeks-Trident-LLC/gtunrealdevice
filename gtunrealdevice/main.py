@@ -148,8 +148,8 @@ def show_info(options):
             lst and lst.append('--------------------')
             lst.append('Devices Info:')
             for fn in DEVICES_DATA.filenames:
-                new_fn = File.change_new_name(fn)
-                lst.append('  - Location: {}'.format(new_fn))
+                generic_fn = File.change_home_dir_to_generic(fn)
+                lst.append('  - Location: {}'.format(generic_fn))
             lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
             if len(DEVICES_DATA):
                 fmt = '    ~ host: {:16} name: {}'
@@ -161,7 +161,8 @@ def show_info(options):
             tbl = SerializedFile.get_info()
             lst and lst.append('--------------------')
             lst.append('Serialization File Info:')
-            lst.append('  - File: {}'.format(File.change_new_name(tbl.get('filename'))))
+            generic_fn = File.change_home_dir_to_generic(tbl.get('filename'))
+            lst.append('  - File: {}'.format(generic_fn))
             lst.append('  - Existed: {existed}'.format(**tbl))
             lst.append('  - Total serialized instance(s): {total}'.format(**tbl))
 

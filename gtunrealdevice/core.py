@@ -16,6 +16,11 @@ from gtunrealdevice.utils import Printer
 from gtunrealdevice.utils import Misc
 from gtunrealdevice.utils import File
 
+from gtunrealdevice.constant import ECODE
+
+from gtunrealdevice.baredevice import create_bare_device_info
+from gtunrealdevice.baredevice import get_builtin_output
+
 
 def check_active_device(func):
     """Wrapper for UnrealDevice methods.
@@ -42,7 +47,7 @@ def check_active_device(func):
                     result = func(*args, **kwargs)
                     return result
                 else:
-                    device.success_code = 1
+                    device.success_code = ECODE.BAD
                     fmt = '{} device is offline.'
                     raise UnrealDeviceOfflineError(fmt.format(device.name))
             else:
@@ -303,8 +308,8 @@ class DevicesData(dict):
     def view(self, device='', cmdlines=False, testcase='', testcases=False):
         lst = ['Devices Data:']
         for fn in DEVICES_DATA.filenames:
-            new_fn = File.change_new_name(fn)
-            lst.append('  - Location: {}'.format(new_fn))
+            generic_fn = File.change_home_dir_to_generic(fn)
+            lst.append('  - Location: {}'.format(generic_fn))
         lst.append('  - Total devices: {}'.format(len(DEVICES_DATA)))
         Printer.print(lst)
 
@@ -387,18 +392,19 @@ class UnrealDevice:
         self.data = None
         self.table = dict()
         self.testcase = ''
-        self.success_code = 0
+        self.success_code = ECODE.SUCCESS
 
     @property
     def is_connected(self):
         """Return device connection status"""
         return self._is_connected
 
-    def connect(self, **kwargs):
+    def connect(self, default=True, **kwargs):
         """Connect an unreal device
 
         Parameters
         ----------
+        default (bool): connect to default device if host is not found.
         kwargs (dict): keyword arguments
 
         Returns
@@ -441,12 +447,22 @@ class UnrealDevice:
                     extra=extra
                 )
                 print(login_result)
-            self.success_code = 0
+            self.success_code = ECODE.SUCCESS
             return self.is_connected
         else:
-            self.success_code = 1
-            fmt = '"{}" is unavailable for connection.'
-            raise UnrealDeviceConnectionError(fmt.format(self.name))
+            if default:
+                bare_device = create_bare_device_info()
+                DEVICES_DATA.update({self.address: bare_device})
+                DEVICES_DATA.save()
+                try:
+                    self.connect()
+                except Exception as ex:
+                    failure = '<<< {}: {} >>>'.format(type(ex).__name__, ex)
+                    raise UnrealDeviceConnectionError(failure)
+            else:
+                self.success_code = ECODE.BAD
+                fmt = '"{}" is unavailable for connection.'
+                raise UnrealDeviceConnectionError(fmt.format(self.name))
 
     def reconnect(self, **kwargs):
         """Reconnect an unreal device
@@ -480,7 +496,7 @@ class UnrealDevice:
 
             return self.is_connected
         else:
-            self.success_code = 1
+            self.success_code = ECODE.BAD
             fmt = '{} is unavailable for reconnection.'
             raise UnrealDeviceConnectionError(fmt.format(self.name))
 
@@ -505,7 +521,7 @@ class UnrealDevice:
                 extra='logout unreal-device {}'.format(self.address),
             )
             print(msg)
-        self.success_code = 0
+        self.success_code = ECODE.SUCCESS
         return self._is_connected
 
     @check_active_device
@@ -530,7 +546,7 @@ class UnrealDevice:
             )
             if kwargs.get('showed', True):
                 print(output)
-            self.success_code = 0
+            self.success_code = ECODE.SUCCESS
             return output
 
         data = self.data.get('cmdlines', dict())
@@ -541,7 +557,9 @@ class UnrealDevice:
                                         prefix='UnrealDeviceCmdline:')
 
         result = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
-        self.success_code = 1 if str(result).endswith('" does not have output') else 0
+
+        is_no_output = str(result).endswith('" does not have output')
+        self.success_code = ECODE.BAD if is_no_output else ECODE.SUCCESS
 
         if not isinstance(result, (list, tuple)):
             output = str(result)
@@ -552,6 +570,7 @@ class UnrealDevice:
             output = result[index]
 
         is_timestamp = kwargs.get('is_timestamp', True)
+        output = get_builtin_output(output)
         output = self.render_data(
             output, is_timestamp=is_timestamp,
             service='execution', extra=cmdline,
@@ -600,7 +619,7 @@ class UnrealDevice:
         if kwargs.get('showed', True):
             print(result)
 
-        self.success_code = 0
+        self.success_code = ECODE.SUCCESS
         return result
 
     def render_data(self, data, extra=None, service='execution', is_timestamp=True):
