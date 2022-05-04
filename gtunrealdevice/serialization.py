@@ -82,17 +82,18 @@ class SerializedFile:
     @classmethod
     def get_info_text(cls):
         node = cls.get_info()
-        return node.text
+        return node.text    # noqa
 
     @classmethod
     def get_connected_info(cls, name=''):
         node = cls.get_info()
-        lst = ['Unreal-device connection status: {} device(s)'.format(node.total)]
+        fmt = 'Unreal-device connection status: {} device(s)'
+        lst = [fmt.format(node.total)]      # noqa
         fmt1 = '  - {} is {} (name={})'
         fmt2 = '  - {} is {} (name={}, testcase={})'
-        if node.total:
+        if node.total:      # noqa
             if name:
-                for device in node.devices:
+                for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     if name in [device.name, device.address]:
                         l1 = [device.address, status, device.name]
@@ -109,7 +110,7 @@ class SerializedFile:
                     lst.append(fmt.format(name))
                 return '\n'.join(lst)
             else:
-                for device in node.devices:
+                for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     l1 = [device.address, status, device.name]
                     device.testcase and l1.append(device.testcase)
@@ -117,7 +118,7 @@ class SerializedFile:
                     lst.append(fmt.format(*l1))
                 return '\n'.join(lst)
         else:
-            return 'Total connected unreal-device: {}'.format(node.total)
+            return 'Total connected unreal-device: {}'.format(node.total)   # noqa
 
     @classmethod
     def add_instance(cls, name, node):
