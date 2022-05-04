@@ -126,6 +126,35 @@ class DevicesData(dict):
 
         with open(path.expanduser(filename), 'w') as stream:
             self and yaml.safe_dump(dict(self), stream)
+            return True
+
+    def remove_device(self, name):
+        """remove device info
+
+        Parameters
+        ----------
+        name (str): device name
+
+        Returns
+        -------
+        bool: True if filename is successfully removed, otherwise, False.
+        """
+
+        name = str(name)
+        pattern = r'(?i) *([*]|(_+all_+)) *$'
+
+        if re.match(pattern, name):
+            self.clear()
+            self.save()
+            return True
+        else:
+            addr = self.get_address_from_name(name)
+            if addr in self:
+                self.pop(addr)
+                self.save()
+                return True
+            else:
+                return False
 
     def get_address_from_name(self, name):
         """Get device address from device name
@@ -398,6 +427,15 @@ class UnrealDevice:
     def is_connected(self):
         """Return device connection status"""
         return self._is_connected
+
+    @property
+    def is_auto_generated_device(self):
+        if Misc.is_dict(self.data):
+            expected = 'auto-generated-for-geekstrident-unreal-device'
+            description = self.data.get('description', '')
+            chk = description == expected
+            return chk
+        return False
 
     def connect(self, default=True, **kwargs):
         """Connect an unreal device

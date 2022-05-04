@@ -2,6 +2,7 @@
 
 import yaml
 import pickle
+import re
 
 from gtunrealdevice.exceptions import SerializedError
 from gtunrealdevice.exceptions import InvalidSerializedFile
@@ -81,17 +82,18 @@ class SerializedFile:
     @classmethod
     def get_info_text(cls):
         node = cls.get_info()
-        return node.text
+        return node.text    # noqa
 
     @classmethod
     def get_connected_info(cls, name=''):
         node = cls.get_info()
-        lst = ['Unreal-device connection status: {} device(s)'.format(node.total)]
+        fmt = 'Unreal-device connection status: {} device(s)'
+        lst = [fmt.format(node.total)]      # noqa
         fmt1 = '  - {} is {} (name={})'
         fmt2 = '  - {} is {} (name={}, testcase={})'
-        if node.total:
+        if node.total:      # noqa
             if name:
-                for device in node.devices:
+                for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     if name in [device.name, device.address]:
                         l1 = [device.address, status, device.name]
@@ -108,7 +110,7 @@ class SerializedFile:
                     lst.append(fmt.format(name))
                 return '\n'.join(lst)
             else:
-                for device in node.devices:
+                for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     l1 = [device.address, status, device.name]
                     device.testcase and l1.append(device.testcase)
@@ -116,7 +118,7 @@ class SerializedFile:
                     lst.append(fmt.format(*l1))
                 return '\n'.join(lst)
         else:
-            return 'Total connected unreal-device: {}'.format(node.total)
+            return 'Total connected unreal-device: {}'.format(node.total)   # noqa
 
     @classmethod
     def add_instance(cls, name, node):
@@ -132,27 +134,54 @@ class SerializedFile:
 
     @classmethod
     def remove_instance(cls, name):
+        pattern = r'(?i) *([*]|(_+all_+)) *$'
+        match = re.match(pattern, name)
         tbl = cls.get_info()
         if tbl.get('total') == 0:
-            fmt = '''*** CANT remove because "{}" unreal-device isn't initialized.'''
-            cls.message = fmt.format(name)
+            if match:
+                cls.message = '*** CANT release because NONE unreal-device is initialized.'
+            else:
+                fmt = '''*** CANT release because "{}" unreal-device isn't initialized.'''
+                cls.message = fmt.format(name)
             return False
         else:
             with open(cls.filename) as read_stream:
                 dict_obj = yaml.safe_load(read_stream)
-                if name in dict_obj:
-                    byte_data = dict_obj.pop(name)
-                    instance = pickle.loads(byte_data)
-                    instance.is_connected and instance.disconnect()
+                if match:
+                    hosts = list(dict_obj)
+                    for host in hosts:
+                        byte_data = dict_obj.pop(host)
+                        instance = pickle.loads(byte_data)
+                        instance.is_connected and instance.disconnect()
+                        if instance.is_auto_generated_device:
+                            DEVICES_DATA.remove_device(host)
+
                     with (open(cls.filename, 'w')) as write_stream:
                         yaml.dump(dict_obj, write_stream)
-                    fmt = '+++ Successfully removed {} unreal-device.'
-                    cls.message = fmt.format(name)
+
+                    hosts = repr(hosts[0]) if len(hosts) == 1 else tuple(hosts)
+                    txt = 'unreal-device' if len(hosts) == 1 else 'unreal-devices'
+                    fmt = '+++ Successfully released {} {}.'
+                    cls.message = fmt.format(hosts, txt)
                     return True
+
                 else:
-                    fmt = '*** CANT remove because there is no "{}" unreal-device.'
-                    cls.message = fmt.format(name)
-                    return False
+                    if name in dict_obj:
+                        byte_data = dict_obj.pop(name)
+                        instance = pickle.loads(byte_data)
+                        instance.is_connected and instance.disconnect()
+                        if instance.is_auto_generated_device:
+                            DEVICES_DATA.remove_device(name)
+
+                        with (open(cls.filename, 'w')) as write_stream:
+                            yaml.dump(dict_obj, write_stream)
+                        fmt = '+++ Successfully released {} unreal-device.'
+                        cls.message = fmt.format(name)
+                        return True
+                    else:
+                        fmt = '*** CANT release because there is no "{}" unreal-device.'
+                        cls.message = fmt.format(name)
+                        return False
 
     @classmethod
     def check_instance(cls, name, testcase=''):
