@@ -126,6 +126,34 @@ class DevicesData(dict):
 
         with open(path.expanduser(filename), 'w') as stream:
             self and yaml.safe_dump(dict(self), stream)
+            return True
+
+    def remove_device(self, name):
+        """remove device info
+
+        Parameters
+        ----------
+        name (str): device name
+
+        Returns
+        -------
+        bool: True if filename is successfully removed, otherwise, False.
+        """
+
+        name = str(name)
+
+        if re.match(r' *(?i)([*]|(_+all_+)) *$', name):
+            self.clear()
+            self.save()
+            return True
+        else:
+            addr = self.get_address_from_name(name)
+            if addr in self:
+                self.pop(addr)
+                self.save()
+                return True
+            else:
+                return False
 
     def get_address_from_name(self, name):
         """Get device address from device name
