@@ -141,8 +141,9 @@ class DevicesData(dict):
         """
 
         name = str(name)
+        pattern = r'(?i) *([*]|(_+all_+)) *$'
 
-        if re.match(r' *(?i)([*]|(_+all_+)) *$', name):
+        if re.match(pattern, name):
             self.clear()
             self.save()
             return True
@@ -426,6 +427,15 @@ class UnrealDevice:
     def is_connected(self):
         """Return device connection status"""
         return self._is_connected
+
+    @property
+    def is_auto_generated_device(self):
+        if Misc.is_dict(self.data):
+            expected = 'auto-generated-for-geekstrident-unreal-device'
+            description = self.data.get('description', '')
+            chk = description == expected
+            return chk
+        return False
 
     def connect(self, default=True, **kwargs):
         """Connect an unreal device
