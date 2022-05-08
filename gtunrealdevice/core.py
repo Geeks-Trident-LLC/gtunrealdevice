@@ -694,6 +694,23 @@ class UnrealDevice:
         result = '\n'.join(lst)
         return result
 
+    @check_active_device
+    def list_command_lines(self):
+        """get a list of command lines
+
+        Returns
+        -------
+        list: a list of command lines
+        """
+
+        testcases = self.data.get('testcases', dict())
+        if self.testcase and self.testcase in testcases:
+            lst = list(testcases[self.testcase])
+            return lst
+        else:
+            lst = list(self.data['cmdlines'])
+            return lst
+
 
 def create(address, name='', **kwargs):
     """Create an unreal device instance
