@@ -1,4 +1,5 @@
-import pytest
+import pytest   # noqa
+
 from os import path
 from gtunrealdevice import UnrealDevice
 
@@ -49,13 +50,12 @@ class TestUnrealDevice:
             ('1.1.1.1', 'device1', 'show version', 1, 'version is 2.0.1'),
             ('1.1.1.1', 'device1', 'show version', 2, 'version is 2.0.2'),
             ('1.1.1.1', 'device1', 'show version', 3, 'version is 2.0.1'),
-            ('1.1.1.1', 'device1', 'show ver', 1, 'version is 2.0.1 other output of show version'),
-            ('1.1.1.1', 'device1', 'show ver', 2, 'version is 2.0.1 other output of show version'),
         ]
     )
     def test_common_execute(self, ip_address, device_name, cmdline, iteration, expected_output):
         device = UnrealDevice(ip_address, name=device_name)
         device.connect(is_timestamp=False)
+        output = ''
         for _ in range(iteration):
             output = device.execute(cmdline, is_timestamp=False)
 
@@ -68,14 +68,13 @@ class TestUnrealDevice:
             ('1.1.1.1', 'device1', 'test1', 'show version', 1, 'version is 2.0.1 from test case 1'),
             ('1.1.1.1', 'device1', 'test1', 'show version', 2, 'version is 2.0.2 from test case 1'),
             ('1.1.1.1', 'device1', 'test1', 'show version', 3, 'version is 2.0.1 from test case 1'),
-            ('1.1.1.1', 'device1', 'test1', 'show ver', 1, 'version is 2.0.1 other output of show version'),
-            ('1.1.1.1', 'device1', 'test1', 'show ver', 2, 'version is 2.0.1 other output of show version'),
         ]
     )
     def test_testcase_execute(self, ip_address, device_name, testcase,
                               cmdline, iteration, expected_output):
         device = UnrealDevice(ip_address, name=device_name)
         device.connect(is_timestamp=False, testcase=testcase)
+        output = ''
         for _ in range(iteration):
             output = device.execute(cmdline, is_timestamp=False)
 
