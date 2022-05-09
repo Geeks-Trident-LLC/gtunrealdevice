@@ -32,10 +32,11 @@ class Data:
     sample_devices_info_text = dedent("""
         ####################################################################
         # sample devices info                                              #
-        # Note: name, login, testcases, and configs nodes are optional     #
+        # Note: name, login, and configs nodes are optional                #
         ####################################################################
         host_address_1:
           name: host_name (optional)
+          description: (optional)
           login: |-
             output_of_login (optional)
           cmdlines:
@@ -52,12 +53,6 @@ class Data:
                 line 1 - other_output_of_cmdline_k
                 ...
                 line n - other_output_of_cmdline_k
-          testcases:
-            name_of_testcase_1:
-              cmdline_1: |-
-                line 1 output_of_cmdline_1_of_testcase_1
-                ...
-                line n output_of_cmdline_1_of_testcase_1
           configs:
             cfg_1_reference: |-
               line 1 of cfg_1 

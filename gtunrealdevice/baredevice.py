@@ -132,7 +132,6 @@ def create_bare_device_info():
     node.cmdlines = dict()
 
     node.cmdlines['show version'] = 'builtin_unreal_device_show_version_output'
-    node.testcases = dict(test1={"show version": 'builtin_unreal_device_show_version_output'})
 
     lst = [
         'show running processes',

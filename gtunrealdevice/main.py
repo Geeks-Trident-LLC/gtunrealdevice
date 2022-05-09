@@ -101,14 +101,9 @@ def view_device_info(options):
             result = SerializedFile.get_connected_info(name=name)
             Printer.print(result)
         else:
-            node = DictObject(device='',
-                              testcases=options.showed_testcases,
-                              cmdlines=options.showed_cmdlines,
-                              testcase=options.testcase.strip())
+            node = DictObject(device='')
             if host:
                 node.device = DEVICES_DATA.get_address_from_name(host)
-
-            other and node.update(testcase=other)
 
             DEVICES_DATA.view(**node)
         sys.exit(ECODE.SUCCESS)
@@ -255,11 +250,6 @@ class Cli:
         ),
 
         parser.add_argument(
-            '--testcase', type=str, default='',
-            help="showing test case data of device"
-        ),
-
-        parser.add_argument(
             '--filename', type=str, default='',
             help="file name"
         ),
@@ -267,16 +257,6 @@ class Cli:
         parser.add_argument(
             '--status', action='store_true',
             help="device status"
-        ),
-
-        parser.add_argument(
-            '--showed-testcases', action='store_true',
-            help="showing test cases data of device"
-        ),
-
-        parser.add_argument(
-            '--showed-cmdlines', action='store_true',
-            help="showing command lines data of device"
         ),
 
         parser.add_argument(
@@ -317,7 +297,7 @@ class Cli:
         parser.add_argument(
             'command', type=str, nargs='?', default='',
             help='command must be either app, configure, connect, '
-                 'destroy, disconnect, execute, gui, info, load, '
+                 'destroy, disconnect, execute, gui, info, list, load, '
                  'release, reload, usage, version, or view'
         )
         parser.add_argument(

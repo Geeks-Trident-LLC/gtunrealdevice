@@ -14,7 +14,7 @@ load:
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device load operands [options]
-      unreal-device load example 1
+      unreal-device load example {1,2}
       
       test@test_machine ~ %
       test@test_machine ~ %
@@ -71,11 +71,10 @@ connect:
       optional arguments:
       -------------------
         --host HOST                  host address or host name
-        --testcase TESTCASE          showing test case data of device
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device connect operands [options]
-      unreal-device connect example {1,2,3,4,5}
+      unreal-device connect example {1,2,3}
       
       test@test_machine ~ %
       test@test_machine ~ %
@@ -89,7 +88,7 @@ connect:
       test@test_machine ~ % unreal-device view 1.1.1.1
       +------------------------------------------------------------------------------+
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 0                                                         |
       +------------------------------------------------------------------------------+
       There is zero device.
@@ -99,9 +98,11 @@ connect:
       test@test_machine ~ %
       test@test_machine ~ %
       test@test_machine ~ % unreal-device connect 1.1.1.1
-      UnrealDeviceConnectionError: 1.1.1.1 is unavailable for connection.
+      login unreal-device 1.1.1.1@dummy_username:dummy_password
+      May 09 2022 10:56:17.430 for "device749" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
+      device749 is successfully connected.
       test@test_machine ~ % echo $?
-      1
+      0
       test@test_machine ~ %
 
   example3:
@@ -113,96 +114,19 @@ connect:
       test@test_machine ~ % unreal-device view 1.1.1.1
       +------------------------------------------------------------------------------+
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 1                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
-        show ver: software version is 1.0.1.1
         show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
-      testcases:
-        test1:
-          show version: software version is 1.0.1.1.a
 
       test@test_machine ~ %
       test@test_machine ~ % unreal-device connect 1.1.1.1
       login unreal-device 1.1.1.1@dummy_username:dummy_password
       Mar 29 2022 16:49:28.370 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
       device1 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-
-  example4:
-    header: |-
-      Example: Assuming "1.1.1.1" host in devices_info.yaml and it also 
-      has data for testcase name as test1.
-      What connection messge will show when connect to "1.1.1.1" host of test1?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view 1.1.1.1
-      +------------------------------------------------------------------------------+
-      | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 1                                                         |
-      +------------------------------------------------------------------------------+
-      cmdlines:
-        show ver: software version is 1.0.1.1
-        show version: software version is 1.0.1.1
-      login: device1 is successfully connected.
-      name: device1
-      testcases:
-        test1:
-          show version: software version is 1.0.1.1.a
-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
-      login unreal-device 1.1.1.1@dummy_username:dummy_password@testcase=test1
-      Mar 29 2022 16:52:30.842 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
-      device1 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-
-  example5:
-    header: |-
-      Example: Assuming "1.1.1.1" host in devices_info.yaml and it doesn't 
-      have data for testcase name as test2.
-      What connection messge will show when connect to "1.1.1.1" host of test2?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view 1.1.1.1 testcase=test2
-      +------------------------------------------------------------------------------+
-      | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 1                                                         |
-      +------------------------------------------------------------------------------+
-      There is no test2 test case in '1.1.1.1' device.
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test2
-      UnrealDeviceWarning: "test2" test case is unavailable for this connection ***
-      login unreal-device 1.1.1.1@dummy_username:dummy_password fallback to default.
-      Mar 29 2022 16:55:22.745 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
-      device1 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-
-  example6:
-    header: |-
-      Example: What connection messge will show when connect to connected host?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
-      UnrealDeviceMessage: 1.1.1.1@testcase=test1 is already connected.  Use reload for a new connection.
       test@test_machine ~ %
       test@test_machine ~ %
       test@test_machine ~ % echo $?
@@ -225,7 +149,7 @@ execute:
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device execute operands [options]
-      unreal-device execute example {1,2,3,4,5}
+      unreal-device execute example {1,2,3,4}
       
        test@test_machine ~ %
        test@test_machine ~ %
@@ -280,17 +204,13 @@ execute:
       test@test_machine ~ % unreal-device view 1.1.1.1
       +------------------------------------------------------------------------------+
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 1                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
-        show ver: software version is 1.0.1.1
         show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
-      testcases:
-        test1:
-          show version: software version is 1.0.1.1.a
       
       test@test_machine ~ % 
       test@test_machine ~ % 
@@ -307,51 +227,6 @@ execute:
       show ver
       Mar 29 2022 17:00:42.203 for "device1" - UNREAL-DEVICE-EXECUTION-SERVICE-TIMESTAMP
       software version is 1.0.1.1
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ % 
-      test@test_machine ~ %
-
-  example5:
-    header: |-
-      Example: How to execute show version command line of test case 1?
-    body: |-
-      test@test_machine ~ % 
-      test@test_machine ~ % unreal-device view 1.1.1.1
-      +------------------------------------------------------------------------------+
-      | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 1                                                         |
-      +------------------------------------------------------------------------------+
-      cmdlines:
-        show ver: software version is 1.0.1.1
-        show version: software version is 1.0.1.1
-      login: device1 is successfully connected.
-      name: device1
-      testcases:
-        test1:
-          show version: software version is 1.0.1.1.a
-      
-      test@test_machine ~ % 
-      test@test_machine ~ % 
-      test@test_machine ~ % unreal-device connect 1.1.1.1 --testcase=test1
-      login unreal-device 1.1.1.1@dummy_username:dummy_password@testcase=test1
-      Mar 29 2022 17:19:33.215 for "device1" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
-      device1 is successfully connected.
-      test@test_machine ~ % 
-      test@test_machine ~ % 
-      test@test_machine ~ % 
-      test@test_machine ~ % unreal-device view 1.1.1.1 --status
-      +------------------------------------------------------------------------------+
-      | Unreal-device connection status: 2 device(s)                                 |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
-      +------------------------------------------------------------------------------+
-      test@test_machine ~ % unreal-device execute show version --host=1.1.1.1
-      show version
-      Mar 29 2022 17:21:29.626 for "device1" - UNREAL-DEVICE-EXECUTION-SERVICE-TIMESTAMP
-      software version is 1.0.1.1.a
-      test@test_machine ~ % 
       test@test_machine ~ %
       test@test_machine ~ % echo $?
       0
@@ -388,7 +263,7 @@ configure:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -414,7 +289,7 @@ configure:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -435,7 +310,7 @@ configure:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -462,7 +337,7 @@ configure:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device11)                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -493,7 +368,7 @@ configure:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -519,11 +394,10 @@ reload:
       optional arguments:
       -------------------
         --host HOST                  host address or host name
-        --testcase TESTCASE          showing test case data of device
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device reload operands [options]
-      unreal-device reload example {1,2,3,4,5}
+      unreal-device reload example {1,2,3}
 
       test@test_machine ~ %
       test@test_machine ~ %
@@ -537,7 +411,7 @@ reload:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -559,7 +433,7 @@ reload:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -584,124 +458,6 @@ reload:
       test@test_machine ~ %
       test@test_machine ~ % echo $?
       0
-      test@test_machine ~ %
-
-  example4:
-    header: |-
-      Example: How to reload a device on specific testcase?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device info connected        
-      +------------------------------------------------------------------------------+
-      | Connected Device(s) Info:                                                    |
-      | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
-      |   - 2.2.2.2 is connected (name=device2)                                      |
-      +------------------------------------------------------------------------------+
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device reload --host=2.2.2.2 --testcase=test1
-      reload unreal-device
-      Mar 30 2022 11:40:38.404 for "device2" - UNREAL-DEVICE-RELOAD-SERVICE-TIMESTAMP
-      Reloading "2.2.2.2" device ...
-      ...
-      Closing all applications ... Application are closed.
-      Unload device drivers ... Unload completed
-      ... 
-      Booting "2.2.2.2" device ...
-      ...Checking memory ... memory tests are PASSED.
-      Loading device drivers ... Device drivers are loaded.
-      ...
-      System is ready for login.
-      
-      
-      login unreal-device 2.2.2.2@dummy_username:dummy_password@testcase=test1
-      Mar 30 2022 11:40:38.404 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
-      device2 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device info connected        
-      +------------------------------------------------------------------------------+
-      | Connected Device(s) Info:                                                    |
-      | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
-      |   - 2.2.2.2 is connected (name=device2, testcase=test1)                      |
-      +------------------------------------------------------------------------------+
-      test@test_machine ~ %
-
-  example5:
-    header: |-
-      Example: What is a result after reload device of unavailable testcase?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device info connected        
-      +------------------------------------------------------------------------------+
-      | Connected Device(s) Info:                                                    |
-      | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
-      |   - 2.2.2.2 is connected (name=device2, testcase=test1)                      |
-      +------------------------------------------------------------------------------+
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view --host=2.2.2.2
-      +------------------------------------------------------------------------------+
-      | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 3                                                         |
-      +------------------------------------------------------------------------------+
-      cmdlines:
-        show ver: software version is 2.0.2.2
-        show version: software version is 2.0.2.2
-      login: device2 is successfully connected.
-      name: device2
-      testcases:
-        test1:
-          show version: software version is 2.0.2.2.a
-
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view --host 2.2.2.2 --testcase=test999
-      +------------------------------------------------------------------------------+
-      | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 3                                                         |
-      +------------------------------------------------------------------------------+
-      There is no test999 test case in '2.2.2.2' device.
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device reload --host=2.2.2.2 --testcase=test999 
-      reload unreal-device
-      Mar 30 2022 11:48:55.497 for "device2" - UNREAL-DEVICE-RELOAD-SERVICE-TIMESTAMP
-      Reloading "2.2.2.2" device ...
-      ...
-      Closing all applications ... Application are closed.
-      Unload device drivers ... Unload completed
-      ... 
-      Booting "2.2.2.2" device ...
-      ...Checking memory ... memory tests are PASSED.
-      Loading device drivers ... Device drivers are loaded.
-      ...
-      System is ready for login.
-      
-      
-      UnrealDeviceWarning: "test999" test case is unavailable for this connection ***
-      login unreal-device 2.2.2.2@dummy_username:dummy_password fallback to default.
-      Mar 30 2022 11:48:55.498 for "device2" - UNREAL-DEVICE-AUTHENTICATION-SERVICE-TIMESTAMP
-      device2 is successfully connected.
-      test@test_machine ~ %
-      test@test_machine ~ % echo $?
-      0
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device info connected        
-      +------------------------------------------------------------------------------+
-      | Connected Device(s) Info:                                                    |
-      | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
-      |   - 2.2.2.2 is connected (name=device2)                                      |
-      +------------------------------------------------------------------------------+
       test@test_machine ~ %
 
 disconnect:
@@ -733,7 +489,7 @@ disconnect:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -755,7 +511,7 @@ disconnect:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       |   - 2.2.2.2 is connected (name=device2)                                      |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -778,7 +534,7 @@ disconnect:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device11)                                     |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -799,7 +555,7 @@ disconnect:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device11)                                     |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -807,7 +563,7 @@ disconnect:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 2                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       |   - 2.2.2.2 is disconnected (name=device2)                                   |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
@@ -815,7 +571,7 @@ disconnect:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 1                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
       test@test_machine ~ %  unreal-device disconnect 2.2.2.2
@@ -855,7 +611,7 @@ destroy:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 1                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
       test@test_machine ~ % unreal-device destroy --host=2.2.2.2
@@ -875,7 +631,7 @@ destroy:
       +------------------------------------------------------------------------------+
       | Connected Device(s) Info:                                                    |
       | Total connected unreal-device: 1                                             |
-      |   - 1.1.1.1 is connected (name=device1, testcase=test1)                      |
+      |   - 1.1.1.1 is connected (name=device1)                                      |
       +------------------------------------------------------------------------------+
       test@test_machine ~ %
       test@test_machine ~ % unreal-device destroy --host=1.1.1.1
@@ -984,13 +740,10 @@ view:
       -------------------
         --host HOST                  host address or host name
         --status                     device status
-        --testcase TESTCASE          showing test case data of device
-        --showed-testcases           showing test cases data of device
-        --showed-cmdlines            showing command lines data of device
         -h, --help                   show this help message and exit
       ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       unreal-device view operands [options]
-      unreal-device view example {1,2,3,4,5,6,7,8,9}
+      unreal-device view example {1,2,3,4,5,6}
       test@test_machine ~ %
       test@test_machine ~ %
 
@@ -1003,7 +756,7 @@ view:
       test@test_machine ~ % unreal-device view
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       1.1.1.1:
@@ -1012,27 +765,18 @@ view:
           show version: software version is 1.0.1.1
         login: device1 is successfully connected.
         name: device1
-        testcases:
-          test1:
-            show version: software version is 1.0.1.1.a
       2.2.2.2:
         cmdlines:
           show ver: software version is 2.0.2.2
           show version: software version is 2.0.2.2
         login: device2 is successfully connected.
         name: device2
-        testcases:
-          test1:
-            show version: software version is 2.0.2.2.a
       3.3.3.3:
         cmdlines:
           show ver: software version is 3.0.3.3
           show version: software version is 3.0.3.3
         login: device3 is successfully connected.
         name: device3
-        testcases:
-          test1:
-            show version: software version is 3.0.3.3.c
       test@test_machine ~ %
 
   example3:
@@ -1107,7 +851,7 @@ view:
       test@test_machine ~ % unreal-device view --host=1.1.1.1
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       cmdlines:
@@ -1115,60 +859,9 @@ view:
         show version: software version is 1.0.1.1
       login: device1 is successfully connected.
       name: device1
-      testcases:
-        test1:
-          show version: software version is 1.0.1.1.a
       test@test_machine ~ %
-      
+
   example6:
-    header: |-
-      Example: How to view list of testcase data from specific device?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view --host=1.1.1.1 --showed-testcases
-      +------------------------------------------------------------------------------+
-      | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 3                                                         |
-      +------------------------------------------------------------------------------+
-      test1:
-        show version: software version is 1.0.1.1.a
-      test@test_machine ~ %
-
-  example7:
-    header: |-
-      Example: How to view list of command lines data from specific device?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view --host=1.1.1.1 --showed-cmdlines
-      +------------------------------------------------------------------------------+
-      | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 3                                                         |
-      +------------------------------------------------------------------------------+
-      show ver: software version is 1.0.1.1
-      show version: software version is 1.0.1.1
-      test@test_machine ~ %
-
-  example8:
-    header: |-
-      Example: How to view list of command lines data of specific 
-      test case from specific device?
-    body: |-
-      test@test_machine ~ %
-      test@test_machine ~ %
-      test@test_machine ~ % unreal-device view --host=1.1.1.1 --testcase=test1
-      +------------------------------------------------------------------------------+
-      | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
-      |   - Total devices: 3                                                         |
-      +------------------------------------------------------------------------------+
-      show version: software version is 1.0.1.1.a
-      test@test_machine ~ %
-
-  example9:
     header: |-
       Example: What is a message when user tries to find unavailable device?
     body: |-
@@ -1177,7 +870,7 @@ view:
       test@test_machine ~ % unreal-device view --host=5.5.5.5
       +------------------------------------------------------------------------------+
       | Devices Data:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       +------------------------------------------------------------------------------+
       There is no '5.5.5.5' device.
@@ -1241,14 +934,14 @@ info:
       |              https://pypi.org/project/PyYAML/                                |
       | --------------------                                                         |
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       |     ~ host: 1.1.1.1          name: device1                                   |
       |     ~ host: 2.2.2.2          name: device2                                   |
       |     ~ host: 3.3.3.3          name: device3                                   |
       | --------------------                                                         |
       | Serialization File Info:                                                     |
-      |   - File: /Users/test/.geekstrident/gtunrealdevice/serialized_data.yaml      |
+      |   - File: ${HOME}/.geekstrident/gtunrealdevice/serialized_data.yaml          |
       |   - Existed: True                                                            |
       |   - Total serialized instance(s): 3                                          |
       | --------------------                                                         |
@@ -1285,7 +978,7 @@ info:
       test@test_machine ~ % unreal-device info --devices-data
       +------------------------------------------------------------------------------+
       | Devices Info:                                                                |
-      |   - Location: /Users/test/.geekstrident/gtunrealdevice/devices_info.yaml     |
+      |   - Location: ${HOME}/.geekstrident/gtunrealdevice/devices_info.yaml         |
       |   - Total devices: 3                                                         |
       |     ~ host: 1.1.1.1          name: device1                                   |
       |     ~ host: 2.2.2.2          name: device2                                   |
@@ -1320,7 +1013,7 @@ info:
       test@test_machine ~ % unreal-device info --serialization
       +------------------------------------------------------------------------------+
       | Serialization File Info:                                                     |
-      |   - File: /Users/test/.geekstrident/gtunrealdevice/serialized_data.yaml      |
+      |   - File: ${HOME}/.geekstrident/gtunrealdevice/serialized_data.yaml          |
       |   - Existed: True                                                            |
       |   - Total serialized instance(s): 3                                          |
       +------------------------------------------------------------------------------+
@@ -1341,7 +1034,7 @@ info:
       
       ####################################################################
       # sample devices info                                              #
-      # Note: name, login, testcases, and configs nodes are optional     #
+      # Note: name, login, and configs nodes are optional     #
       ####################################################################
       host_address_1:
         name: host_name (optional)
@@ -1361,17 +1054,147 @@ info:
               line 1 - other_output_of_cmdline_k
               ...
               line n - other_output_of_cmdline_k
-        testcases:
-          name_of_testcase_1:
-            cmdline_1: |-
-              line 1 output_of_cmdline_1_of_testcase_1
-              ...
-              line n output_of_cmdline_1_of_testcase_1
         configs:
           cfg_1_reference: |-
             line 1 of cfg_1 
             ...
             line n of cfg_1
 
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+list:
+  example1:
+    header: |-
+      Example: How to use unreal-device list command line?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device list --help
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device list usage
+      optional arguments:
+      -------------------
+        --host HOST                  host address or host name
+        -h, --help                   show this help message and exit
+      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      unreal-device list operands [options]
+      unreal-device list example {1,2,3}
+      
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example2:
+    header: |-
+      Example: What messge will show when try to list none connected device?
+    body: |-      
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 0                                             |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device list 
+      *** CANT list device(s) because there is no connected device.
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example3:
+    header: |-
+      Example: How to list all devices and command lines?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is disconnected (name=device90)                                  |
+      |   - 2.2.2.2 is connected (name=device103)                                    |
+      +------------------------------------------------------------------------------+
+      
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device list 
+      +------------------------------------------------------------------------------+
+      | HOST: 1.1.1.1              NAME: device90             Connected: False       |
+      +------------------------------------------------------------------------------+
+      +------------------------------------------------------------------------------+
+      | HOST: 2.2.2.2              NAME: device103            Connected: True        |
+      +------------------------------------------------------------------------------+
+      Command lines:
+        - show modules
+        - show modules csv-format
+        - show modules json-format
+        - show running processes
+        - show running processes csv-format
+        - show running processes json-format
+        - show version
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example4:
+    header: |-
+      Example: How to list particular connected device and its command lines?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is disconnected (name=device90)                                  |
+      |   - 2.2.2.2 is connected (name=device103)                                    |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device list --host=2.2.2.2
+      +------------------------------------------------------------------------------+
+      | HOST: 2.2.2.2              NAME: device103            Connected: True        |
+      +------------------------------------------------------------------------------+
+      Command lines:
+        - show modules
+        - show modules csv-format
+        - show modules json-format
+        - show running processes
+        - show running processes csv-format
+        - show running processes json-format
+        - show version
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
+      test@test_machine ~ %
+      test@test_machine ~ %
+
+  example5:
+    header: |-
+      Example: How is output of listing disconnected device?
+    body: |-
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device info --connected-devices
+      +------------------------------------------------------------------------------+
+      | Connected Device(s) Info:                                                    |
+      | Total connected unreal-device: 2                                             |
+      |   - 1.1.1.1 is disconnected (name=device90)                                  |
+      |   - 2.2.2.2 is connected (name=device103)                                    |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ %
+      test@test_machine ~ % unreal-device list --host=1.1.1.1
+      +------------------------------------------------------------------------------+
+      | HOST: 1.1.1.1              NAME: device90             Connected: False       |
+      +------------------------------------------------------------------------------+
+      test@test_machine ~ %
+      test@test_machine ~ % echo $?
+      0
       test@test_machine ~ %
       test@test_machine ~ %

@@ -1,6 +1,7 @@
 """Module containing the logic for unreal device operation"""
 
 import sys
+import re
 
 from gtunrealdevice import UnrealDevice
 from gtunrealdevice.utils import Printer
@@ -28,29 +29,26 @@ def do_device_connect(options):
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
         host = options.host or parsed_node.host
-        testcase = options.testcase or parsed_node.other
 
         host_addr = DEVICES_DATA.get_address_from_name(host)
 
         if host_addr:
-            if SerializedFile.check_instance(host_addr, testcase=testcase):
+            if SerializedFile.check_instance(host_addr):
                 instance = SerializedFile.get_instance(host_addr)
 
                 if instance.is_connected:
-                    if instance.testcase == testcase:
-                        fmt = ('{}{} is already connected.  Use reload for '
-                               'a new connection.')
-                        extra = '@testcase={}'.format(testcase) if testcase else ''
-                        Printer.print_unreal_device_msg(fmt, host_addr, extra)
-                        sys.exit(ECODE.SUCCESS)
+                    fmt = ('{} is already connected.  Use reload for '
+                           'a new connection.')
+                    Printer.print_unreal_device_msg(fmt, host_addr)
+                    sys.exit(ECODE.SUCCESS)
                 else:
-                    instance.connect(testcase=testcase)
+                    instance.connect()
                     SerializedFile.add_instance(host_addr, instance)
                     sys.exit(instance.success_code)
 
             try:
                 instance = UnrealDevice(host_addr)
-                instance.connect(testcase=testcase)
+                instance.connect()
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(instance.success_code)
             except Exception as ex:
@@ -222,14 +220,13 @@ def do_device_reload(options):
         parsed_node = MiscDevice.parse_host_and_other(*options.operands)
 
         host = options.host or parsed_node.host
-        testcase = options.testcase or parsed_node.other
 
         host_addr = DEVICES_DATA.get_address_from_name(host)
         if host_addr:
             instance = SerializedFile.get_instance(host_addr)
             if instance:
                 reload_data = reload_default_fmt.format(host_addr)
-                instance.reconnect(testcase=testcase, reload_data=reload_data)
+                instance.reconnect(reload_data=reload_data)
                 SerializedFile.add_instance(host_addr, instance)
                 sys.exit(instance.success_code)
             else:
@@ -263,17 +260,36 @@ def do_list_device(options):
 
                         lst and lst.insert(0, 'Command lines:')
                         print('\n'.join(lst))
-                    sys.exit(ECODE.SUCCESS)
+                        sys.exit(ECODE.SUCCESS)
             print('*** %r device is not connected' % host)
-            sys.exit(ECODE.BAD)
-        else:
-            for device in node.devices:
-                Printer.print(fmt.format(device))
-                if device.is_connected:
-                    lst = []
-                    for cmdline in device.list_command_lines():
-                        lst.append('  - {}'.format(cmdline))
-
-                    lst and lst.insert(0, 'Command lines:')
-                    print('\n'.join(lst))
             sys.exit(ECODE.SUCCESS)
+        else:
+            operands = options.operands
+            txt = ''.join(operands).strip()
+            operands = [] if re.match(r'(?i)([*]|_+all_+)$', txt) else operands
+
+            if operands:
+                for host in operands:
+                    host = host.strip()
+                    for device in node.devices:
+                        if device.address == host or device.name == host:
+                            Printer.print(fmt.format(device))
+                            if device.is_connected:
+                                lst = []
+                                for cmdline in device.list_command_lines():
+                                    lst.append('  - {}'.format(cmdline))
+
+                                lst and lst.insert(0, 'Command lines:')
+                                print('\n'.join(lst))
+                sys.exit(ECODE.SUCCESS)
+            else:
+                for device in node.devices:
+                    Printer.print(fmt.format(device))
+                    if device.is_connected:
+                        lst = []
+                        for cmdline in device.list_command_lines():
+                            lst.append('  - {}'.format(cmdline))
+
+                        lst and lst.insert(0, 'Command lines:')
+                        print('\n'.join(lst))
+                sys.exit(ECODE.SUCCESS)

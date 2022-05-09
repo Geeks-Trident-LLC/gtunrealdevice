@@ -61,22 +61,3 @@ class TestUnrealDevice:
 
         actual_expected_result = Misc.join_string(cmdline, expected_output, sep='\n')
         assert output == format(actual_expected_result)
-
-    @pytest.mark.parametrize(
-        ('ip_address', 'device_name', 'testcase', 'cmdline', 'iteration', 'expected_output'),
-        [
-            ('1.1.1.1', 'device1', 'test1', 'show version', 1, 'version is 2.0.1 from test case 1'),
-            ('1.1.1.1', 'device1', 'test1', 'show version', 2, 'version is 2.0.2 from test case 1'),
-            ('1.1.1.1', 'device1', 'test1', 'show version', 3, 'version is 2.0.1 from test case 1'),
-        ]
-    )
-    def test_testcase_execute(self, ip_address, device_name, testcase,
-                              cmdline, iteration, expected_output):
-        device = UnrealDevice(ip_address, name=device_name)
-        device.connect(is_timestamp=False, testcase=testcase)
-        output = ''
-        for _ in range(iteration):
-            output = device.execute(cmdline, is_timestamp=False)
-
-        actual_expected_result = Misc.join_string(cmdline, expected_output, sep='\n')
-        assert output == actual_expected_result

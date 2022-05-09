@@ -17,20 +17,16 @@ tool = 'unreal-device'
 class FLAG(IntFlag):
     HOST = 1
     STATUS = 2
-    TESTCASE = 4
-    SHOWED_TESTCASES = 8
-    SHOWED_CMDLINES = 16
-    FILENAME = 32
-    SAVE = 64
-    ALL = 128
-    DEPENDENCY = 256
-    DEVICES_DATA = 512
-    SERIALIZATION = 1024
-    CONNECTED = 2048
-    SAMPLE_DEVICES_INFO = 4096
-    HELP = 8192
-    HOST_TESTCASE = HOST | TESTCASE | HELP
-    VIEW_USAGE = HOST | STATUS | TESTCASE | SHOWED_TESTCASES | SHOWED_CMDLINES | HELP
+    FILENAME = 4
+    SAVE = 8
+    ALL = 16
+    DEPENDENCY = 32
+    DEVICES_DATA = 64
+    SERIALIZATION = 128
+    CONNECTED = 256
+    SAMPLE_DEVICES_INFO = 512
+    HELP = 1024
+    VIEW_USAGE = HOST | STATUS | HELP
     INFO_USAGE = ALL | DEPENDENCY | DEVICES_DATA | SERIALIZATION | CONNECTED | SAMPLE_DEVICES_INFO | HELP
 
 
@@ -98,9 +94,6 @@ def get_usage_header(name, flags=0):
     args = [
         '  --host HOST                  host address or host name',
         '  --status                     device status',
-        '  --testcase TESTCASE          showing test case data of device',
-        '  --showed-testcases           showing test cases data of device',
-        '  --showed-cmdlines            showing command lines data of device',
         '  --filename FILENAME          file name',
         '  --saved                      saving devices info to devices_info.yaml',
         '  --all                        showing all information',
@@ -158,8 +151,8 @@ class ConfigureUsage:
 
 
 class ConnectUsage:
-    usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
-    other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
+    usage = get_usage('connect', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('connect', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('connect')
 
 
@@ -206,8 +199,8 @@ class ReleaseUsage:
 
 
 class ReloadUsage:
-    usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
-    other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.TESTCASE | FLAG.HELP)
+    usage = get_usage('reload', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('reload', flags=FLAG.HOST | FLAG.HELP)
     example_usage = get_example_usage('reload')
 
 

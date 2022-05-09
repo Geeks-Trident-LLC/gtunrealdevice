@@ -68,3 +68,7 @@ class ViewExample(Example):
 
 class InfoExample(Example):
     name = 'info'
+
+
+class ListExample(Example):
+    name = 'list'

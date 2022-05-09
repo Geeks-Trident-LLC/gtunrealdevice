@@ -180,29 +180,6 @@ class DevicesData(dict):
                     return addr
             return name
 
-    def is_testcase_exist(self, address, testcase):
-        """Check if test case is existed.
-
-        Parameters
-        ----------
-        address (str):
-        testcase (str): a test case name
-
-        Returns
-        -------
-        bool: True if found, otherwise False
-        """
-        testcase = str(testcase).strip()
-        if not testcase:
-            return False
-
-        address = self.get_address_from_name(address)
-        if address not in self:
-            return False
-
-        testcases = self.get(address).get('testcases', dict())
-        return testcase in testcases
-
     def is_valid_file(self, filename):
         """Check filename
 
@@ -255,18 +232,6 @@ class DevicesData(dict):
                 self.message = 'Invalid cmdline format.'
                 return False
 
-        testcases = node.get('testcases', None)
-        if testcases:
-            if not isinstance(testcases, dict):
-                self.message = 'Invalid testcases format.'
-                return False
-
-            for testcase in testcases:
-                if isinstance(testcase, dict):
-                    continue
-                self.message = 'Invalid testcase format.'
-                return False
-
         configs = node.get('configs', None)
         if configs:
             if not isinstance(configs, dict):
@@ -292,49 +257,27 @@ class DevicesData(dict):
             result = data
         return result
 
-    def update_command_line(self, cmdline, output, device,
-                            testcase='', appended=False):
+    def update_command_line(self, cmdline, output, device, appended=False):
 
         output = self.get_data(output)
 
-        if testcase:
-            if device in self:
-                testcases = self[device].get('testcases', dict())
-                if testcase in testcases:
-                    if appended:
-                        if cmdline in testcases[testcase]:
-                            value = testcases[testcase][cmdline]
-                            if isinstance(value, list):
-                                value.append(output)
-                            else:
-                                testcases[testcase][cmdline] = [value, output]
-                        else:
-                            testcases[testcase][cmdline] = output
+        if device in self:
+            cmdlines = self[device].get('cmdlines', dict())
+            if cmdline in cmdlines:
+                if appended:
+                    if isinstance(cmdlines[cmdline], list):
+                        cmdlines[cmdline].append(output)
                     else:
-                        testcases[testcase][cmdline] = output
-                else:
-                    testcases[testcase] = {cmdline: output}
-                testcases and self[device].update(testcases=testcases)
-            else:
-                self[device] = dict(testcases={testcase: {cmdline: output}})
-        else:
-            if device in self:
-                cmdlines = self[device].get('cmdlines', dict())
-                if cmdline in cmdlines:
-                    if appended:
-                        if isinstance(cmdlines[cmdline], list):
-                            cmdlines[cmdline].append(output)
-                        else:
-                            cmdlines[cmdline] = [cmdlines[cmdline], output]
-                    else:
-                        cmdlines[cmdline] = output
+                        cmdlines[cmdline] = [cmdlines[cmdline], output]
                 else:
                     cmdlines[cmdline] = output
-                cmdlines and self[device].update(cmdlines=cmdlines)
             else:
-                self[device] = dict(cmdlines={cmdline: output})
+                cmdlines[cmdline] = output
+            cmdlines and self[device].update(cmdlines=cmdlines)
+        else:
+            self[device] = dict(cmdlines={cmdline: output})
 
-    def view(self, device='', cmdlines=False, testcase='', testcases=False):
+    def view(self, device=''):
         lst = ['Devices Data:']
         for fn in DEVICES_DATA.filenames:
             generic_fn = File.change_home_dir_to_generic(fn)
@@ -345,40 +288,11 @@ class DevicesData(dict):
         if not self:
             print('There is zero device.')
 
-        if any([device, cmdlines, testcase, testcases]):
-            if device:
-                if device in self:
-                    tcs = self[device].get('testcases', None)
-                    if testcase:
-                        if tcs and testcase in tcs:
-                            print(yaml.dump(tcs[testcase]))
-                        elif tcs and testcase not in tcs:
-                            fmt = 'There is no {} test case in {!r} device.'
-                            print(fmt.format(testcase, device))
-                        else:
-                            fmt = 'There is no testcases section in {!r} device.'
-                            print(fmt.format(device))
-                    else:
-                        if testcases or cmdlines:
-                            if testcases:
-                                if tcs:
-                                    print(yaml.dump(tcs))
-                                else:
-                                    fmt = 'There is no testcases section in {!r} device.'
-                                    print(fmt.format(device))
-                            else:
-                                node = self[device].get('cmdlines', None)
-                                if node:
-                                    print(yaml.dump(node))
-                                else:
-                                    fmt = 'There is no cmdlines section in {!r} device.'
-                                    print(fmt.format(device))
-                        else:
-                            print(yaml.dump(self[device]))
-                else:
-                    print('There is no {!r} device.'.format(device))
+        if device:
+            if device in self:
+                print(yaml.dump(self[device]))
             else:
-                self and print(yaml.dump(dict(self)))
+                print('There is no {!r} device.'.format(device))
         else:
             self and print(yaml.dump(dict(self)))
 
@@ -420,7 +334,6 @@ class UnrealDevice:
         self._is_connected = False
         self.data = None
         self.table = dict()
-        self.testcase = ''
         self.success_code = ECODE.SUCCESS
 
     @property
@@ -459,24 +372,10 @@ class UnrealDevice:
 
             self._is_connected = True
 
-            testcase = kwargs.get('testcase', '')
-            if testcase:
-                if testcase in self.data.get('testcases', dict()):
-                    self.testcase = testcase
-                else:
-                    fmt = '"{}" test case is unavailable for this connection ***'
-                    Printer.print_message(fmt, testcase, prefix='UnrealDeviceWarning:')
-
             if kwargs.get('showed', True):
                 login_result = self.data.get('login', '')
                 fmt = 'login unreal-device {}@dummy_username:dummy_password'
                 extra = fmt.format(self.address)
-                if testcase:
-                    if testcase in self.data.get('testcases', dict()):
-                        extra = '{}@testcase={}'.format(extra, testcase)
-                    else:
-                        self.testcase = ''
-                        extra = '{} fallback to default.'.format(extra)
 
                 is_timestamp = kwargs.get('is_timestamp', True)
                 login_result = self.render_data(
@@ -530,7 +429,7 @@ class UnrealDevice:
                     print('{}\n\n'.format(reconnect_txt))
 
             self._is_connected = False
-            self.connect(testcase=kwargs.get('testcase', ''))
+            self.connect()
 
             return self.is_connected
         else:
@@ -588,8 +487,6 @@ class UnrealDevice:
             return output
 
         data = self.data.get('cmdlines', dict())
-        if self.testcase:
-            data = self.data.get('testcases').get(self.testcase, data)
 
         no_output = Printer.get_message('"{}" does not have output', cmdline,
                                         prefix='UnrealDeviceCmdline:')
@@ -704,13 +601,8 @@ class UnrealDevice:
         list: a list of command lines
         """
 
-        testcases = self.data.get('testcases', dict())
-        if self.testcase and self.testcase in testcases:
-            lst = sorted(testcases[self.testcase])
-            return lst
-        else:
-            lst = sorted(self.data['cmdlines'])
-            return lst
+        lst = sorted(self.data['cmdlines'])
+        return lst
 
     @check_active_device
     def search_command_line(self, cmdline):
