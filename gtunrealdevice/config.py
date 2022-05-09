@@ -7,7 +7,7 @@ from textwrap import dedent
 
 from gtunrealdevice.utils import File
 
-__version__ = '0.2.6'
+__version__ = '0.2.8'
 version = __version__
 __edition__ = 'Community'
 edition = __edition__
