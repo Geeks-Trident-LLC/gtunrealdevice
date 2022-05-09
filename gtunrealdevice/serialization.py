@@ -67,14 +67,10 @@ class SerializedFile:
                'Total connected unreal-device: {}'.format(tbl['total'])]
 
         if instances:
-            fmt1 = '  - {} is {} (name={})'
-            fmt2 = '  - {} is {} (name={}, testcase={})'
             for instance in instances:
                 status = 'connected' if instance.is_connected else 'disconnected'
                 l1 = [instance.address, status, instance.name]
-                instance.testcase and l1.append(instance.testcase)
-                fmt = fmt2 if instance.testcase else fmt1
-                lst.append(fmt.format(*l1))
+                lst.append('  - {} is {} (name={})'.format(*l1))
         tbl.update(devices=instances)
         tbl.update(text='\n'.join(lst))
         return tbl
@@ -89,17 +85,13 @@ class SerializedFile:
         node = cls.get_info()
         fmt = 'Unreal-device connection status: {} device(s)'
         lst = [fmt.format(node.total)]      # noqa
-        fmt1 = '  - {} is {} (name={})'
-        fmt2 = '  - {} is {} (name={}, testcase={})'
         if node.total:      # noqa
             if name:
                 for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     if name in [device.name, device.address]:
                         l1 = [device.address, status, device.name]
-                        device.testcase and l1.append(device.testcase)
-                        fmt = fmt2 if device.testcase else fmt1
-                        lst.append(fmt.format(*l1))
+                        lst.append('  - {} is {} (name={})'.format(*l1))
                         return '\n'.join(lst)
 
                 host = DEVICES_DATA.get_address_from_name(name)
@@ -113,9 +105,7 @@ class SerializedFile:
                 for device in node.devices:     # noqa
                     status = 'connected' if device.is_connected else 'disconnected'
                     l1 = [device.address, status, device.name]
-                    device.testcase and l1.append(device.testcase)
-                    fmt = fmt2 if device.testcase else fmt1
-                    lst.append(fmt.format(*l1))
+                    lst.append('  - {} is {} (name={})'.format(*l1))
                 return '\n'.join(lst)
         else:
             return 'Total connected unreal-device: {}'.format(node.total)   # noqa
@@ -184,17 +174,10 @@ class SerializedFile:
                         return False
 
     @classmethod
-    def check_instance(cls, name, testcase=''):
+    def check_instance(cls, name):
         tbl = cls.get_info()
         dict_obj = tbl.get('dict_obj', dict())
-        if name in dict_obj:
-            if testcase:
-                instance = pickle.loads(dict_obj.get(name))
-                return getattr(instance, 'testcase', '') == testcase
-            else:
-                return True
-        else:
-            return False
+        return name in dict_obj
 
     @classmethod
     def get_instance(cls, name):

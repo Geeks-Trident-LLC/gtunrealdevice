@@ -8,12 +8,3 @@
         version is 2.0.1
       - |-
         version is 2.0.2
-  testcases:
-    test1:
-      show version:
-        - |-
-          version is 2.0.1 from test case 1
-        - |-
-          version is 2.0.2 from test case 1
-        - |-
-          version is 2.0.1 from test case 1
