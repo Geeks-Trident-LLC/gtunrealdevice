@@ -594,7 +594,8 @@ class UnrealDevice:
         no_output = Printer.get_message('"{}" does not have output', cmdline,
                                         prefix='UnrealDeviceCmdline:')
 
-        result = data.get(cmdline, self.data.get('cmdlines').get(cmdline, no_output))
+        lookup = self.search_command_line(cmdline)
+        result = data.get(lookup, self.data.get('cmdlines').get(lookup, no_output))
 
         is_no_output = str(result).endswith('" does not have output')
         self.success_code = ECODE.BAD if is_no_output else ECODE.SUCCESS
@@ -693,6 +694,70 @@ class UnrealDevice:
 
         result = '\n'.join(lst)
         return result
+
+    @check_active_device
+    def list_command_lines(self):
+        """get a list of command lines
+
+        Returns
+        -------
+        list: a list of command lines
+        """
+
+        testcases = self.data.get('testcases', dict())
+        if self.testcase and self.testcase in testcases:
+            lst = sorted(testcases[self.testcase])
+            return lst
+        else:
+            lst = sorted(self.data['cmdlines'])
+            return lst
+
+    @check_active_device
+    def search_command_line(self, cmdline):
+        """get the full command line per requesting command line
+
+        Parameters
+        ----------
+        cmdline (str): a command line
+
+        Returns
+        -------
+        str: the full command line if found, otherwise, cmdline
+        """
+        if not cmdline.strip():
+            return cmdline
+
+        other_cmdline = '{}s'.format(cmdline)
+        another_cmdline = '{}es'.format(cmdline)
+        simplified_cmdline = re.sub(' +', ' ', cmdline)
+        other_simplified_cmdline = '{}s'.format(simplified_cmdline)
+        another_simplified_cmdline = '{}es'.format(simplified_cmdline)
+
+        lst_of_command_lines = self.list_command_lines()
+        if cmdline in lst_of_command_lines:
+            return cmdline
+        elif other_cmdline in lst_of_command_lines:
+            return other_cmdline
+        elif another_cmdline in lst_of_command_lines:
+            return another_cmdline
+        elif simplified_cmdline in lst_of_command_lines:
+            return simplified_cmdline
+        elif other_simplified_cmdline in lst_of_command_lines:
+            return other_simplified_cmdline
+        elif another_simplified_cmdline in lst_of_command_lines:
+            return another_simplified_cmdline
+        else:
+            chk_lst = []
+            for command_line in lst_of_command_lines:
+                is_subcommand = command_line.startswith(cmdline)
+                is_subcommand |= command_line.startswith(simplified_cmdline)
+                if is_subcommand:
+                    command_line not in chk_lst and chk_lst.append(command_line)
+
+            if len(chk_lst) == 1:
+                return chk_lst[0]
+            else:
+                return cmdline
 
 
 def create(address, name='', **kwargs):

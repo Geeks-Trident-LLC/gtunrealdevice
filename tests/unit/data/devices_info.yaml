@@ -8,8 +8,6 @@
         version is 2.0.1
       - |-
         version is 2.0.2
-    show ver:
-      - version is 2.0.1 other output of show version
   testcases:
     test1:
       show version:

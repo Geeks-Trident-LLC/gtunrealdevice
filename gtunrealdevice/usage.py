@@ -187,6 +187,12 @@ class InfoUsage:
     example_usage = get_example_usage('info')
 
 
+class ListUsage:
+    usage = get_usage('list', flags=FLAG.HOST | FLAG.HELP)
+    other_usage = get_usage('list', flags=FLAG.HOST | FLAG.HELP)
+    example_usage = get_example_usage('list')
+
+
 class LoadUsage:
     usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE | FLAG.HELP)
     other_usage = get_usage('load', flags=FLAG.FILENAME | FLAG.SAVE | FLAG.HELP)
@@ -218,6 +224,7 @@ class Usage:
     destroy = DestroyUsage
     execute = ExecuteUsage
     info = InfoUsage
+    list = ListUsage
     load = LoadUsage
     reload = ReloadUsage
     release = ReleaseUsage

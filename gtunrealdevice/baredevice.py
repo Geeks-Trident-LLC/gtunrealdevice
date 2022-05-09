@@ -90,7 +90,7 @@ class BareOutputCls:
                         {"module": "5", "name": "Bot Cooler", "model": "C1-AX", "version": "2.3.5", "status": "Running"}
                     ]
                 }
-            """
+            """     # noqa
         elif case == 'csv':
             data = """
                 "module","name","model","version","status"

@@ -18,6 +18,7 @@ from gtunrealdevice.operation import do_device_configure
 from gtunrealdevice.operation import do_device_reload
 from gtunrealdevice.operation import do_device_destroy
 from gtunrealdevice.operation import do_device_release
+from gtunrealdevice.operation import do_list_device
 
 from gtunrealdevice.usage import validate_usage
 from gtunrealdevice.usage import validate_example_usage
@@ -226,7 +227,7 @@ class Cli:
     prog = 'unreal-device'
     prog_fn = 'geeks-trident-unreal-device-app'
     commands = ['app', 'configure', 'connect', 'destroy',
-                'disconnect', 'execute', 'gui', 'info', 'load',
+                'disconnect', 'execute', 'gui', 'info', 'list', 'load',
                 'release', 'reload', 'usage', 'version', 'view']
 
     def __init__(self):
@@ -364,6 +365,8 @@ class Cli:
         do_device_reload(self.options)
         do_device_destroy(self.options)
         do_device_release(self.options)
+
+        do_list_device(self.options)
 
 
 def execute():
