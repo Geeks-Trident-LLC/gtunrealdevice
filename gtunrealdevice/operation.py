@@ -238,3 +238,42 @@ def do_device_reload(options):
                 sys.exit(ECODE.BAD)
         else:
             show_usage(options.command, exit_code=ECODE.BAD)
+
+
+def do_list_device(options):
+    if options.command == 'list':
+        validate_usage(options.command, options.operands)
+        validate_example_usage(options.command, options.operands)
+
+        node = SerializedFile.get_info()
+        if not node.devices:
+            print('*** CANT list device(s) because there is no connected device.')
+            sys.exit(ECODE.SUCCESS)
+
+        host = options.host.strip()
+        fmt = 'HOST: {0.address:20s} NAME: {0.name:20s} Connected: {0.is_connected}'
+        if host:
+            for device in node.devices:
+                if device.address == host or device.name == host:
+                    Printer.print(fmt.format(device))
+                    if device.is_connected:
+                        lst = []
+                        for cmdline in device.list_command_lines():
+                            lst.append('  - {}'.format(cmdline))
+
+                        lst and lst.insert(0, 'Command lines:')
+                        print('\n'.join(lst))
+                    sys.exit(ECODE.SUCCESS)
+            print('*** %r device is not connected' % host)
+            sys.exit(ECODE.BAD)
+        else:
+            for device in node.devices:
+                Printer.print(fmt.format(device))
+                if device.is_connected:
+                    lst = []
+                    for cmdline in device.list_command_lines():
+                        lst.append('  - {}'.format(cmdline))
+
+                    lst and lst.insert(0, 'Command lines:')
+                    print('\n'.join(lst))
+            sys.exit(ECODE.SUCCESS)
