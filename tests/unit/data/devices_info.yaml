@@ -1,0 +1,10 @@
+"1.1.1.1":
+  name: device1
+  login: |-
+    device1 is successfully connected.
+  cmdlines:
+    show version:
+      - |-
+        version is 2.0.1
+      - |-
+        version is 2.0.2
